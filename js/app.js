@@ -1,42 +1,28 @@
-const KritrApp = {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    booted: false,
+        /* THEMES */
 
-    bootTimer: null,
-
-
-    initialize() {
-
-        this.setupTabs();
-
-        this.setupControls();
-
-        this.setupAudioEvents();
-
-        this.setupFileHandling();
-
-        this.setupPetControls();
-
-        this.setupKeyboard();
-
-        KritrWindow.initialize();
-
-        KritrVisualizer.initialize();
-
-        KritrEffects.initialize();
-
-        KritrPets.initialize();
-
-        KritrSettings.initialize();
-
-        Playlist.render();
-
-        this.startBoot();
-
-    },
+        KritrThemes.load();
 
 
-    setupTabs() {
+        /* SETTINGS */
+
+        Settings.initialize();
+
+
+        /* PET */
+
+        Pet.load();
+
+
+        /* VISUALIZER */
+
+        Visualizer.initialize();
+
+
+        /* TABS */
 
         const tabs =
             document.querySelectorAll(
@@ -44,218 +30,108 @@ const KritrApp = {
             );
 
 
-        tabs.forEach(
-            tab => {
+        tabs.forEach(tab => {
 
-                tab.addEventListener(
-                    "click",
-                    () => {
+            tab.addEventListener(
+                "click",
+                () => {
 
-                        const target =
-                            tab.dataset.tab;
-
-
-                        tabs.forEach(
-                            t =>
-                                t.classList.remove(
-                                    "active"
-                                )
-                        );
+                    const target =
+                        tab.dataset.tab;
 
 
-                        document
-                            .querySelectorAll(
-                                ".tab-panel"
-                            )
-                            .forEach(
-                                panel =>
-                                    panel.classList.remove(
-                                        "active"
-                                    )
-                            );
-
-
-                        tab.classList.add(
-                            "active"
-                        );
-
-
-                        const panel =
-                            document.getElementById(
-                                `${target}-tab`
-                            );
-
-
-                        if (panel) {
-
-                            panel.classList.add(
+                    tabs.forEach(
+                        item =>
+                            item.classList.remove(
                                 "active"
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-    },
-
-
-    setupControls() {
-
-        document.getElementById(
-            "play-button"
-        ).addEventListener(
-            "click",
-            () => Player.toggle()
-        );
-
-
-        document.getElementById(
-            "previous-track"
-        ).addEventListener(
-            "click",
-            () => Player.previous()
-        );
-
-
-        document.getElementById(
-            "next-track"
-        ).addEventListener(
-            "click",
-            () => Player.next()
-        );
-
-
-        document.getElementById(
-            "volume"
-        ).addEventListener(
-            "input",
-            event => {
-
-                Player.setVolume(
-                    event.target.value
-                );
-
-            }
-        );
-
-
-        document.getElementById(
-            "speed-down"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.setSpeed(
-                    Player.speed - 0.1
-                );
-
-            }
-        );
-
-
-        document.getElementById(
-            "speed-up"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.setSpeed(
-                    Player.speed + 0.1
-                );
-
-            }
-        );
-
-
-        document.getElementById(
-            "progress"
-        ).addEventListener(
-            "input",
-            event => {
-
-                if (!audio.duration) {
-                    return;
-                }
-
-                const percentage =
-                    Number(
-                        event.target.value
-                    ) / 100;
-
-                audio.currentTime =
-                    audio.duration *
-                    percentage;
-
-            }
-        );
-
-
-        document.getElementById(
-            "visualizer-mode-button"
-        ).addEventListener(
-            "click",
-            () => {
-
-                const modes = [
-                    "bars",
-                    "wave",
-                    "dots",
-                    "orbit",
-                    "pixel",
-                    "void"
-                ];
-
-                const current =
-                    KritrVisualizer.mode;
-
-                const index =
-                    modes.indexOf(
-                        current
+                            )
                     );
 
-                const next =
-                    modes[
-                        (
-                            index + 1
-                        ) % modes.length
-                    ];
 
-                KritrVisualizer.setMode(
-                    next
-                );
+                    document.querySelectorAll(
+                        ".tab-page"
+                    ).forEach(
+                        page =>
+                            page.classList.remove(
+                                "active"
+                            )
+                    );
 
-                document.getElementById(
-                    "visualizer-select"
-                ).value =
-                    next;
+
+                    tab.classList.add(
+                        "active"
+                    );
+
+
+                    document.querySelector(
+                        `#${target}-tab`
+                    ).classList.add(
+                        "active"
+                    );
+
+                }
+            );
+
+        });
+
+
+        /* PLAY BUTTON */
+
+        document.querySelector(
+            "#play-btn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                Player.toggle();
 
             }
         );
 
 
-        document.getElementById(
-            "clear-playlist"
+        /* PREVIOUS */
+
+        document.querySelector(
+            "#previous-btn"
         ).addEventListener(
             "click",
-            () => Playlist.clear()
+            () => {
+
+                Player.previous();
+
+            }
         );
 
-    },
+
+        /* NEXT */
+
+        document.querySelector(
+            "#next-btn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                Player.next();
+
+            }
+        );
 
 
-    setupAudioEvents() {
+        /* AUDIO EVENTS */
 
         audio.addEventListener(
             "play",
             () => {
 
-                this.setPlayingUI(
-                    true
-                );
+                document.querySelector(
+                    "#play-btn"
+                ).textContent =
+                    "Ⅱ";
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    "PLAYING";
 
             }
         );
@@ -265,9 +141,15 @@ const KritrApp = {
             "pause",
             () => {
 
-                this.setPlayingUI(
-                    false
-                );
+                document.querySelector(
+                    "#play-btn"
+                ).textContent =
+                    "▶";
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    "PAUSED";
 
             }
         );
@@ -283,24 +165,44 @@ const KritrApp = {
         );
 
 
+        /* PROGRESS */
+
         audio.addEventListener(
             "timeupdate",
             () => {
 
-                this.updateProgress();
+                if (
+                    !audio.duration
+                ) {
+                    return;
+                }
 
-            }
-        );
+
+                const percentage =
+                    (
+                        audio.currentTime /
+                        audio.duration
+                    ) * 100;
 
 
-        audio.addEventListener(
-            "loadedmetadata",
-            () => {
+                document.querySelector(
+                    "#progress"
+                ).value =
+                    percentage;
 
-                document.getElementById(
-                    "duration"
+
+                document.querySelector(
+                    "#current-time"
                 ).textContent =
-                    this.formatTime(
+                    formatTime(
+                        audio.currentTime
+                    );
+
+
+                document.querySelector(
+                    "#duration"
+                ).textContent =
+                    formatTime(
                         audio.duration
                     );
 
@@ -308,30 +210,108 @@ const KritrApp = {
         );
 
 
-        audio.addEventListener(
-            "error",
-            () => {
+        document.querySelector(
+            "#progress"
+        ).addEventListener(
+            "input",
+            event => {
 
-                this.setStatus(
-                    "AUDIO ERROR",
-                    false
+                if (
+                    !audio.duration
+                ) {
+                    return;
+                }
+
+
+                audio.currentTime =
+                    (
+                        Number(
+                            event.target.value
+                        ) / 100
+                    ) *
+                    audio.duration;
+
+            }
+        );
+
+
+        /* VOLUME */
+
+        const savedVolume =
+            KritrStorage.load(
+                "volume",
+                80
+            );
+
+
+        const volume =
+            document.querySelector(
+                "#volume"
+            );
+
+
+        volume.value =
+            savedVolume;
+
+
+        Player.setVolume(
+            savedVolume
+        );
+
+
+        volume.addEventListener(
+            "input",
+            event => {
+
+                Player.setVolume(
+                    event.target.value
                 );
 
             }
         );
 
-    },
 
+        /* SPEED */
 
-    setupFileHandling() {
-
-        const input =
-            document.getElementById(
-                "file-input"
+        const speed =
+            document.querySelector(
+                "#speed"
             );
 
 
-        input.addEventListener(
+        const savedSpeed =
+            KritrStorage.load(
+                "speed",
+                "1"
+            );
+
+
+        speed.value =
+            savedSpeed;
+
+
+        Player.setSpeed(
+            savedSpeed
+        );
+
+
+        speed.addEventListener(
+            "change",
+            event => {
+
+                Player.setSpeed(
+                    event.target.value
+                );
+
+            }
+        );
+
+
+        /* FILE INPUT */
+
+        document.querySelector(
+            "#file-input"
+        ).addEventListener(
             "change",
             event => {
 
@@ -339,16 +319,17 @@ const KritrApp = {
                     event.target.files
                 );
 
-                event.target.value =
-                    "";
+                event.target.value = "";
 
             }
         );
 
 
+        /* DRAG AND DROP */
+
         const windowElement =
-            document.getElementById(
-                "kritr-window"
+            document.querySelector(
+                ".kritr-window"
             );
 
 
@@ -357,22 +338,6 @@ const KritrApp = {
             event => {
 
                 event.preventDefault();
-
-                windowElement.classList.add(
-                    "dragging"
-                );
-
-            }
-        );
-
-
-        windowElement.addEventListener(
-            "dragleave",
-            () => {
-
-                windowElement.classList.remove(
-                    "dragging"
-                );
 
             }
         );
@@ -384,11 +349,6 @@ const KritrApp = {
 
                 event.preventDefault();
 
-                windowElement.classList.remove(
-                    "dragging"
-                );
-
-
                 Playlist.addFiles(
                     event.dataTransfer.files
                 );
@@ -396,18 +356,30 @@ const KritrApp = {
             }
         );
 
-    },
+
+        /* CLEAR PLAYLIST */
+
+        document.querySelector(
+            "#clear-playlist"
+        ).addEventListener(
+            "click",
+            () => {
+
+                Playlist.clear();
+
+            }
+        );
 
 
-    setupPetControls() {
+        /* PET */
 
-        document.getElementById(
-            "pet-species"
+        document.querySelector(
+            "#pet-species"
         ).addEventListener(
             "change",
             event => {
 
-                KritrPets.setSpecies(
+                Pet.setSpecies(
                     event.target.value
                 );
 
@@ -415,50 +387,84 @@ const KritrApp = {
         );
 
 
-        document
-            .querySelectorAll(
-                "[data-trick]"
-            )
-            .forEach(
-                button => {
+        document.querySelector(
+            "#pet-trick-btn"
+        ).addEventListener(
+            "click",
+            () => {
 
-                    button.addEventListener(
-                        "click",
-                        () => {
+                const trick =
+                    document.querySelector(
+                        "#pet-trick"
+                    ).value;
 
-                            KritrPets.trick(
-                                button.dataset.trick
-                            );
+                Pet.trick(
+                    trick
+                );
 
-                        }
-                    );
-
-                }
-            );
-
-    },
+            }
+        );
 
 
-    setupKeyboard() {
+        /* CLOSE / MINIMIZE */
+
+        document.querySelector(
+            "#close-btn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                document.querySelector(
+                    ".kritr-window"
+                ).style.display =
+                    "none";
+
+            }
+        );
+
+
+        document.querySelector(
+            "#minimize-btn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                document.querySelector(
+                    ".kritr-window"
+                ).style.transform =
+                    "scale(0.7)";
+
+            }
+        );
+
+
+        /* MAXIMIZE */
+
+        document.querySelector(
+            "#maximize-btn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                document.querySelector(
+                    ".kritr-window"
+                ).classList.toggle(
+                    "maximized"
+                );
+
+            }
+        );
+
+
+        /* KEYBOARD */
 
         document.addEventListener(
             "keydown",
             event => {
 
-                const tag =
-                    event.target.tagName;
-
                 if (
-                    tag === "INPUT" ||
-                    tag === "SELECT" ||
-                    tag === "TEXTAREA"
-                ) {
-                    return;
-                }
-
-
-                if (
-                    event.code === "Space"
+                    event.code ===
+                    "Space"
                 ) {
 
                     event.preventDefault();
@@ -469,329 +475,67 @@ const KritrApp = {
 
 
                 if (
-                    event.code === "ArrowRight"
+                    event.code ===
+                    "ArrowRight"
                 ) {
 
-                    audio.currentTime =
-                        Math.min(
-                            audio.duration || 0,
-                            (
-                                audio.currentTime +
-                                5
-                            )
-                        );
+                    audio.currentTime += 5;
 
                 }
 
 
                 if (
-                    event.code === "ArrowLeft"
+                    event.code ===
+                    "ArrowLeft"
                 ) {
 
-                    audio.currentTime =
-                        Math.max(
-                            0,
-                            (
-                                audio.currentTime -
-                                5
-                            )
-                        );
+                    audio.currentTime -= 5;
 
                 }
 
             }
         );
 
-    },
 
-
-    setPlayingUI(playing) {
-
-        const button =
-            document.getElementById(
-                "play-button"
-            );
-
-
-        const indicator =
-            document.getElementById(
-                "playing-indicator"
-            );
-
-
-        const status =
-            document.getElementById(
-                "track-status-text"
-            );
-
-
-        if (playing) {
-
-            button.textContent =
-                "❚❚";
-
-            button.setAttribute(
-                "aria-label",
-                "Pause"
-            );
-
-            indicator.classList.add(
-                "playing"
-            );
-
-            status.textContent =
-                "PLAYING";
-
-            this.setStatus(
-                "PLAYING",
-                true
-            );
-
-        } else {
-
-            button.textContent =
-                "▶";
-
-            button.setAttribute(
-                "aria-label",
-                "Play"
-            );
-
-            indicator.classList.remove(
-                "playing"
-            );
-
-            status.textContent =
-                "PAUSED";
-
-            this.setStatus(
-                "PAUSED",
-                true
-            );
-
-        }
-
-    },
-
-
-    updateProgress() {
-
-        if (
-            !audio.duration ||
-            !Number.isFinite(
-                audio.duration
-            )
-        ) {
-            return;
-        }
-
-
-        const percentage =
-            (
-                audio.currentTime /
-                audio.duration
-            ) * 100;
-
-
-        document.getElementById(
-            "progress"
-        ).value =
-            percentage;
-
-
-        document.getElementById(
-            "current-time"
+        document.querySelector(
+            "#status"
         ).textContent =
-            this.formatTime(
-                audio.currentTime
-            );
+            "READY";
 
-    },
+    }
+);
 
 
-    setStatus(
-        text,
-        online = true
+/* TIME FORMAT */
+
+function formatTime(seconds) {
+
+    if (
+        !Number.isFinite(seconds)
     ) {
 
-        document.getElementById(
-            "status-text"
-        ).textContent =
-            text;
-
-
-        const dot =
-            document.getElementById(
-                "status-dot"
-            );
-
-
-        dot.classList.toggle(
-            "offline",
-            !online
-        );
-
-    },
-
-
-    formatTime(seconds) {
-
-        if (
-            !Number.isFinite(seconds) ||
-            seconds < 0
-        ) {
-            return "0:00";
-        }
-
-
-        const minutes =
-            Math.floor(
-                seconds / 60
-            );
-
-        const remaining =
-            Math.floor(
-                seconds % 60
-            );
-
-
-        return (
-            minutes +
-            ":" +
-            String(
-                remaining
-            ).padStart(
-                2,
-                "0"
-            )
-        );
-
-    },
-
-
-    startBoot() {
-
-        const screen =
-            document.getElementById(
-                "boot-screen"
-            );
-
-        const bar =
-            document.getElementById(
-                "boot-progress-bar"
-            );
-
-        const status =
-            document.getElementById(
-                "boot-status"
-            );
-
-        const skip =
-            document.getElementById(
-                "skip-boot"
-            );
-
-
-        const messages = [
-            "INITIALIZING...",
-            "AUDIO ENGINE READY",
-            "VISUALIZER CALIBRATED",
-            "PET AWAKE",
-            "KRITR READY"
-        ];
-
-
-        let progress = 0;
-
-
-        const finish = () => {
-
-            if (this.booted) {
-                return;
-            }
-
-            this.booted = true;
-
-            clearInterval(
-                this.bootTimer
-            );
-
-            screen.classList.add(
-                "finished"
-            );
-
-
-            setTimeout(
-                () => {
-
-                    screen.remove();
-
-                },
-                450
-            );
-
-        };
-
-
-        skip.addEventListener(
-            "click",
-            finish
-        );
-
-
-        this.bootTimer =
-            setInterval(
-                () => {
-
-                    progress +=
-                        Math.random() *
-                        18 +
-                        8;
-
-
-                    progress =
-                        Math.min(
-                            100,
-                            progress
-                        );
-
-
-                    bar.style.width =
-                        `${progress}%`;
-
-
-                    const index =
-                        Math.min(
-                            messages.length - 1,
-                            Math.floor(
-                                progress /
-                                20
-                            )
-                        );
-
-
-                    status.textContent =
-                        messages[index];
-
-
-                    if (
-                        progress >= 100
-                    ) {
-
-                        setTimeout(
-                            finish,
-                            350
-                        );
-
-                    }
-
-                },
-                180
-            );
+        return "0:00";
 
     }
 
-};
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
 
 
-KritrApp.initialize();
+    const remaining =
+        Math.floor(
+            seconds % 60
+        )
+        .toString()
+        .padStart(
+            2,
+            "0"
+        );
+
+
+    return `${minutes}:${remaining}`;
+
+}

@@ -1,15 +1,15 @@
-const KritrVisualizer = {
+const Visualizer = {
 
     canvas:
-        document.getElementById(
-            "visualizer"
+        document.querySelector(
+            "#visualizer"
         ),
 
     ctx: null,
 
-    mode: "bars",
+    data: null,
 
-    dpr: 1,
+    mode: "bars",
 
 
     initialize() {
@@ -27,7 +27,7 @@ const KritrVisualizer = {
         );
 
         requestAnimationFrame(
-            () => this.draw()
+            () => this.render()
         );
 
     },
@@ -38,70 +38,29 @@ const KritrVisualizer = {
         const rect =
             this.canvas.getBoundingClientRect();
 
-        this.dpr =
-            window.devicePixelRatio || 1;
-
         this.canvas.width =
-            rect.width * this.dpr;
-
-        this.canvas.height =
-            rect.height * this.dpr;
-
-        this.ctx.setTransform(
-            this.dpr,
-            0,
-            0,
-            this.dpr,
-            0,
-            0
-        );
-
-    },
-
-
-    setMode(mode) {
-
-        const modes = [
-            "bars",
-            "wave",
-            "dots",
-            "orbit",
-            "pixel",
-            "void"
-        ];
-
-        if (!modes.includes(mode)) {
-            mode = "bars";
-        }
-
-        this.mode = mode;
-
-        KritrStorage.save(
-            "visualizer",
-            mode
-        );
-
-        document.getElementById(
-            "visualizer-mode-button"
-        ).textContent =
-            `MODE: ${mode.toUpperCase()}`;
-
-    },
-
-
-    draw() {
-
-        const ctx =
-            this.ctx;
-
-        const rect =
-            this.canvas.getBoundingClientRect();
-
-        const width =
             rect.width;
 
-        const height =
+        this.canvas.height =
             rect.height;
+
+    },
+
+
+    render() {
+
+        requestAnimationFrame(
+            () => this.render()
+        );
+
+
+        const ctx = this.ctx;
+
+        const width =
+            this.canvas.width;
+
+        const height =
+            this.canvas.height;
 
 
         ctx.clearRect(
@@ -112,103 +71,116 @@ const KritrVisualizer = {
         );
 
 
-        KritrReactivity.update();
+        if (
+            !Player.analyser
+        ) {
 
-
-        const style =
-            getComputedStyle(
-                document.body
-            );
-
-        const accent =
-            style.getPropertyValue(
-                "--accent-main"
-            ).trim();
-
-        const secondary =
-            style.getPropertyValue(
-                "--accent-secondary"
-            ).trim();
-
-
-        if (this.mode === "bars") {
-
-            this.drawBars(
+            this.drawIdle(
                 ctx,
                 width,
-                height,
-                accent
+                height
             );
+
+            return;
 
         }
 
 
-        if (this.mode === "wave") {
+        if (!this.data) {
+
+            this.data =
+                new Uint8Array(
+                    Player.analyser.frequencyBinCount
+                );
+
+        }
+
+
+        Player.analyser.getByteFrequencyData(
+            this.data
+        );
+
+
+        if (
+            this.mode === "wave"
+        ) {
 
             this.drawWave(
                 ctx,
                 width,
-                height,
-                accent
+                height
             );
 
-        }
-
-
-        if (this.mode === "dots") {
+        } else if (
+            this.mode === "dots"
+        ) {
 
             this.drawDots(
                 ctx,
                 width,
-                height,
-                accent
+                height
             );
 
-        }
+        } else {
 
-
-        if (this.mode === "orbit") {
-
-            this.drawOrbit(
+            this.drawBars(
                 ctx,
                 width,
-                height,
-                accent,
-                secondary
+                height
             );
 
         }
 
+    },
 
-        if (this.mode === "pixel") {
 
-            this.drawPixel(
-                ctx,
-                width,
-                height,
-                accent
+    drawIdle(
+        ctx,
+        width,
+        height
+    ) {
+
+        const time =
+            performance.now() / 500;
+
+        const center =
+            height / 2;
+
+        ctx.strokeStyle =
+            getComputedStyle(
+                document.body
+            )
+            .getPropertyValue(
+                "--accent-main"
             );
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+
+        for (
+            let x = 0;
+            x < width;
+            x += 8
+        ) {
+
+            const y =
+                center +
+                Math.sin(
+                    x * 0.03 + time
+                ) * 8;
+
+            if (x === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
 
         }
 
 
-        if (this.mode === "void") {
-
-            this.drawVoid(
-                ctx,
-                width,
-                height,
-                accent
-            );
-
-        }
-
-
-        KritrEffects.update();
-
-        requestAnimationFrame(
-            () => this.draw()
-        );
+        ctx.stroke();
 
     },
 
@@ -216,75 +188,49 @@ const KritrVisualizer = {
     drawBars(
         ctx,
         width,
-        height,
-        color
+        height
     ) {
 
-        const data =
-            KritrReactivity.frequencyData;
-
-        if (!data) {
-            this.drawIdle(
-                ctx,
-                width,
-                height,
-                color
-            );
-
-            return;
-        }
-
-
-        const bars = 40;
-
-        const gap = 3;
-
         const barWidth =
-            (
-                width -
-                gap * (bars - 1)
-            ) / bars;
-
+            width /
+            this.data.length;
 
         for (
             let i = 0;
-            i < bars;
+            i < this.data.length;
             i++
         ) {
 
-            const index =
-                Math.floor(
-                    i /
-                    bars *
-                    data.length
-                );
-
             const value =
-                data[index] / 255;
+                this.data[i] / 255;
 
             const barHeight =
-                Math.max(
-                    2,
-                    value * height * 0.9
-                );
-
+                value * height * 0.8;
 
             const x =
-                i *
-                (barWidth + gap);
+                i * barWidth;
 
             const y =
                 height - barHeight;
 
 
             ctx.fillStyle =
-                color;
+                getComputedStyle(
+                    document.body
+                )
+                .getPropertyValue(
+                    "--accent-main"
+                );
+
 
             ctx.fillRect(
-                Math.floor(x),
-                Math.floor(y),
-                Math.ceil(barWidth),
-                Math.ceil(barHeight)
+                x,
+                y,
+                Math.max(
+                    2,
+                    barWidth - 2
+                ),
+                barHeight
             );
 
         }
@@ -295,53 +241,49 @@ const KritrVisualizer = {
     drawWave(
         ctx,
         width,
-        height,
-        color
+        height
     ) {
 
-        const data =
-            KritrReactivity.getWaveform();
+        const center =
+            height / 2;
 
-        if (!data) {
-            return;
-        }
-
-
-        ctx.beginPath();
+        ctx.strokeStyle =
+            getComputedStyle(
+                document.body
+            )
+            .getPropertyValue(
+                "--accent-secondary"
+            );
 
         ctx.lineWidth = 2;
 
-        ctx.strokeStyle =
-            color;
+        ctx.beginPath();
 
 
         for (
             let i = 0;
-            i < data.length;
+            i < this.data.length;
             i++
         ) {
 
             const x =
-                i /
-                (data.length - 1) *
+                (i /
+                    this.data.length) *
                 width;
 
             const y =
+                center +
                 (
-                    data[i] / 255
-                ) * height;
+                    this.data[i] -
+                    128
+                ) *
+                0.8;
 
 
             if (i === 0) {
-                ctx.moveTo(
-                    x,
-                    y
-                );
+                ctx.moveTo(x, y);
             } else {
-                ctx.lineTo(
-                    x,
-                    y
-                );
+                ctx.lineTo(x, y);
             }
 
         }
@@ -355,397 +297,60 @@ const KritrVisualizer = {
     drawDots(
         ctx,
         width,
-        height,
-        color
+        height
     ) {
 
-        const data =
-            KritrReactivity.frequencyData;
-
-        if (!data) {
-            return;
-        }
-
-
-        const count = 48;
-
-
-        for (
-            let i = 0;
-            i < count;
-            i++
-        ) {
-
-            const value =
-                data[
-                    Math.floor(
-                        i /
-                        count *
-                        data.length
-                    )
-                ] / 255;
-
-
-            const x =
-                i /
-                (count - 1) *
-                width;
-
-            const y =
-                height / 2 +
-                (
-                    value -
-                    0.5
-                ) *
-                height *
-                0.9;
-
-
-            const size =
-                1.5 +
-                value * 4;
-
-
-            ctx.fillStyle =
-                color;
-
-            ctx.fillRect(
-                x,
-                y,
-                size,
-                size
-            );
-
-        }
-
-    },
-
-
-    drawOrbit(
-        ctx,
-        width,
-        height,
-        color,
-        secondary
-    ) {
-
-        const data =
-            KritrReactivity.frequencyData;
-
-        if (!data) {
-            return;
-        }
-
-
-        const cx =
-            width / 2;
-
-        const cy =
+        const center =
             height / 2;
 
-        const radius =
-            Math.min(
-                width,
-                height
-            ) *
-            (
-                0.22 +
-                KritrReactivity.bass *
-                0.08
-            );
-
-
-        ctx.beginPath();
-
-        ctx.strokeStyle =
-            secondary;
-
-        ctx.lineWidth = 2;
-
-        ctx.arc(
-            cx,
-            cy,
-            radius,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.stroke();
-
-
-        const points = 36;
-
-
-        for (
-            let i = 0;
-            i < points;
-            i++
-        ) {
-
-            const value =
-                data[
-                    Math.floor(
-                        i /
-                        points *
-                        data.length
-                    )
-                ] / 255;
-
-
-            const angle =
-                i /
-                points *
-                Math.PI *
-                2;
-
-
-            const r =
-                radius +
-                value *
-                28;
-
-
-            const x =
-                cx +
-                Math.cos(angle) * r;
-
-            const y =
-                cy +
-                Math.sin(angle) * r;
-
-
-            ctx.fillStyle =
-                color;
-
-            ctx.fillRect(
-                x - 2,
-                y - 2,
-                4,
-                4
-            );
-
-        }
-
-    },
-
-
-    drawPixel(
-        ctx,
-        width,
-        height,
-        color
-    ) {
-
-        const data =
-            KritrReactivity.frequencyData;
-
-        if (!data) {
-            return;
-        }
-
-
-        const cols = 48;
-
-        const rows = 8;
-
-        const cellWidth =
-            width / cols;
-
-        const cellHeight =
-            height / rows;
-
-
-        for (
-            let x = 0;
-            x < cols;
-            x++
-        ) {
-
-            const index =
-                Math.floor(
-                    x /
-                    cols *
-                    data.length
-                );
-
-            const value =
-                data[index] / 255;
-
-
-            const activeRows =
-                Math.floor(
-                    value * rows
-                );
-
-
-            for (
-                let y = 0;
-                y < activeRows;
-                y++
-            ) {
-
-                ctx.fillStyle =
-                    color;
-
-                ctx.globalAlpha =
-                    0.35 +
-                    (
-                        y /
-                        rows
-                    ) *
-                    0.65;
-
-
-                ctx.fillRect(
-                    Math.floor(
-                        x *
-                        cellWidth
-                    ),
-                    Math.floor(
-                        height -
-                        (
-                            y + 1
-                        ) *
-                        cellHeight
-                    ),
-                    Math.ceil(
-                        cellWidth - 2
-                    ),
-                    Math.ceil(
-                        cellHeight - 2
-                    )
-                );
-
-            }
-
-        }
-
-        ctx.globalAlpha = 1;
-
-    },
-
-
-    drawVoid(
-        ctx,
-        width,
-        height,
-        color
-    ) {
-
-        const data =
-            KritrReactivity.frequencyData;
-
-        if (!data) {
-            return;
-        }
-
-
-        const energy =
-            KritrReactivity.energy;
-
-
-        const count =
-            Math.floor(
-                5 +
-                energy * 80
+        ctx.fillStyle =
+            getComputedStyle(
+                document.body
+            )
+            .getPropertyValue(
+                "--accent-main"
             );
 
 
         for (
             let i = 0;
-            i < count;
+            i < this.data.length;
             i++
         ) {
 
+            const value =
+                this.data[i] / 255;
+
             const x =
-                Math.random() *
+                (i /
+                    this.data.length) *
                 width;
 
             const y =
-                Math.random() *
-                height;
+                center -
+                value * center;
 
 
-            const size =
-                Math.random() *
-                3 +
-                1;
+            ctx.beginPath();
 
-
-            ctx.fillStyle =
-                color;
-
-            ctx.globalAlpha =
-                energy * 0.7;
-
-
-            ctx.fillRect(
+            ctx.arc(
                 x,
                 y,
-                size,
-                size
+                3 + value * 5,
+                0,
+                Math.PI * 2
             );
 
+            ctx.fill();
+
         }
-
-
-        ctx.globalAlpha = 1;
 
     },
 
 
-    drawIdle(
-        ctx,
-        width,
-        height,
-        color
-    ) {
+    setMode(mode) {
 
-        ctx.beginPath();
-
-        ctx.strokeStyle =
-            color;
-
-        ctx.globalAlpha =
-            0.35;
-
-        ctx.lineWidth = 1;
-
-
-        for (
-            let x = 0;
-            x <= width;
-            x += 4
-        ) {
-
-            const y =
-                height / 2 +
-                Math.sin(
-                    x * 0.04 +
-                    performance.now() *
-                    0.001
-                ) *
-                5;
-
-
-            if (x === 0) {
-                ctx.moveTo(
-                    x,
-                    y
-                );
-            } else {
-                ctx.lineTo(
-                    x,
-                    y
-                );
-            }
-
-        }
-
-
-        ctx.stroke();
-
-        ctx.globalAlpha = 1;
+        this.mode = mode;
 
     }
 

@@ -1,1678 +1,754 @@
-/* =========================================================
-   KRITR PLAYER — MAIN UI
-   V0.2 VISUAL REWORK
-   ========================================================= */
+:root {
 
-/* ---------------------------------------------------------
-   RESET
-   --------------------------------------------------------- */
+    --bg-color: #15131a;
+    --window-bg: #211d28;
+    --window-header: #302a3a;
+
+    --accent-main: #ff79c6;
+    --accent-secondary: #8be9fd;
+
+    --text-color: #f8f8f2;
+    --muted-color: #9992a5;
+
+    --border-color: #4a4255;
+
+    --shadow:
+        6px 6px 0 rgba(0, 0, 0, 0.6);
+
+    --ui-scale: 1;
+
+}
+
 
 * {
     box-sizing: border-box;
 }
 
+
 html,
 body {
+
     width: 100%;
     height: 100%;
+
     margin: 0;
+
 }
 
+
 body {
-    overflow: hidden;
-    background: #08080b;
+
+    background: var(--bg-color);
+
     color: var(--text-color);
-    font-family: "VT323", "Consolas", monospace;
-    image-rendering: pixelated;
-    transition:
-        background 0.5s ease,
-        color 0.35s ease;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
 }
+
 
 button,
 input,
 select {
+
     font: inherit;
+
 }
+
 
 button {
+
     color: inherit;
+
 }
 
-button,
-select,
-input[type="range"] {
-    -webkit-tap-highlight-color: transparent;
-}
-
-
-/* ---------------------------------------------------------
-   KRITR VARIABLES
-   --------------------------------------------------------- */
-
-:root {
-    --bg-color: #09090d;
-    --window-bg: #101116;
-    --window-header: #16171e;
-
-    --panel-bg: #0c0d12;
-    --panel-bg-light: #151720;
-
-    --accent-main: #b9a7ff;
-    --accent-secondary: #79d9ff;
-
-    --accent-soft: rgba(185, 167, 255, 0.14);
-    --accent-glow: rgba(185, 167, 255, 0.34);
-
-    --text-color: #f2f0ff;
-    --muted-color: #858392;
-
-    --border-color: #2a2b35;
-    --border-light: #3a3b48;
-
-    --danger: #ff667d;
-    --success: #72f1b8;
-    --warning: #ffd166;
-
-    --shadow:
-        0 20px 70px rgba(0, 0, 0, 0.65),
-        0 0 45px rgba(185, 167, 255, 0.07);
-
-    --pixel-shadow:
-        4px 4px 0 rgba(0, 0, 0, 0.55);
-
-    --ui-scale: 1;
-
-    --radius: 6px;
-}
-
-
-/* ---------------------------------------------------------
-   BODY ATMOSPHERE
-   --------------------------------------------------------- */
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            circle at 50% 45%,
-            var(--accent-soft),
-            transparent 38%
-        );
-
-    opacity: 0.8;
-    z-index: -3;
-
-    transition:
-        background 0.6s ease,
-        opacity 0.5s ease;
-}
-
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-
-    background-image:
-        linear-gradient(
-            rgba(255, 255, 255, 0.018) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0.012) 1px,
-            transparent 1px
-        );
-
-    background-size: 32px 32px;
-
-    opacity: 0.25;
-    z-index: -2;
-}
-
-
-/* ---------------------------------------------------------
-   MAIN WINDOW
-   --------------------------------------------------------- */
 
 .kritr-window {
-    position: relative;
 
-    width: min(540px, calc(100vw - 28px));
-    height: min(760px, calc(100vh - 28px));
+    width: min(
+        620px,
+        94vw
+    );
 
-    min-width: 330px;
-    min-height: 460px;
+    height: min(
+        680px,
+        92vh
+    );
 
-    margin: 14px auto;
+    background: var(--window-bg);
+
+    border: 2px solid var(--border-color);
+
+    box-shadow: var(--shadow);
 
     display: flex;
+
     flex-direction: column;
 
-    overflow: hidden;
+    transform:
+        scale(var(--ui-scale));
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.025),
-            transparent 35%
-        ),
-        var(--window-bg);
+    transform-origin: center;
 
-    border: 1px solid var(--border-light);
-
-    box-shadow:
-        var(--shadow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.035);
-
-    transform: scale(var(--ui-scale));
-    transform-origin: center center;
-
-    transition:
-        width 0.3s ease,
-        height 0.3s ease,
-        background 0.4s ease,
-        box-shadow 0.35s ease,
-        border-color 0.35s ease;
-
-    isolation: isolate;
 }
 
 
-/* ---------------------------------------------------------
-   INTERACTIVE AUDIO GLOW
-   --------------------------------------------------------- */
-
-.kritr-window::before {
-    content: "";
-
-    position: absolute;
-    inset: -2px;
-
-    pointer-events: none;
-
-    border: 1px solid var(--accent-main);
-
-    opacity: 0.08;
-
-    filter: blur(5px);
-
-    transition:
-        opacity 0.15s ease,
-        filter 0.15s ease;
-
-    z-index: -1;
-}
-
-.kritr-window.music-active::before {
-    opacity: 0.28;
-    filter: blur(9px);
-}
-
-
-/* ---------------------------------------------------------
-   TITLE BAR
-   --------------------------------------------------------- */
+/* TITLE BAR */
 
 .titlebar {
-    position: relative;
 
-    height: 46px;
-    min-height: 46px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    background: var(--window-header);
+
+    border-bottom:
+        2px solid var(--border-color);
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    padding: 0 12px;
+    padding:
+        0 10px;
+
+}
+
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+}
+
+
+.brand-icon {
+
+    color:
+        var(--accent-main);
+
+}
+
+
+.window-buttons {
+
+    display: flex;
+
+    gap: 4px;
+
+}
+
+
+.window-buttons button {
+
+    width: 27px;
+    height: 24px;
+
+    background: transparent;
+
+    border:
+        1px solid var(--border-color);
+
+    cursor: pointer;
+
+}
+
+
+.window-buttons button:hover {
 
     background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.025),
-            transparent
-        ),
-        var(--window-header);
+        var(--accent-main);
 
-    border-bottom: 1px solid var(--border-color);
+    color:
+        var(--bg-color);
 
-    user-select: none;
 }
 
 
-/* ---------------------------------------------------------
-   LOGO
-   --------------------------------------------------------- */
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-
-    font-family: "Press Start 2P", "Consolas", monospace;
-    font-size: 12px;
-    letter-spacing: 1px;
-
-    color: var(--text-color);
-
-    text-shadow:
-        2px 2px 0 rgba(0, 0, 0, 0.7),
-        0 0 12px var(--accent-glow);
-
-    transition:
-        color 0.3s ease,
-        text-shadow 0.3s ease;
-}
-
-.logo::before {
-    content: "◆";
-
-    color: var(--accent-main);
-
-    font-size: 10px;
-
-    animation:
-        kritrLogoPulse 2.2s infinite ease-in-out;
-}
-
-@keyframes kritrLogoPulse {
-    0%,
-    100% {
-        opacity: 0.6;
-        transform: scale(0.9);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.15);
-    }
-}
-
-
-/* ---------------------------------------------------------
-   WINDOW CONTROLS
-   --------------------------------------------------------- */
-
-.window-controls {
-    display: flex;
-    gap: 5px;
-}
-
-.window-controls button {
-    width: 25px;
-    height: 25px;
-
-    padding: 0;
-
-    display: grid;
-    place-items: center;
-
-    background: transparent;
-
-    border: 1px solid transparent;
-
-    color: var(--muted-color);
-
-    cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        color 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.1s ease;
-}
-
-.window-controls button:hover {
-    color: var(--text-color);
-
-    background: var(--accent-soft);
-
-    border-color: var(--border-color);
-}
-
-.window-controls button:active {
-    transform: translate(1px, 1px);
-}
-
-.window-controls button:last-child:hover {
-    color: var(--danger);
-
-    background: rgba(255, 102, 125, 0.1);
-
-    border-color: rgba(255, 102, 125, 0.25);
-}
-
-
-/* ---------------------------------------------------------
-   TABS
-   --------------------------------------------------------- */
+/* TABS */
 
 .tabs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
 
-    min-height: 43px;
+    display: flex;
 
-    background: var(--panel-bg);
+    flex-shrink: 0;
 
-    border-bottom: 1px solid var(--border-color);
+    background:
+        rgba(0, 0, 0, 0.2);
+
+    border-bottom:
+        2px solid var(--border-color);
+
 }
 
+
 .tab {
-    position: relative;
 
-    padding: 0 7px;
+    flex: 1;
 
-    border: 0;
-    border-right: 1px solid var(--border-color);
+    padding:
+        10px 5px;
+
+    border: none;
+
+    border-right:
+        1px solid var(--border-color);
 
     background: transparent;
 
-    color: var(--muted-color);
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 7px;
+    color:
+        var(--muted-color);
 
     cursor: pointer;
 
-    transition:
-        color 0.2s ease,
-        background 0.2s ease;
+    font-size: 11px;
+
+    font-weight: bold;
+
 }
 
-.tab:last-child {
-    border-right: 0;
-}
-
-.tab::after {
-    content: "";
-
-    position: absolute;
-
-    left: 20%;
-    right: 20%;
-    bottom: 0;
-
-    height: 2px;
-
-    background: var(--accent-main);
-
-    transform: scaleX(0);
-
-    box-shadow: 0 0 8px var(--accent-glow);
-
-    transition: transform 0.2s ease;
-}
 
 .tab:hover {
-    color: var(--text-color);
-    background: rgba(255, 255, 255, 0.025);
+
+    color:
+        var(--text-color);
+
 }
+
 
 .tab.active {
-    color: var(--accent-main);
-    background: var(--accent-soft);
+
+    background:
+        var(--accent-main);
+
+    color:
+        #15131a;
+
 }
 
-.tab.active::after {
-    transform: scaleX(1);
-}
 
+/* TAB PAGES */
 
-/* ---------------------------------------------------------
-   CONTENT AREA
-   --------------------------------------------------------- */
+.tab-page {
 
-.tab-content {
+    display: none;
+
     flex: 1;
 
     min-height: 0;
 
-    overflow: hidden;
-
-    position: relative;
 }
 
-.tab-panel {
-    display: none;
 
+.tab-page.active {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+/* PLAYER */
+
+#player-tab {
+
+    padding: 16px;
+
+    gap: 14px;
+
+}
+
+
+/* VISUALIZER */
+
+.visualizer-container {
+
+    position: relative;
+
+    flex: 1;
+
+    min-height: 250px;
+
+    overflow: hidden;
+
+    background:
+        #0d0b10;
+
+    border:
+        2px solid var(--border-color);
+
+}
+
+
+#visualizer {
+
+    width: 100%;
     height: 100%;
+
+    display: block;
+
+}
+
+
+/* PET */
+
+.pet-display {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 18px;
+
+    transform:
+        translateX(-50%);
+
+    pointer-events: none;
+
+}
+
+
+.pet-sprite {
+
+    font-size: 55px;
+
+    color:
+        var(--accent-main);
+
+    text-shadow:
+        4px 4px 0 #000;
+
+}
+
+
+/* TRACK INFO */
+
+.track-info {
+
+    text-align: center;
+
+}
+
+
+.track-title {
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+}
+
+
+.track-artist {
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    color:
+        var(--muted-color);
+
+}
+
+
+/* PROGRESS */
+
+.progress-container {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 10px;
+
+    color:
+        var(--muted-color);
+
+}
+
+
+.progress-container input {
+
+    flex: 1;
+
+}
+
+
+/* CONTROLS */
+
+.player-controls {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.control-button {
+
+    width: 42px;
+    height: 36px;
+
+    background:
+        var(--window-header);
+
+    border:
+        2px solid var(--border-color);
+
+    cursor: pointer;
+
+}
+
+
+.control-button:hover {
+
+    border-color:
+        var(--accent-main);
+
+}
+
+
+.play-button {
+
+    width: 52px;
+    height: 44px;
+
+    background:
+        var(--accent-main);
+
+    color:
+        #15131a;
+
+    border-color:
+        var(--accent-main);
+
+}
+
+
+/* SECONDARY */
+
+.secondary-controls {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+.volume-control,
+.speed-control {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 10px;
+
+    color:
+        var(--muted-color);
+
+}
+
+
+.volume-control input {
+
+    width: 100px;
+
+}
+
+
+select {
+
+    background:
+        var(--window-header);
+
+    color:
+        var(--text-color);
+
+    border:
+        1px solid var(--border-color);
+
+    padding: 5px;
+
+}
+
+
+/* ACTIONS */
+
+.music-actions {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+.action-button,
+.small-button {
+
+    display: inline-block;
+
+    padding:
+        8px 12px;
+
+    background:
+        var(--window-header);
+
+    border:
+        1px solid var(--border-color);
+
+    cursor: pointer;
+
+    font-size: 10px;
+
+}
+
+
+.action-button:hover,
+.small-button:hover {
+
+    background:
+        var(--accent-main);
+
+    color:
+        #15131a;
+
+}
+
+
+#drop-hint {
+
+    font-size: 9px;
+
+    color:
+        var(--muted-color);
+
+}
+
+
+/* OTHER PAGES */
+
+.page-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding:
+        16px;
+
+    border-bottom:
+        1px solid var(--border-color);
+
+}
+
+
+.page-header h2 {
+
+    margin: 0;
+
+    font-size: 14px;
+
+}
+
+
+/* PLAYLIST */
+
+.playlist {
+
+    flex: 1;
 
     overflow-y: auto;
 
-    padding: 14px;
-}
+    padding: 8px;
 
-.tab-panel.active {
-    display: block;
-
-    animation:
-        kritrTabIn 0.22s ease-out;
-}
-
-@keyframes kritrTabIn {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 
-/* ---------------------------------------------------------
-   PLAYER LAYOUT
-   --------------------------------------------------------- */
+.empty-playlist {
 
-#player-tab {
-    display: none;
-
-    flex-direction: column;
-    gap: 12px;
-}
-
-#player-tab.active {
-    display: flex;
-}
-
-
-/* ---------------------------------------------------------
-   VISUALIZER
-   --------------------------------------------------------- */
-
-.visualizer-container {
-    position: relative;
-
-    width: 100%;
-    height: 210px;
-
-    overflow: hidden;
-
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(255, 255, 255, 0.025),
-            transparent 65%
-        ),
-        #08090d;
-
-    border: 1px solid var(--border-color);
-
-    box-shadow:
-        inset 0 0 25px rgba(0, 0, 0, 0.55),
-        0 0 18px rgba(0, 0, 0, 0.2);
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.visualizer-container::before {
-    content: "AUDIO // LIVE";
-
-    position: absolute;
-
-    top: 8px;
-    left: 9px;
-
-    z-index: 2;
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 6px;
-
-    color: var(--muted-color);
-
-    letter-spacing: 1px;
-
-    pointer-events: none;
-
-    opacity: 0.7;
-}
-
-.visualizer-container::after {
-    content: "";
-
-    position: absolute;
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0,
-            transparent 3px,
-            rgba(255, 255, 255, 0.018) 4px
-        );
-
-    opacity: 0.5;
-}
-
-#visualizer {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-}
-
-
-/* ---------------------------------------------------------
-   PET DISPLAY
-   --------------------------------------------------------- */
-
-#pet-display {
-    position: relative;
-
-    min-height: 115px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-
-    background:
-        radial-gradient(
-            circle at center,
-            var(--accent-soft),
-            transparent 58%
-        ),
-        var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-
-    transition:
-        background 0.3s ease,
-        border-color 0.3s ease;
-}
-
-#pet-display::before,
-#pet-display::after {
-    position: absolute;
-
-    font-family: monospace;
-
-    color: var(--accent-main);
-
-    opacity: 0.25;
-
-    pointer-events: none;
-}
-
-#pet-display::before {
-    content: "┌────────────────────────┐";
-
-    top: 8px;
-    left: 8px;
-}
-
-#pet-display::after {
-    content: "└────────────────────────┘";
-
-    bottom: 8px;
-    right: 8px;
-}
-
-.pet-sprite {
-    position: relative;
-
-    font-size: 48px;
-    line-height: 1;
-
-    color: var(--accent-main);
-
-    text-shadow:
-        4px 4px 0 rgba(0, 0, 0, 0.6),
-        0 0 16px var(--accent-glow);
-
-    filter: drop-shadow(
-        0 0 8px var(--accent-glow)
-    );
-
-    transition:
-        transform 0.25s ease,
-        color 0.3s ease,
-        filter 0.3s ease;
-}
-
-#pet-display.music-reactive .pet-sprite {
-    animation:
-        petMusicBounce 0.42s infinite alternate ease-in-out;
-}
-
-@keyframes petMusicBounce {
-    from {
-        transform: translateY(2px) scale(1);
-    }
-
-    to {
-        transform: translateY(-5px) scale(1.04);
-    }
-}
-
-
-/* ---------------------------------------------------------
-   TRACK INFORMATION
-   --------------------------------------------------------- */
-
-.track-info {
-    min-width: 0;
-
-    padding: 3px 2px;
-}
-
-#track-title {
-    margin: 0;
-
-    overflow: hidden;
-
-    color: var(--text-color);
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 10px;
-
-    line-height: 1.7;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    text-shadow:
-        0 0 8px rgba(255, 255, 255, 0.08);
-}
-
-#track-artist {
-    margin-top: 4px;
-
-    overflow: hidden;
-
-    color: var(--muted-color);
-
-    font-size: 17px;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-
-/* ---------------------------------------------------------
-   PROGRESS BAR
-   --------------------------------------------------------- */
-
-.progress-container {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-#progress {
-    width: 100%;
-    height: 8px;
-
-    appearance: none;
-    -webkit-appearance: none;
-
-    cursor: pointer;
-
-    background:
-        repeating-linear-gradient(
-            90deg,
-            var(--border-color) 0,
-            var(--border-color) 5px,
-            transparent 5px,
-            transparent 7px
-        );
-
-    border: 0;
-}
-
-#progress::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-
-    width: 12px;
-    height: 12px;
-
-    background: var(--accent-main);
-
-    border: 2px solid var(--window-bg);
-
-    box-shadow:
-        0 0 8px var(--accent-glow);
-
-    cursor: pointer;
-}
-
-#progress::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-
-    background: var(--accent-main);
-
-    border: 2px solid var(--window-bg);
-
-    box-shadow:
-        0 0 8px var(--accent-glow);
-
-    cursor: pointer;
-}
-
-.time-row {
-    display: flex;
-    justify-content: space-between;
-
-    color: var(--muted-color);
-
-    font-size: 15px;
-}
-
-
-/* ---------------------------------------------------------
-   MAIN PLAYER CONTROLS
-   --------------------------------------------------------- */
-
-.controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 10px;
-}
-
-.control-button {
-    width: 42px;
-    height: 38px;
-
-    display: grid;
-    place-items: center;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-
-    color: var(--text-color);
-
-    cursor: pointer;
-
-    box-shadow:
-        3px 3px 0 rgba(0, 0, 0, 0.4);
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        color 0.15s ease,
-        transform 0.1s ease,
-        box-shadow 0.1s ease;
-}
-
-.control-button:hover {
-    background: var(--accent-soft);
-
-    border-color: var(--accent-main);
-
-    color: var(--accent-main);
-
-    box-shadow:
-        0 0 12px var(--accent-glow);
-}
-
-.control-button:active {
-    transform: translate(3px, 3px);
-
-    box-shadow: none;
-}
-
-.control-button.play {
-    width: 52px;
-    height: 46px;
-
-    background: var(--accent-main);
-
-    color: #0a0a0d;
-
-    border-color: var(--accent-main);
-
-    font-family: "Press Start 2P", monospace;
-
-    box-shadow:
-        4px 4px 0 rgba(0, 0, 0, 0.55),
-        0 0 18px var(--accent-glow);
-}
-
-.control-button.play:hover {
-    background: var(--text-color);
-
-    color: #08080b;
-
-    box-shadow:
-        0 0 20px var(--accent-glow);
-}
-
-
-/* ---------------------------------------------------------
-   SECONDARY CONTROLS
-   --------------------------------------------------------- */
-
-.secondary-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    gap: 8px;
-}
-
-.control-group {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-
-    min-width: 0;
-
-    padding: 7px 8px;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-}
-
-.control-group label {
-    color: var(--muted-color);
-
-    font-size: 14px;
-
-    white-space: nowrap;
-}
-
-.control-group input[type="range"] {
-    min-width: 0;
-    width: 100%;
-}
-
-
-/* ---------------------------------------------------------
-   RANGE INPUTS
-   --------------------------------------------------------- */
-
-input[type="range"] {
-    appearance: none;
-    -webkit-appearance: none;
-
-    height: 5px;
-
-    background: var(--border-color);
-
-    cursor: pointer;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-
-    width: 9px;
-    height: 9px;
-
-    background: var(--accent-main);
-
-    border: 0;
-
-    box-shadow: 0 0 7px var(--accent-glow);
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 9px;
-    height: 9px;
-
-    background: var(--accent-main);
-
-    border: 0;
-
-    box-shadow: 0 0 7px var(--accent-glow);
-}
-
-
-/* ---------------------------------------------------------
-   ACTION BUTTONS
-   --------------------------------------------------------- */
-
-.action-row {
-    display: flex;
-    gap: 8px;
-}
-
-.action-button {
-    flex: 1;
-
-    min-height: 34px;
-
-    padding: 6px 10px;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-
-    color: var(--muted-color);
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 6px;
-
-    cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        color 0.15s ease,
-        transform 0.1s ease;
-}
-
-.action-button:hover {
-    color: var(--accent-main);
-
-    background: var(--accent-soft);
-
-    border-color: var(--accent-main);
-}
-
-.action-button:active {
-    transform: translateY(2px);
-}
-
-
-/* ---------------------------------------------------------
-   FILE INPUT
-   --------------------------------------------------------- */
-
-.file-input {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 34px;
-
-    padding: 6px 10px;
-
-    background: var(--panel-bg);
-
-    border: 1px dashed var(--border-color);
-
-    color: var(--muted-color);
-
-    cursor: pointer;
-
-    transition:
-        color 0.2s ease,
-        border-color 0.2s ease,
-        background 0.2s ease;
-}
-
-.file-input:hover {
-    color: var(--accent-main);
-
-    border-color: var(--accent-main);
-
-    background: var(--accent-soft);
-}
-
-.file-input input {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    opacity: 0;
-
-    cursor: pointer;
-}
-
-
-/* ---------------------------------------------------------
-   PLAYLIST
-   --------------------------------------------------------- */
-
-#playlist-tab {
-    padding: 12px;
-}
-
-#playlist {
-    display: flex;
-    flex-direction: column;
-
-    gap: 5px;
-}
-
-.playlist-item {
-    position: relative;
-
-    display: grid;
-    grid-template-columns: 32px 1fr auto;
-    align-items: center;
-
-    gap: 8px;
-
-    min-height: 48px;
-
-    padding: 6px 8px;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-
-    cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.1s ease;
-}
-
-.playlist-item:hover {
-    background: var(--accent-soft);
-
-    border-color: var(--border-light);
-
-    transform: translateX(2px);
-}
-
-.playlist-item.active {
-    background:
-        linear-gradient(
-            90deg,
-            var(--accent-soft),
-            transparent
-        );
-
-    border-color: var(--accent-main);
-}
-
-.playlist-item.active::before {
-    content: "▶";
-
-    color: var(--accent-main);
-
-    font-size: 9px;
-}
-
-.playlist-item-number {
-    color: var(--muted-color);
-
-    font-size: 14px;
+    padding: 30px;
 
     text-align: center;
-}
 
-.playlist-item-info {
-    min-width: 0;
-}
+    color:
+        var(--muted-color);
 
-.playlist-item-title {
-    overflow: hidden;
+    font-size: 11px;
 
-    color: var(--text-color);
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    font-size: 17px;
-}
-
-.playlist-item-meta {
-    color: var(--muted-color);
-
-    font-size: 13px;
-}
-
-.playlist-item-duration {
-    color: var(--muted-color);
-
-    font-size: 13px;
 }
 
 
-/* ---------------------------------------------------------
-   PET TAB
-   --------------------------------------------------------- */
+.playlist-item {
 
-.pet-controls {
     display: flex;
-    flex-direction: column;
 
-    gap: 12px;
-}
-
-.pet-section {
-    padding: 12px;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-}
-
-.pet-section-title {
-    margin-bottom: 8px;
-
-    color: var(--accent-main);
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 7px;
-}
-
-.pet-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 7px;
-}
-
-.pet-option {
-    min-height: 38px;
-
-    background: transparent;
-
-    border: 1px solid var(--border-color);
-
-    color: var(--muted-color);
-
-    cursor: pointer;
-
-    transition:
-        color 0.15s ease,
-        background 0.15s ease,
-        border-color 0.15s ease;
-}
-
-.pet-option:hover,
-.pet-option.active {
-    color: var(--accent-main);
-
-    background: var(--accent-soft);
-
-    border-color: var(--accent-main);
-}
-
-
-/* ---------------------------------------------------------
-   SETTINGS
-   --------------------------------------------------------- */
-
-.settings {
-    display: flex;
-    flex-direction: column;
-
-    gap: 10px;
-}
-
-.setting-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 
     padding: 10px;
 
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
-}
-
-.setting-row label {
-    color: var(--text-color);
-
-    font-size: 17px;
-}
-
-.setting-row small {
-    display: block;
-
-    margin-top: 2px;
-
-    color: var(--muted-color);
-
-    font-size: 13px;
-}
-
-select {
-    min-width: 120px;
-
-    padding: 6px 8px;
-
-    background: var(--panel-bg-light);
-
-    border: 1px solid var(--border-color);
-
-    color: var(--text-color);
-
-    outline: none;
-
-    cursor: pointer;
-}
-
-select:focus {
-    border-color: var(--accent-main);
-
-    box-shadow:
-        0 0 0 2px var(--accent-soft);
-}
-
-
-/* ---------------------------------------------------------
-   CHECKBOX
-   --------------------------------------------------------- */
-
-input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-
-    width: 18px;
-    height: 18px;
-
-    margin: 0;
-
-    background: var(--panel-bg);
-
-    border: 1px solid var(--border-color);
+    border-bottom:
+        1px solid var(--border-color);
 
     cursor: pointer;
 
-    position: relative;
-}
-
-input[type="checkbox"]:checked {
-    background: var(--accent-main);
-
-    border-color: var(--accent-main);
-}
-
-input[type="checkbox"]:checked::after {
-    content: "✓";
-
-    position: absolute;
-
-    inset: 0;
-
-    display: grid;
-    place-items: center;
-
-    color: #08080b;
-
-    font-size: 13px;
-    font-weight: bold;
 }
 
 
-/* ---------------------------------------------------------
-   STATUS BAR
-   --------------------------------------------------------- */
+.playlist-item:hover {
 
-.status-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background:
+        var(--window-header);
 
-    min-height: 25px;
-
-    padding: 0 9px;
-
-    background: var(--panel-bg);
-
-    border-top: 1px solid var(--border-color);
-
-    color: var(--muted-color);
-
-    font-size: 13px;
-
-    user-select: none;
-}
-
-.status-bar .status-online {
-    display: flex;
-    align-items: center;
-
-    gap: 5px;
-}
-
-.status-bar .status-online::before {
-    content: "";
-
-    width: 6px;
-    height: 6px;
-
-    background: var(--success);
-
-    box-shadow:
-        0 0 7px rgba(114, 241, 184, 0.7);
-
-    animation:
-        statusPulse 2s infinite;
-}
-
-@keyframes statusPulse {
-    0%,
-    100% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 1;
-    }
 }
 
 
-/* ---------------------------------------------------------
-   SCROLLBARS
-   --------------------------------------------------------- */
+.playlist-item.active {
 
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
+    background:
+        var(--accent-main);
 
-::-webkit-scrollbar-track {
-    background: var(--panel-bg);
-}
+    color:
+        #15131a;
 
-::-webkit-scrollbar-thumb {
-    background: var(--border-light);
-
-    border: 2px solid var(--panel-bg);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-main);
 }
 
 
-/* ---------------------------------------------------------
-   MAXIMIZED MODE
-   --------------------------------------------------------- */
+.playlist-number {
 
-.kritr-window.maximized {
-    width: 100vw;
-    height: 100vh;
+    width: 25px;
 
-    margin: 0;
-
-    border: 0;
-}
-
-.kritr-window.maximized .visualizer-container {
-    height: 300px;
-}
-
-
-/* ---------------------------------------------------------
-   HIDDEN / MINIMIZED
-   --------------------------------------------------------- */
-
-.kritr-window.minimized {
-    height: 46px;
-}
-
-.kritr-window.minimized .tabs,
-.kritr-window.minimized .tab-content,
-.kritr-window.minimized .status-bar {
-    display: none;
-}
-
-
-/* ---------------------------------------------------------
-   DRAGGING
-   --------------------------------------------------------- */
-
-.kritr-window.dragging {
-    user-select: none;
-
-    transition: none;
-
-    box-shadow:
-        0 25px 90px rgba(0, 0, 0, 0.75),
-        0 0 35px var(--accent-glow);
-}
-
-
-/* ---------------------------------------------------------
-   AUDIO REACTIVE STATES
-   --------------------------------------------------------- */
-
-.kritr-window.bass-hit {
-    animation:
-        bassPulse 0.16s ease-out;
-}
-
-@keyframes bassPulse {
-    0% {
-        transform:
-            scale(var(--ui-scale))
-            translate(0, 0);
-    }
-
-    45% {
-        transform:
-            scale(calc(var(--ui-scale) * 1.008))
-            translate(0, -1px);
-    }
-
-    100% {
-        transform:
-            scale(var(--ui-scale))
-            translate(0, 0);
-    }
-}
-
-
-/* ---------------------------------------------------------
-   DROP STATE
-   --------------------------------------------------------- */
-
-.kritr-window.drag-over {
-    border-color: var(--accent-main);
-
-    box-shadow:
-        0 0 0 2px var(--accent-soft),
-        0 0 35px var(--accent-glow),
-        var(--shadow);
-}
-
-.kritr-window.drag-over::after {
-    content: "DROP MUSIC HERE";
-
-    position: absolute;
-
-    inset: 8px;
-
-    z-index: 100;
-
-    display: grid;
-    place-items: center;
-
-    background: rgba(8, 8, 11, 0.88);
-
-    border: 1px dashed var(--accent-main);
-
-    color: var(--accent-main);
-
-    font-family: "Press Start 2P", monospace;
     font-size: 10px;
 
-    letter-spacing: 1px;
-
-    pointer-events: none;
-
-    text-shadow:
-        0 0 12px var(--accent-glow);
 }
 
 
-/* ---------------------------------------------------------
-   EMPTY STATES
-   --------------------------------------------------------- */
+.playlist-name {
 
-.empty-state {
-    min-height: 180px;
+    flex: 1;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+}
+
+
+/* PET / SETTINGS */
+
+.pet-settings,
+.settings {
 
     display: flex;
+
     flex-direction: column;
 
+    gap: 18px;
+
+    padding: 18px;
+
+}
+
+
+.pet-settings label,
+.settings label {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    font-size: 10px;
+
+    color:
+        var(--muted-color);
+
+}
+
+
+.checkbox-setting {
+
+    flex-direction: row !important;
+
     align-items: center;
-    justify-content: center;
 
-    gap: 8px;
-
-    color: var(--muted-color);
-
-    text-align: center;
-}
-
-.empty-state strong {
-    color: var(--accent-main);
-
-    font-family: "Press Start 2P", monospace;
-    font-size: 8px;
-}
-
-.empty-state span {
-    font-size: 16px;
 }
 
 
-/* ---------------------------------------------------------
-   FOCUS
-   --------------------------------------------------------- */
+/* STATUS */
 
-button:focus-visible,
-select:focus-visible,
-input:focus-visible {
-    outline: 1px solid var(--accent-main);
+.statusbar {
 
-    outline-offset: 2px;
-}
+    height: 27px;
 
+    flex-shrink: 0;
 
-/* ---------------------------------------------------------
-   MOBILE
-   --------------------------------------------------------- */
+    padding:
+        0 9px;
 
-@media (max-width: 600px) {
-    body {
-        overflow: hidden;
-    }
+    display: flex;
 
-    .kritr-window {
-        width: 100vw;
-        height: 100vh;
+    align-items: center;
 
-        min-width: 0;
-        min-height: 0;
+    justify-content: space-between;
 
-        margin: 0;
+    background:
+        #0d0b10;
 
-        border: 0;
+    border-top:
+        2px solid var(--border-color);
 
-        transform: none;
-    }
+    color:
+        var(--muted-color);
 
-    .titlebar {
-        height: 42px;
-        min-height: 42px;
-    }
+    font-size: 9px;
 
-    .logo {
-        font-size: 9px;
-    }
-
-    .tabs {
-        min-height: 40px;
-    }
-
-    .tab {
-        font-size: 6px;
-    }
-
-    .tab-panel {
-        padding: 10px;
-    }
-
-    .visualizer-container {
-        height: 170px;
-    }
-
-    #pet-display {
-        min-height: 90px;
-    }
-
-    .pet-sprite {
-        font-size: 40px;
-    }
-
-    .secondary-controls {
-        grid-template-columns: 1fr;
-    }
-
-    .action-row {
-        flex-direction: column;
-    }
-
-    .setting-row {
-        grid-template-columns: 1fr;
-    }
-
-    select {
-        width: 100%;
-    }
-}
-
-
-/* ---------------------------------------------------------
-   VERY SMALL SCREENS
-   --------------------------------------------------------- */
-
-@media (max-width: 380px) {
-    .tab {
-        font-size: 5px;
-    }
-
-    .visualizer-container {
-        height: 145px;
-    }
-
-    #track-title {
-        font-size: 8px;
-    }
-
-    .control-button {
-        width: 38px;
-        height: 35px;
-    }
-
-    .control-button.play {
-        width: 46px;
-        height: 42px;
-    }
-}
-
-
-/* ---------------------------------------------------------
-   REDUCED MOTION
-   --------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-
-        scroll-behavior: auto !important;
-
-        transition-duration: 0.001ms !important;
-    }
 }

@@ -1,216 +1,53 @@
-@keyframes panel-in {
+@media (max-width: 600px) {
 
-    from {
-        opacity: 0;
+    body {
 
-        transform:
-            translateY(7px);
+        align-items: stretch;
+
     }
 
-    to {
-        opacity: 1;
 
-        transform:
-            translateY(0);
+    .kritr-window {
+
+        width: 100vw;
+        height: 100vh;
+
+        border: none;
+
+        box-shadow: none;
+
     }
 
-}
 
+    #player-tab {
 
-@keyframes status-pulse {
+        padding: 10px;
 
-    0%,
-    100% {
-        transform: scale(1);
     }
 
-    50% {
-        transform: scale(1.8);
+
+    .visualizer-container {
+
+        min-height: 180px;
+
     }
 
-}
 
+    .secondary-controls {
 
-@keyframes particle-float {
+        flex-direction: column;
 
-    0% {
-        transform:
-            translate(0, 0)
-            scale(1);
+        gap: 10px;
+
     }
 
-    50% {
-        transform:
-            translate(8px, -14px)
-            scale(1.4);
-    }
 
-    100% {
-        transform:
-            translate(-4px, 4px)
-            scale(1);
-    }
+    .music-actions {
 
-}
+        flex-direction: column;
 
+        gap: 8px;
 
-@keyframes pet-bounce {
-
-    0%,
-    100% {
-        transform:
-            translateY(0);
-    }
-
-    35% {
-        transform:
-            translateY(-30px)
-            rotate(-4deg);
-    }
-
-    65% {
-        transform:
-            translateY(-10px)
-            rotate(4deg);
-    }
-
-}
-
-
-@keyframes pet-spin {
-
-    from {
-        transform:
-            rotate(0deg);
-    }
-
-    to {
-        transform:
-            rotate(360deg);
-    }
-
-}
-
-
-@keyframes pet-heart {
-
-    0% {
-        transform:
-            scale(1);
-    }
-
-    50% {
-        transform:
-            scale(1.3)
-            rotate(-5deg);
-    }
-
-    100% {
-        transform:
-            scale(1);
-    }
-
-}
-
-
-@keyframes boot-logo {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            scale(0.85)
-            translateY(10px);
-    }
-
-    70% {
-        opacity: 1;
-    }
-
-    100% {
-        transform:
-            scale(1)
-            translateY(0);
-    }
-
-}
-
-
-@keyframes boot-blink {
-
-    50% {
-        opacity: 0.4;
-    }
-
-}
-
-
-@keyframes boot-exit {
-
-    from {
-        opacity: 1;
-
-        transform:
-            scale(1);
-    }
-
-    to {
-        opacity: 0;
-
-        transform:
-            scale(1.05);
-    }
-
-}
-
-
-.pet-bounce {
-    animation:
-        pet-bounce
-        550ms
-        ease;
-}
-
-
-.pet-spin {
-    animation:
-        pet-spin
-        650ms
-        ease;
-}
-
-
-.pet-heart {
-    animation:
-        pet-heart
-        500ms
-        ease;
-}
-
-
-.beat-flash {
-    animation:
-        beat-flash
-        130ms
-        ease;
-}
-
-
-@keyframes beat-flash {
-
-    0% {
-        filter:
-            brightness(1);
-    }
-
-    50% {
-        filter:
-            brightness(1.35);
-    }
-
-    100% {
-        filter:
-            brightness(1);
     }
 
 }

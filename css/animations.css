@@ -1,216 +1,119 @@
-@keyframes panel-in {
+/* CRT */
 
-    from {
-        opacity: 0;
+#crt-overlay {
 
-        transform:
-            translateY(7px);
-    }
+    position: fixed;
 
-    to {
-        opacity: 1;
+    inset: 0;
 
-        transform:
-            translateY(0);
-    }
+    pointer-events: none;
 
-}
+    z-index: 9999;
 
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.025),
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px,
+            transparent 3px
+        );
 
-@keyframes status-pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.8);
-    }
+    opacity: 0.35;
 
 }
 
 
-@keyframes particle-float {
-
-    0% {
-        transform:
-            translate(0, 0)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate(8px, -14px)
-            scale(1.4);
-    }
-
-    100% {
-        transform:
-            translate(-4px, 4px)
-            scale(1);
-    }
-
-}
-
-
-@keyframes pet-bounce {
-
-    0%,
-    100% {
-        transform:
-            translateY(0);
-    }
-
-    35% {
-        transform:
-            translateY(-30px)
-            rotate(-4deg);
-    }
-
-    65% {
-        transform:
-            translateY(-10px)
-            rotate(4deg);
-    }
-
-}
-
-
-@keyframes pet-spin {
-
-    from {
-        transform:
-            rotate(0deg);
-    }
-
-    to {
-        transform:
-            rotate(360deg);
-    }
-
-}
-
-
-@keyframes pet-heart {
-
-    0% {
-        transform:
-            scale(1);
-    }
-
-    50% {
-        transform:
-            scale(1.3)
-            rotate(-5deg);
-    }
-
-    100% {
-        transform:
-            scale(1);
-    }
-
-}
-
-
-@keyframes boot-logo {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            scale(0.85)
-            translateY(10px);
-    }
-
-    70% {
-        opacity: 1;
-    }
-
-    100% {
-        transform:
-            scale(1)
-            translateY(0);
-    }
-
-}
-
-
-@keyframes boot-blink {
-
-    50% {
-        opacity: 0.4;
-    }
-
-}
-
-
-@keyframes boot-exit {
-
-    from {
-        opacity: 1;
-
-        transform:
-            scale(1);
-    }
-
-    to {
-        opacity: 0;
-
-        transform:
-            scale(1.05);
-    }
-
-}
-
+/* PET */
 
 .pet-bounce {
+
     animation:
-        pet-bounce
-        550ms
-        ease;
+        petBounce 0.5s steps(4);
+
 }
 
 
 .pet-spin {
+
     animation:
-        pet-spin
-        650ms
-        ease;
+        petSpin 0.7s steps(8);
+
 }
 
 
 .pet-heart {
+
     animation:
-        pet-heart
-        500ms
-        ease;
+        petHeart 0.8s steps(5);
+
 }
 
 
-.beat-flash {
-    animation:
-        beat-flash
-        130ms
-        ease;
-}
-
-
-@keyframes beat-flash {
+@keyframes petBounce {
 
     0% {
-        filter:
-            brightness(1);
+        transform: translateY(0);
     }
 
-    50% {
-        filter:
-            brightness(1.35);
+    40% {
+        transform: translateY(-25px);
     }
 
     100% {
-        filter:
-            brightness(1);
+        transform: translateY(0);
     }
+
+}
+
+
+@keyframes petSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+@keyframes petHeart {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
+
+
+/* BUTTON */
+
+button,
+.action-button {
+
+    transition:
+        background 0.1s,
+        border-color 0.1s,
+        transform 0.1s;
+
+}
+
+
+button:active,
+.action-button:active {
+
+    transform:
+        translate(2px, 2px);
 
 }
