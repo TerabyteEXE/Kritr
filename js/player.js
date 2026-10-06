@@ -37,7 +37,8 @@ const Player = {
             this.audioContext
                 .createAnalyser();
 
-        this.analyser.fftSize = 128;
+        this.analyser.fftSize = 512;
+        this.analyser.smoothingTimeConstant = 0.68;
 
         this.source.connect(
             this.analyser

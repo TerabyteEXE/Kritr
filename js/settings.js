@@ -59,6 +59,12 @@ const Settings = {
                 const value =
                     scale.value / 100;
 
+                scale.style.setProperty(
+                    "--progress",
+                    `${(scale.value - scale.min) /
+                        (scale.max - scale.min) * 100}%`
+                );
+
                 document.documentElement.style
                     .setProperty(
                         "--ui-scale",
@@ -104,6 +110,12 @@ const Settings = {
 
         scale.value =
             savedScale;
+
+        scale.style.setProperty(
+            "--progress",
+            `${(savedScale - scale.min) /
+                (scale.max - scale.min) * 100}%`
+        );
 
         document.documentElement.style
             .setProperty(

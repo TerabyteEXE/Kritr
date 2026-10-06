@@ -123,6 +123,14 @@ document.addEventListener(
             "play",
             () => {
 
+                document.body.classList.add(
+                    "is-playing"
+                );
+
+                document.body.classList.remove(
+                    "is-loading"
+                );
+
                 document.querySelector(
                     "#play-btn"
                 ).textContent =
@@ -141,6 +149,11 @@ document.addEventListener(
             "pause",
             () => {
 
+                document.body.classList.remove(
+                    "is-playing",
+                    "is-loading"
+                );
+
                 document.querySelector(
                     "#play-btn"
                 ).textContent =
@@ -150,6 +163,77 @@ document.addEventListener(
                     "#status"
                 ).textContent =
                     "PAUSED";
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "loadstart",
+            () => {
+
+                document.body.classList.add(
+                    "is-loading"
+                );
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    "LOADING";
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "waiting",
+            () => {
+
+                document.body.classList.add(
+                    "is-loading"
+                );
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    "BUFFERING";
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "canplay",
+            () => {
+
+                document.body.classList.remove(
+                    "is-loading"
+                );
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    audio.paused
+                        ? "READY"
+                        : "PLAYING";
+
+            }
+        );
+
+
+        audio.addEventListener(
+            "error",
+            () => {
+
+                document.body.classList.remove(
+                    "is-loading",
+                    "is-playing"
+                );
+
+                document.querySelector(
+                    "#status"
+                ).textContent =
+                    "AUDIO ERROR";
 
             }
         );
@@ -189,6 +273,13 @@ document.addEventListener(
                     "#progress"
                 ).value =
                     percentage;
+
+                document.querySelector(
+                    "#progress"
+                ).style.setProperty(
+                    "--progress",
+                    `${percentage}%`
+                );
 
 
                 document.querySelector(
@@ -231,6 +322,11 @@ document.addEventListener(
                     ) *
                     audio.duration;
 
+                event.target.style.setProperty(
+                    "--progress",
+                    `${event.target.value}%`
+                );
+
             }
         );
 
@@ -253,6 +349,11 @@ document.addEventListener(
         volume.value =
             savedVolume;
 
+        volume.style.setProperty(
+            "--progress",
+            `${savedVolume}%`
+        );
+
 
         Player.setVolume(
             savedVolume
@@ -265,6 +366,11 @@ document.addEventListener(
 
                 Player.setVolume(
                     event.target.value
+                );
+
+                event.target.style.setProperty(
+                    "--progress",
+                    `${event.target.value}%`
                 );
 
             }
@@ -338,6 +444,22 @@ document.addEventListener(
             event => {
 
                 event.preventDefault();
+                windowElement.classList.add(
+                    "is-drop-target"
+                );
+
+            }
+        );
+
+        windowElement.addEventListener(
+            "dragleave",
+            event => {
+
+                if (!windowElement.contains(event.relatedTarget)) {
+                    windowElement.classList.remove(
+                        "is-drop-target"
+                    );
+                }
 
             }
         );
@@ -348,6 +470,10 @@ document.addEventListener(
             event => {
 
                 event.preventDefault();
+
+                windowElement.classList.remove(
+                    "is-drop-target"
+                );
 
                 Playlist.addFiles(
                     event.dataTransfer.files
