@@ -10,16 +10,16 @@
         transparent 1px,
         transparent 3px
     );
-    opacity: 0.28;
+    opacity: 0.12;
 }
 
 .kritr-window {
-    animation: bootReveal 760ms steps(8, end) both;
+    animation: bootReveal 500ms ease-out both;
 }
 
 .brand-icon {
     display: inline-block;
-    animation: bootGem 900ms steps(5, end) both;
+    animation: bootGem 650ms ease-out both;
 }
 
 .visualizer-container::after {
@@ -33,49 +33,29 @@
         var(--accent-glow),
         transparent 58%
     );
-    transition: opacity 100ms linear;
-}
-
-.kritr-window.beat-hit {
-    animation: beatDrop 280ms steps(3, end);
+    transition: opacity 220ms ease-out;
 }
 
 .pet-sprite {
     transform-origin: center bottom;
-    transition: filter 180ms ease, text-shadow 180ms ease;
-}
-
-.is-playing .pet-sprite {
-    animation: petGroove 1.1s steps(4, end) infinite;
-    filter: drop-shadow(0 0 8px var(--accent-glow));
-}
-
-.pet-sprite.beat-hit {
-    animation: petBeat 280ms steps(3, end);
+    transform: scale(var(--pet-scale, 1));
+    transition: transform 220ms ease-out, filter 220ms ease;
 }
 
 .pet-sprite.pet-bounce {
-    animation: petBounce 500ms steps(4, end);
+    animation: petBounce 800ms ease-out;
 }
 
 .pet-sprite.pet-spin {
-    animation: petSpin 700ms steps(8, end);
+    animation: petSpin 900ms ease-out;
 }
 
 .pet-sprite.pet-heart {
-    animation: petHeart 800ms steps(5, end);
-}
-
-.tab-page.active {
-    animation: pageReveal 180ms steps(4, end);
-}
-
-.is-playing .play-button {
-    animation: playPulse 1.8s ease-in-out infinite;
+    animation: petHeart 700ms ease-in-out;
 }
 
 .is-loading .play-button {
-    animation: loadingBlink 700ms steps(2, end) infinite;
+    border-color: var(--accent-secondary);
 }
 
 .is-drop-target .visualizer-container {
@@ -86,76 +66,19 @@
 @keyframes bootReveal {
     0% {
         opacity: 0;
-        filter: brightness(1.8) saturate(0.7);
-    }
-    65% {
-        opacity: 1;
-        filter: brightness(1.2);
     }
     100% {
         opacity: 1;
-        filter: brightness(1);
     }
 }
 
 @keyframes bootGem {
     0% {
         opacity: 0;
-        transform: rotate(-90deg) scale(0.2);
+        transform: scale(0.85);
     }
-    55% {
+    100% {
         opacity: 1;
-        transform: rotate(18deg) scale(1.25);
-    }
-    100% {
-        transform: rotate(0) scale(1);
-    }
-}
-
-@keyframes pageReveal {
-    from {
-        opacity: 0.45;
-        filter: brightness(1.4);
-    }
-    to {
-        opacity: 1;
-        filter: brightness(1);
-    }
-}
-
-@keyframes beatDrop {
-    0% {
-        transform: scale(var(--ui-scale));
-        box-shadow: var(--shadow);
-    }
-    45% {
-        transform: translate(1px, -2px) scale(var(--ui-scale));
-        box-shadow: 0 0 var(--beat-glow, 16px) var(--accent-glow), var(--shadow);
-    }
-    100% {
-        transform: scale(var(--ui-scale));
-        box-shadow: var(--shadow);
-    }
-}
-
-@keyframes petGroove {
-    0%, 100% {
-        transform: translateY(0) rotate(0);
-    }
-    50% {
-        transform: translateY(-4px) rotate(-2deg);
-    }
-}
-
-@keyframes petBeat {
-    0% {
-        transform: scale(1);
-    }
-    45% {
-        transform: scale(1.32) rotate(-5deg);
-        filter: drop-shadow(0 0 14px var(--accent-main));
-    }
-    100% {
         transform: scale(1);
     }
 }
@@ -165,7 +88,7 @@
         transform: translateY(0);
     }
     40% {
-        transform: translateY(-25px);
+        transform: translateY(-12px);
     }
 }
 
@@ -174,7 +97,7 @@
         transform: rotate(0);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(180deg);
     }
 }
 
@@ -183,22 +106,7 @@
         transform: scale(1);
     }
     50% {
-        transform: scale(1.3);
-    }
-}
-
-@keyframes playPulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 var(--accent-glow);
-    }
-    50% {
-        box-shadow: 0 0 14px 2px var(--accent-glow);
-    }
-}
-
-@keyframes loadingBlink {
-    50% {
-        opacity: 0.45;
+        transform: scale(1.1);
     }
 }
 
@@ -208,6 +116,7 @@
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
 }

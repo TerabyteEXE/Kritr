@@ -14,9 +14,9 @@ const Visualizer = {
 
     bass: 0,
 
-    previousBass: 0,
+    lastFrame: 0,
 
-    lastBeat: 0,
+    motionQuery: null,
 
     particles: [],
 
@@ -24,6 +24,7 @@ const Visualizer = {
     initialize() {
 
         this.ctx = this.canvas.getContext("2d");
+        this.motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
         this.resize();
 
@@ -32,8 +33,13 @@ const Visualizer = {
             () => this.resize()
         );
 
+        this.motionQuery.addEventListener("change", () => {
+            this.lastFrame = 0;
+            this.render();
+        });
+
         requestAnimationFrame(
-            () => this.render()
+            time => this.render(time)
         );
 
     },
@@ -72,11 +78,21 @@ const Visualizer = {
     },
 
 
-    render() {
+    render(time = performance.now()) {
 
-        requestAnimationFrame(
-            () => this.render()
-        );
+        const reducedMotion = this.motionQuery.matches;
+
+        if (!reducedMotion) {
+            requestAnimationFrame(
+                nextTime => this.render(nextTime)
+            );
+        }
+
+        if (!reducedMotion && time - this.lastFrame < 33) {
+            return;
+        }
+
+        this.lastFrame = time;
 
         const rect = this.canvas.getBoundingClientRect();
         const width = rect.width;
@@ -91,31 +107,37 @@ const Visualizer = {
 
         const playing = !audio.paused && Player.analyser;
 
-        if (playing) {
+        if (playing && !reducedMotion) {
             this.readAudio();
         } else {
-            this.level *= 0.92;
-            this.bass *= 0.9;
-            this.previousBass *= 0.9;
+            this.level = 0;
+            this.bass = 0;
             this.drawIdle(ctx, width, height);
         }
 
         this.canvas.parentElement.style.setProperty(
             "--audio-level",
-            this.level.toFixed(3)
+            Math.min(0.14, this.level * 0.12 + this.bass * 0.08).toFixed(3)
         );
 
-        if (this.mode === "wave" && playing) {
+        document.querySelector(".pet-sprite").style.setProperty(
+            "--pet-scale",
+            (1 + this.bass * 0.06).toFixed(3)
+        );
+
+        if (this.mode === "wave" && playing && !reducedMotion) {
             this.drawWave(ctx, width, height);
-        } else if (this.mode === "dots" && playing) {
+        } else if (this.mode === "dots" && playing && !reducedMotion) {
             this.drawDots(ctx, width, height);
-        } else if (this.mode === "particles" && playing) {
+        } else if (this.mode === "particles" && playing && !reducedMotion) {
             this.drawParticles(ctx, width, height);
-        } else if (playing) {
+        } else if (playing && !reducedMotion) {
             this.drawBars(ctx, width, height);
         }
 
-        this.drawAmbientParticles(ctx, width, height, playing);
+        if (!reducedMotion) {
+            this.drawAmbientParticles(ctx, width, height, playing);
+        }
 
     },
 
@@ -148,47 +170,7 @@ const Visualizer = {
         }
 
         this.level += (total / samples / 255 - this.level) * 0.28;
-        this.bass += (bassTarget - this.bass) * 0.42;
-
-        const now = performance.now();
-        const risingBass = this.bass > this.previousBass * 1.22;
-
-        if (
-            this.bass > 0.22 &&
-            (risingBass || this.bass > 0.58) &&
-            now - this.lastBeat > 240
-        ) {
-            this.lastBeat = now;
-            this.onBeat();
-        }
-
-        this.previousBass = this.bass;
-
-    },
-
-
-    onBeat() {
-
-        const windowElement = document.querySelector(".kritr-window");
-        const pet = document.querySelector(".pet-sprite");
-
-        windowElement.classList.remove("beat-hit");
-        pet.classList.remove("beat-hit");
-
-        void windowElement.offsetWidth;
-
-        windowElement.classList.add("beat-hit");
-        pet.classList.add("beat-hit");
-
-        windowElement.style.setProperty(
-            "--beat-glow",
-            `${8 + this.bass * 24}px`
-        );
-
-        window.setTimeout(() => {
-            windowElement.classList.remove("beat-hit");
-            pet.classList.remove("beat-hit");
-        }, 280);
+        this.bass += (bassTarget - this.bass) * 0.28;
 
     },
 
@@ -208,7 +190,6 @@ const Visualizer = {
     drawIdle(ctx, width, height) {
 
         const center = height / 2;
-        const time = performance.now() / 650;
         const { main, secondary } = this.colors();
         const gradient = ctx.createLinearGradient(0, 0, width, 0);
 
@@ -218,7 +199,7 @@ const Visualizer = {
         ctx.beginPath();
 
         for (let x = 0; x <= width; x += 4) {
-            const y = center + Math.sin(x * 0.018 + time) * 5;
+            const y = center + Math.sin(x * 0.018) * 3;
 
             if (x === 0) {
                 ctx.moveTo(x, y);
@@ -341,7 +322,6 @@ const Visualizer = {
             const particle = this.particles[i];
             const index = Math.floor(i / this.particles.length * this.data.length);
             const value = this.data[index] / 255;
-            const pulse = 0.5 + Math.sin(performance.now() / 450 + particle.phase) * 0.5;
             const radius = particle.size + value * 7;
             const x = particle.x;
             const y = center + Math.sin(particle.phase + performance.now() / 700) * height * 0.22;
@@ -349,7 +329,7 @@ const Visualizer = {
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
             ctx.fillStyle = i % 3 ? main : secondary;
-            ctx.globalAlpha = 0.35 + value * pulse * 0.65;
+            ctx.globalAlpha = 0.45 + value * 0.4;
             ctx.shadowColor = ctx.fillStyle;
             ctx.shadowBlur = 5 + value * 12;
             ctx.fill();
