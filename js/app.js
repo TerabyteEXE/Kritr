@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
+            if (windowElement?.classList.contains("mini-mode")) return;
+
             const target = tab.dataset.tab;
             tabs.forEach(item => item.classList.toggle("active", item === tab));
             pages.forEach(page => page.classList.toggle("active", page.id === `${target}-tab`));
@@ -55,14 +57,18 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.addEventListener("ended", () => Player.next(true));
 
     audio.addEventListener("loadedmetadata", () => {
-        document.querySelector("#duration").textContent = formatTime(audio.duration);
+        const duration = document.querySelector("#duration");
+        if (duration) duration.textContent = formatTime(audio.duration);
     });
 
     audio.addEventListener("timeupdate", () => {
         if (!Number.isFinite(audio.duration) || !audio.duration) return;
         if (progress) progress.value = Math.round((audio.currentTime / audio.duration) * 1000);
-        document.querySelector("#current-time").textContent = formatTime(audio.currentTime);
-        document.querySelector("#duration").textContent = formatTime(audio.duration);
+
+        const currentTime = document.querySelector("#current-time");
+        const duration = document.querySelector("#duration");
+        if (currentTime) currentTime.textContent = formatTime(audio.currentTime);
+        if (duration) duration.textContent = formatTime(audio.duration);
     });
 
     progress?.addEventListener("input", event => {
@@ -112,27 +118,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelector("#clear-playlist")?.addEventListener("click", () => Playlist.clear());
-
-    document.querySelector("#pet-species")?.addEventListener("change", event => {
-        Pet.setSpecies(event.target.value);
-    });
-
+    document.querySelector("#pet-species")?.addEventListener("change", event => Pet.setSpecies(event.target.value));
     document.querySelector("#pet-trick-btn")?.addEventListener("click", () => {
-        Pet.trick(document.querySelector("#pet-trick").value);
+        Pet.trick(document.querySelector("#pet-trick")?.value || "bounce");
     });
 
-    document.querySelector("#pet-display")?.addEventListener("click", () => Pet.interact?.());
-    document.querySelector("#pet-preview")?.addEventListener("click", () => Pet.interact?.());
+    document.querySelector("#pet-display")?.addEventListener("click", () => Pet.interact());
+    document.querySelector("#pet-preview")?.addEventListener("click", () => Pet.interact());
 
+    // The left window button is now the real mini-player toggle.
     document.querySelector("#minimize-btn")?.addEventListener("click", () => {
-        windowElement?.classList.toggle("compact");
-        windowElement?.classList.remove("maximized");
+        Features.toggleMini();
     });
 
     document.querySelector("#maximize-btn")?.addEventListener("click", () => {
-        windowElement?.classList.toggle("maximized");
-        windowElement?.classList.remove("compact");
-        window.setTimeout(() => Visualizer.resize(), 320);
+        const becomingMaximized = !windowElement?.classList.contains("maximized");
+
+        if (becomingMaximized) {
+            Features.applyWindowMode("normal");
+            windowElement?.classList.add("maximized");
+        } else {
+            windowElement?.classList.remove("maximized");
+        }
+
+        window.setTimeout(() => Visualizer.resize(), 150);
     });
 
     document.querySelector("#close-btn")?.addEventListener("click", () => {
@@ -146,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("kritr:basshit", () => {
         Pet.reactToBass();
         if (!KritrStorage.load("reactive", true)) return;
+
         windowElement?.classList.remove("bass-hit");
         void windowElement?.offsetWidth;
         windowElement?.classList.add("bass-hit");

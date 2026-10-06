@@ -1,548 +1,247 @@
 const Pet = {
     species: "cat",
-
-    element: document.querySelector(".pet-sprite"),
-    preview: document.querySelector("#pet-preview"),
-    display: document.querySelector("#pet-display"),
-    bubble: document.querySelector(".pet-bubble"),
-
     playing: false,
     activity: "normal",
     reactionsEnabled: true,
-
-    frameIndex: 0,
-    idleCounter: 0,
     loopTimer: null,
+    reactionTimer: null,
+    messageTimer: null,
+    name: "KRITR-CHAN",
 
-    speciesFrames: {
+    element: null,
+    preview: null,
+    display: null,
+    bubble: null,
+
+    faces: {
         cat: {
-            idle: [
-                "(=^･ω･^=)",
-                "(=^･ｪ･^=)",
-                "(=^･ω･^=)",
-                "(=－ω－=)"
-            ],
-
-            happy: [
-                "(=^▽^=)",
-                "(=^ω^=)",
-                "(=^･ω･^=)"
-            ],
-
-            music: [
-                "(=^･ω･^=) ♪",
-                "(=^ω^=) ♫",
-                "(=≧▽≦=) ♪"
-            ],
-
-            bass: [
-                "(=OωO=)!!",
-                "(=≧ω≦=)★",
-                "(=^▽^=)!!"
-            ],
-
-            sleepy: [
-                "(=－ω－=)",
-                "(=－ω－=) z",
-                "(=－ω－=) zz"
-            ]
+            base: "(=^･ω･^=)",
+            blink: "(=^－ω－^=)",
+            happy: "(=^▽^=)",
+            surprised: "(=OωO=)",
+            sleepy: "(=－ω－=)"
         },
-
-
         slime: {
-            idle: [
-                "(●´ω｀●)",
-                "(●・ω・●)",
-                "(●´ω｀●)",
-                "(●－ω－●)"
-            ],
-
-            happy: [
-                "(●⌒ω⌒●)",
-                "(●^▽^●)",
-                "(●´▽｀●)"
-            ],
-
-            music: [
-                "(●・ω・●) ♪",
-                "(●⌒ω⌒●) ♫",
-                "(●≧▽≦●) ♪"
-            ],
-
-            bass: [
-                "(●OωO●)!!",
-                "(●≧ω≦●)★",
-                "(●^▽^●)!!"
-            ],
-
-            sleepy: [
-                "(●－ω－●)",
-                "(●－ω－●) z",
-                "(●－ω－●) zz"
-            ]
+            base: "(●´ω｀●)",
+            blink: "(●－ω－●)",
+            happy: "(●^▽^●)",
+            surprised: "(●OωO●)",
+            sleepy: "(●－ω－●)"
         },
-
-
         bunny: {
-            idle: [
-                "／(=･ x ･=)＼",
-                "／(=･ω･=)＼",
-                "／(=･ x ･=)＼",
-                "／(=- x -=)＼"
-            ],
-
-            happy: [
-                "／(=^ x ^=)＼",
-                "／(=^ω^=)＼",
-                "／(=≧ x ≦=)＼"
-            ],
-
-            music: [
-                "／(=･ x ･=)＼ ♪",
-                "／(=^ω^=)＼ ♫",
-                "／(=≧▽≦=)＼ ♪"
-            ],
-
-            bass: [
-                "／(=O x O=)＼!!",
-                "／(=≧ω≦=)＼★",
-                "／(=^▽^=)＼!!"
-            ],
-
-            sleepy: [
-                "／(=- x -=)＼",
-                "／(=- x -=)＼ z",
-                "／(=- x -=)＼ zz"
-            ]
+            base: "／(=･ x ･=)＼",
+            blink: "／(=- x -=)＼",
+            happy: "／(=^ x ^=)＼",
+            surprised: "／(=O x O=)＼",
+            sleepy: "／(=- x -=)＼"
         }
     },
-
 
     init() {
+        this.element = document.querySelector(".pet-sprite");
+        this.preview = document.querySelector("#pet-preview");
+        this.display = document.querySelector("#pet-display");
+        this.bubble = document.querySelector(".pet-bubble");
+
         this.load();
+        this.bindNameInput();
         this.startLifeLoop();
+        this.showBase();
     },
 
-
-    getFrames(type = "idle") {
-        const species =
-            this.speciesFrames[this.species]
-            || this.speciesFrames.cat;
-
-        return species[type] || species.idle;
+    currentFaces() {
+        return this.faces[this.species] || this.faces.cat;
     },
 
-
-    showFrame(frame) {
-        if (this.element) {
-            this.element.textContent = frame;
-        }
-
-        if (this.preview) {
-            this.preview.textContent = frame;
-        }
+    showFace(face) {
+        if (this.element) this.element.textContent = face;
+        if (this.preview) this.preview.textContent = face;
     },
 
-
-    showAnimation(type = "idle") {
-        const frames = this.getFrames(type);
-
-        if (!frames.length) {
-            return;
-        }
-
-        const frame =
-            frames[
-                this.frameIndex
-                % frames.length
-            ];
-
-        this.showFrame(frame);
-
-        this.frameIndex++;
+    showBase() {
+        this.showFace(this.currentFaces().base);
+        this.setBubble(this.playing ? "♪" : "♡");
     },
 
+    setBubble(symbol) {
+        if (this.bubble) this.bubble.textContent = symbol;
+    },
+
+    moment(faceName, duration = 360, bubble = null) {
+        if (!this.reactionsEnabled) return;
+
+        window.clearTimeout(this.reactionTimer);
+        const face = this.currentFaces()[faceName] || this.currentFaces().base;
+        this.showFace(face);
+        if (bubble !== null) this.setBubble(bubble);
+
+        this.reactionTimer = window.setTimeout(() => {
+            this.showBase();
+        }, duration);
+    },
 
     setSpecies(species) {
-        if (!this.speciesFrames[species]) {
-            species = "cat";
-        }
-
+        if (!this.faces[species]) species = "cat";
         this.species = species;
 
-        this.frameIndex = 0;
+        const selector = document.querySelector("#pet-species");
+        if (selector) selector.value = species;
+        if (this.display) this.display.dataset.species = species;
 
-        const selector =
-            document.querySelector(
-                "#pet-species"
-            );
-
-        if (selector) {
-            selector.value = species;
-        }
-
-        if (this.display) {
-            this.display.dataset.species =
-                species;
-        }
-
-        this.showAnimation("idle");
-
-        KritrStorage.save(
-            "petSpecies",
-            species
-        );
-
+        KritrStorage.save("petSpecies", species);
         KritrStorage.save("pet", species);
+        this.showBase();
     },
-
 
     setPlaying(isPlaying) {
-        this.playing = isPlaying;
-
-        this.frameIndex = 0;
-        this.wakeUp();
-
+        this.playing = Boolean(isPlaying);
         if (this.display) {
-            this.display.classList.toggle(
-                "pet-is-playing",
-                isPlaying
-            );
+            this.display.classList.toggle("pet-is-playing", this.playing);
         }
 
-        if (this.reactionsEnabled) {
-            this.showAnimation(isPlaying ? "music" : "idle");
-            if (this.bubble) {
-                this.bubble.textContent = isPlaying ? "♪" : "♡";
-            }
+        if (this.playing) {
+            this.moment("happy", 500, "♪");
+            this.say("let's listen!", 1200);
+        } else {
+            this.showBase();
         }
     },
 
-
-    getEnergy() {
-        const root =
-            document.querySelector(
-                ".kritr-window"
-            );
-
-        if (!root) {
-            return 0;
-        }
-
-        const value =
-            getComputedStyle(root)
-                .getPropertyValue("--energy");
-
-        const number =
-            parseFloat(value);
-
-        return Number.isFinite(number)
-            ? number
-            : 0;
+    reactToBass() {
+        if (!this.reactionsEnabled || !this.playing) return;
+        this.moment("surprised", 260, "★");
     },
 
+    blink() {
+        if (!this.reactionsEnabled) return;
+        this.moment("blink", 180, this.playing ? "♪" : "♡");
+    },
 
     updateLife() {
         if (!this.reactionsEnabled) {
-            this.showAnimation("idle");
-            if (this.bubble) this.bubble.textContent = "♡";
+            this.showBase();
             return;
         }
 
-        const energy =
-            this.getEnergy();
-
-        this.idleCounter++;
-
-
-        /*
-         * MUSIC MODE
-         */
-
-        if (this.playing) {
-
-            if (energy > 0.72) {
-                this.showAnimation("bass");
-
-                if (this.bubble) {
-                    this.bubble.textContent =
-                        Math.random() > 0.5
-                            ? "★"
-                            : "!!";
-                }
-
-                return;
-            }
-
-            this.showAnimation(energy > 0.28 && Math.random() < 0.35 ? "happy" : "music");
-            if (this.bubble) {
-                const bubbles = energy > 0.28
-                    ? ["♪", "♫", "♥", "☆", "!!"]
-                    : ["♪", "♫", "♥"];
-                this.bubble.textContent = bubbles[Math.floor(Math.random() * bubbles.length)];
-            }
-
-            return;
-        }
-
-
-        /*
-         * IDLE MODE
-         */
-
-        if (this.idleCounter > 18) {
-            this.showAnimation("sleepy");
-
-            if (this.bubble) {
-                this.bubble.textContent =
-                    "z";
-            }
-
-            return;
-        }
-
-
-        /*
-         * Occasional little expressions
-         */
-
-        if (Math.random() < 0.16) {
-            this.showAnimation("happy");
-
-            if (this.bubble) {
-                this.bubble.textContent =
-                    Math.random() > 0.5
-                        ? "♡"
-                        : "☆";
-            }
-
-            return;
-        }
-
-
-        this.showAnimation("idle");
-
-        if (this.bubble) {
-            this.bubble.textContent =
-                "♡";
-        }
+        // The pet should feel like one character, not a slot machine.
+        // Most life-loop ticks do nothing. Occasionally it only blinks.
+        const chance = this.playing ? 0.22 : 0.32;
+        if (Math.random() < chance) this.blink();
     },
-
 
     startLifeLoop() {
-        if (this.loopTimer) {
-            clearInterval(
-                this.loopTimer
-            );
-        }
+        if (this.loopTimer) window.clearInterval(this.loopTimer);
 
         const speeds = {
-            low: 1200,
-            normal: 700,
-            high: 400
+            low: 9000,
+            normal: 6500,
+            high: 4200
         };
 
-        const delay =
-            speeds[this.activity]
-            || speeds.normal;
-
-
-        this.loopTimer =
-            setInterval(() => {
-                this.updateLife();
-            }, delay);
+        this.loopTimer = window.setInterval(
+            () => this.updateLife(),
+            speeds[this.activity] || speeds.normal
+        );
     },
-
 
     setActivity(level) {
-        if (
-            ![
-                "low",
-                "normal",
-                "high"
-            ].includes(level)
-        ) {
-            level = "normal";
-        }
-
+        if (!["low", "normal", "high"].includes(level)) level = "normal";
         this.activity = level;
-
+        KritrStorage.save("petActivity", level);
         this.startLifeLoop();
-
-        KritrStorage.save(
-            "petActivity",
-            level
-        );
     },
-
 
     setReactions(enabled) {
-        this.reactionsEnabled =
-            Boolean(enabled);
-
+        this.reactionsEnabled = Boolean(enabled);
+        KritrStorage.save("petReactions", this.reactionsEnabled);
         if (this.display) {
-            this.display.classList.toggle(
-                "pet-reactions-on",
-                this.reactionsEnabled
-            );
+            this.display.classList.toggle("pet-reactions-on", this.reactionsEnabled);
         }
-
-        if (!this.reactionsEnabled) {
-            this.showAnimation("idle");
-            if (this.bubble) this.bubble.textContent = "♡";
-        } else if (this.playing) {
-            this.showAnimation("music");
-            if (this.bubble) this.bubble.textContent = "♪";
-        }
-
-        KritrStorage.save(
-            "petReactions",
-            this.reactionsEnabled
-        );
+        this.showBase();
     },
-
 
     wakeUp() {
-        this.idleCounter = 0;
+        if (this.reactionsEnabled) this.moment("happy", 420, "☆");
     },
-
-
-    reactToBass() {
-        if (!this.reactionsEnabled) {
-            return;
-        }
-
-        const frames =
-            this.getFrames("bass");
-
-        const frame =
-            frames[
-                Math.floor(
-                    Math.random()
-                    * frames.length
-                )
-            ];
-
-        this.showFrame(frame);
-
-        if (this.bubble) {
-            this.bubble.textContent =
-                "★";
-        }
-
-        this.wakeUp();
-    },
-
 
     trick(type) {
-        if (!["bounce", "spin", "heart"].includes(type)) {
-            return;
-        }
+        if (!["bounce", "spin", "heart"].includes(type)) return;
 
-        const targets = [
-            this.element,
-            this.preview
-        ].filter(Boolean);
-
-
-        const classes = [
-            "pet-bounce",
-            "pet-spin",
-            "pet-heart"
-        ];
-
+        const targets = [this.element, this.preview].filter(Boolean);
+        const classes = ["pet-bounce", "pet-spin", "pet-heart"];
 
         targets.forEach(target => {
-
-            target.classList.remove(
-                ...classes
-            );
-
+            target.classList.remove(...classes);
             void target.offsetWidth;
-
-            target.classList.add(
-                `pet-${type}`
-            );
-
+            target.classList.add(`pet-${type}`);
         });
 
-
-        this.showAnimation("happy");
-
-        this.wakeUp();
-
+        this.moment("happy", 850, type === "heart" ? "♥" : "☆");
+        this.say(type === "heart" ? "love!" : "ta-da!", 1100);
 
         window.setTimeout(() => {
-
-            targets.forEach(target => {
-
-                target.classList.remove(
-                    ...classes
-                );
-
-            });
-
+            targets.forEach(target => target.classList.remove(...classes));
         }, 900);
     },
 
+    interact() {
+        const lines = this.playing
+            ? ["good song!", "♪", "nice beat!", "i'm listening!"]
+            : ["hi!", "play something?", "*poke*", "i'm here!"];
+
+        this.say(lines[Math.floor(Math.random() * lines.length)], 1500);
+        this.moment("happy", 650, "♡");
+    },
+
+    setName(name) {
+        const clean = String(name || "KRITR-CHAN").trim().slice(0, 16) || "KRITR-CHAN";
+        this.name = clean;
+
+        document.querySelectorAll(".pet-name").forEach(el => {
+            el.textContent = clean.toUpperCase();
+        });
+
+        const input = document.querySelector("#pet-name-input");
+        if (input && input.value !== clean) input.value = clean;
+        KritrStorage.save("petName", clean);
+    },
+
+    say(message, duration = 1800) {
+        const box = document.querySelector("#pet-message");
+        if (!box) return;
+
+        window.clearTimeout(this.messageTimer);
+        box.textContent = String(message).slice(0, 28);
+        box.classList.remove("message-pop");
+        void box.offsetWidth;
+        box.classList.add("message-pop");
+
+        this.messageTimer = window.setTimeout(() => {
+            box.textContent = this.playing ? "listening with you" : "ready when you are";
+        }, duration);
+    },
+
+    bindNameInput() {
+        const input = document.querySelector("#pet-name-input");
+        if (!input) return;
+
+        input.addEventListener("change", () => this.setName(input.value));
+        input.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+                this.setName(input.value);
+                input.blur();
+                this.say(`i'm ${this.name}!`, 1400);
+            }
+        });
+    },
 
     load() {
         const activity = KritrStorage.load("petActivity", "normal");
         this.activity = ["low", "normal", "high"].includes(activity) ? activity : "normal";
         this.reactionsEnabled = Boolean(KritrStorage.load("petReactions", true));
+        this.name = KritrStorage.load("petName", "KRITR-CHAN");
 
-        this.setSpecies(
-            KritrStorage.load("petSpecies", KritrStorage.load("pet", "cat"))
-        );
+        this.setSpecies(KritrStorage.load("petSpecies", KritrStorage.load("pet", "cat")));
+        this.setName(this.name);
     }
-};
-// Personality extensions -----------------------------------------------------
-Pet.name = KritrStorage.load("petName", "KRITR-CHAN");
-Pet.messageTimer = null;
-
-Pet.setName = function(name) {
-    const clean = String(name || "KRITR-CHAN").trim().slice(0, 16) || "KRITR-CHAN";
-    this.name = clean;
-    document.querySelectorAll(".pet-name").forEach(el => el.textContent = clean.toUpperCase());
-    const input = document.querySelector("#pet-name-input");
-    if (input && input.value !== clean) input.value = clean;
-    KritrStorage.save("petName", clean);
-};
-
-Pet.say = function(message, duration = 1800) {
-    const box = document.querySelector("#pet-message");
-    if (!box) return;
-    window.clearTimeout(this.messageTimer);
-    box.textContent = String(message).slice(0, 28);
-    box.classList.remove("message-pop");
-    void box.offsetWidth;
-    box.classList.add("message-pop");
-    this.messageTimer = window.setTimeout(() => {
-        box.textContent = this.playing ? "jammin' with you!" : "ready to jam!";
-    }, duration);
-};
-
-Pet.interact = function() {
-    this.wakeUp();
-    const lines = this.playing
-        ? ["♪♪♪", "THIS ONE! ♥", "TURN IT UP!", "GOOD BEAT!", "WOO!! ☆"]
-        : ["HI!!", "PLAY A SONG?", "*poke*", "(≧▽≦)", "I'M AWAKE! ☆"];
-    this.say(lines[Math.floor(Math.random() * lines.length)]);
-    const tricks = ["bounce", "heart", "bounce", "spin"];
-    this.trick(tricks[Math.floor(Math.random() * tricks.length)]);
-};
-
-const petBaseInit = Pet.init.bind(Pet);
-Pet.init = function() {
-    petBaseInit();
-    this.setName(KritrStorage.load("petName", "KRITR-CHAN"));
-    const input = document.querySelector("#pet-name-input");
-    input?.addEventListener("change", () => this.setName(input.value));
-    input?.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-            this.setName(input.value);
-            input.blur();
-            this.say(`I'M ${this.name.toUpperCase()}!`);
-        }
-    });
 };
