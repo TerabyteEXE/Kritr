@@ -496,3 +496,53 @@ const Pet = {
         );
     }
 };
+// Personality extensions -----------------------------------------------------
+Pet.name = KritrStorage.load("petName", "KRITR-CHAN");
+Pet.messageTimer = null;
+
+Pet.setName = function(name) {
+    const clean = String(name || "KRITR-CHAN").trim().slice(0, 16) || "KRITR-CHAN";
+    this.name = clean;
+    document.querySelectorAll(".pet-name").forEach(el => el.textContent = clean.toUpperCase());
+    const input = document.querySelector("#pet-name-input");
+    if (input && input.value !== clean) input.value = clean;
+    KritrStorage.save("petName", clean);
+};
+
+Pet.say = function(message, duration = 1800) {
+    const box = document.querySelector("#pet-message");
+    if (!box) return;
+    window.clearTimeout(this.messageTimer);
+    box.textContent = String(message).slice(0, 28);
+    box.classList.remove("message-pop");
+    void box.offsetWidth;
+    box.classList.add("message-pop");
+    this.messageTimer = window.setTimeout(() => {
+        box.textContent = this.playing ? "jammin' with you!" : "ready to jam!";
+    }, duration);
+};
+
+Pet.interact = function() {
+    this.wakeUp();
+    const lines = this.playing
+        ? ["♪♪♪", "THIS ONE! ♥", "TURN IT UP!", "GOOD BEAT!", "WOO!! ☆"]
+        : ["HI!!", "PLAY A SONG?", "*poke*", "(≧▽≦)", "I'M AWAKE! ☆"];
+    this.say(lines[Math.floor(Math.random() * lines.length)]);
+    const tricks = ["bounce", "heart", "bounce", "spin"];
+    this.trick(tricks[Math.floor(Math.random() * tricks.length)]);
+};
+
+const petBaseInit = Pet.init.bind(Pet);
+Pet.init = function() {
+    petBaseInit();
+    this.setName(KritrStorage.load("petName", "KRITR-CHAN"));
+    const input = document.querySelector("#pet-name-input");
+    input?.addEventListener("change", () => this.setName(input.value));
+    input?.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            this.setName(input.value);
+            input.blur();
+            this.say(`I'M ${this.name.toUpperCase()}!`);
+        }
+    });
+};

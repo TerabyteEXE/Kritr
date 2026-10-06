@@ -267,9 +267,7 @@
 
                 </div>
 
-                <div class="track-status">
-                    ♥
-                </div>
+                <button id="favorite-btn" class="track-status favorite-button" type="button" title="Favorite track" aria-label="Favorite track">♡</button>
 
             </div>
 
@@ -299,33 +297,11 @@
 
             <!-- MAIN CONTROLS -->
             <div class="player-controls">
-
-                <button
-                    id="previous-btn"
-                    class="control-button"
-                    type="button"
-                >
-                    ◀◀
-                </button>
-
-
-                <button
-                    id="play-btn"
-                    class="control-button play-button"
-                    type="button"
-                >
-                    ▶
-                </button>
-
-
-                <button
-                    id="next-btn"
-                    class="control-button"
-                    type="button"
-                >
-                    ▶▶
-                </button>
-
+                <button id="shuffle-btn" class="control-button utility-control" type="button" title="Shuffle" aria-label="Shuffle">⤨</button>
+                <button id="previous-btn" class="control-button" type="button" aria-label="Previous">◀◀</button>
+                <button id="play-btn" class="control-button play-button" type="button" aria-label="Play">▶</button>
+                <button id="next-btn" class="control-button" type="button" aria-label="Next">▶▶</button>
+                <button id="repeat-btn" class="control-button utility-control" type="button" title="Repeat" aria-label="Repeat">↻</button>
             </div>
 
 
@@ -449,6 +425,10 @@
 
             </div>
 
+            <div class="playlist-tools">
+                <input id="playlist-search" class="pixel-input" type="search" placeholder="SEARCH SONGS..." autocomplete="off">
+                <button id="favorites-filter" class="small-button" type="button" aria-pressed="false">♡ FAVS</button>
+            </div>
 
             <div
                 id="playlist"
@@ -514,12 +494,15 @@
                         (=^･ω･^=)
                     </div>
 
-                    <div class="pet-preview-message">
-                        ready to jam!
-                    </div>
+                    <div id="pet-message" class="pet-preview-message">ready to jam!</div>
 
                 </div>
 
+
+                <label class="setting-box">
+                    <span>NAME</span>
+                    <input id="pet-name-input" class="pixel-input" type="text" maxlength="16" value="KRITR-CHAN" autocomplete="off">
+                </label>
 
                 <label class="setting-box">
 
@@ -622,6 +605,14 @@
                             <option value="oxide">SUNSET</option>
                             <option value="ice">ICE POP</option>
                             <option value="amber">RETRO CRT</option>
+                            <option value="mochi">MOCHI PINK</option>
+                            <option value="bluecrt">BLUE CRT</option>
+                            <option value="matcha">MATCHA</option>
+                            <option value="candy">CANDY POP</option>
+                            <option value="midnight">MIDNIGHT NEKO</option>
+                            <option value="famicom">FAMICOM</option>
+                            <option value="lavender">LAVENDER DREAM</option>
+                            <option value="lcd">MONO LCD</option>
                         </select>
                     </label>
                     <label class="setting-box">
@@ -654,6 +645,8 @@
                             <option value="wave">WAVE</option>
                             <option value="dots">SPARKLES</option>
                             <option value="spectrum">MIRROR</option>
+                            <option value="blocks">BOUNCE BLOCKS</option>
+                            <option value="stars">STARFIELD</option>
                         </select>
                     </label>
                     <label class="setting-box">
@@ -663,6 +656,26 @@
                     <label class="setting-box">
                         <span>CRT STRENGTH <output data-for="crt-strength">18%</output></span>
                         <input id="crt-strength" type="range" min="0" max="100" value="18">
+                    </label>
+                    <label class="setting-box">
+                        <span>VIZ COLOR</span>
+                        <select id="visualizer-color">
+                            <option value="theme">THEME</option>
+                            <option value="mono">MONO</option>
+                            <option value="rainbow">RAINBOW</option>
+                        </select>
+                    </label>
+                    <label class="setting-box">
+                        <span>BASS FX</span>
+                        <select id="bass-intensity">
+                            <option value="subtle">SUBTLE</option>
+                            <option value="normal">NORMAL</option>
+                            <option value="wild">RIDICULOUS</option>
+                        </select>
+                    </label>
+                    <label class="toggle-setting">
+                        <input id="screen-shake" type="checkbox" checked>
+                        <span>BASS SCREEN SHAKE</span>
                     </label>
                     <label class="toggle-setting">
                         <input id="reactive-toggle" type="checkbox" checked>
@@ -692,10 +705,34 @@
 
                 <section class="settings-category">
                     <h3>SYSTEM</h3>
+                    <label class="setting-box">
+                        <span>BOOT STYLE</span>
+                        <select id="boot-style">
+                            <option value="cute">CUTE</option>
+                            <option value="terminal">TERMINAL</option>
+                            <option value="instant">INSTANT</option>
+                        </select>
+                    </label>
+                    <label class="setting-box">
+                        <span>WINDOW MODE</span>
+                        <select id="window-mode">
+                            <option value="normal">POCKET</option>
+                            <option value="mini">MINI</option>
+                        </select>
+                    </label>
                     <label class="toggle-setting">
                         <input id="boot-toggle" type="checkbox" checked>
                         <span>BOOT ANIMATION</span>
                     </label>
+                    <label class="toggle-setting">
+                        <input id="ui-sounds" type="checkbox">
+                        <span>PIXEL UI SOUNDS</span>
+                    </label>
+                    <div class="settings-actions">
+                        <button id="shortcuts-btn" class="small-button" type="button">? SHORTCUTS</button>
+                        <button id="reset-settings" class="small-button danger-button" type="button">RESET</button>
+                    </div>
+                    <div id="shortcut-help" class="shortcut-help" hidden>SPACE play/pause · ←/→ seek · S shuffle · R repeat · M mini</div>
                 </section>
 
             </div>
@@ -774,6 +811,7 @@
     <script src="js/visualizer.js"></script>
     <script src="js/pets.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/features.js"></script>
     <script src="js/app.js"></script>
 
 </body>

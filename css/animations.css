@@ -546,3 +546,8 @@ button:active,
             .001ms !important;
     }
 }
+/* Feature-pass bass variants */
+body[data-bass-fx="subtle"] .kritr-window.bass-hit { animation-name: bassHitSubtle; }
+body[data-bass-fx="wild"] .kritr-window.bass-hit { animation-name: bassHitWild; }
+@keyframes bassHitSubtle { 50% { transform: translate(1px,0); } }
+@keyframes bassHitWild { 25% { transform: translate(-3px,2px) scale(1.006); } 55% { transform: translate(3px,-2px) scale(1.006); } 100% { transform:none; } }

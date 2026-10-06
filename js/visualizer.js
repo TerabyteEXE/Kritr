@@ -4,6 +4,7 @@ const Visualizer = {
     frequencyData: null,
     timeData: null,
     mode: "bars",
+    colorMode: "theme",
     energy: 0,
     bass: 0,
     lastBassHit: 0,
@@ -70,8 +71,16 @@ const Visualizer = {
         ctx.clearRect(0, 0, width, height);
 
         const styles = getComputedStyle(document.body);
-        const primary = styles.getPropertyValue("--accent-main").trim() || "#ffffff";
-        const secondary = styles.getPropertyValue("--accent-secondary").trim() || primary;
+        let primary = styles.getPropertyValue("--accent-main").trim() || "#ffffff";
+        let secondary = styles.getPropertyValue("--accent-secondary").trim() || primary;
+        if (this.colorMode === "mono") {
+            primary = styles.getPropertyValue("--text-color").trim() || "#ffffff";
+            secondary = primary;
+        } else if (this.colorMode === "rainbow") {
+            const hue = (performance.now() / 35) % 360;
+            primary = `hsl(${hue} 90% 66%)`;
+            secondary = `hsl(${(hue + 90) % 360} 90% 64%)`;
+        }
 
         if (!this.ensureData()) {
             this.energy *= 0.94;
@@ -97,6 +106,12 @@ const Visualizer = {
                 break;
             case "spectrum":
                 this.drawSpectrum(ctx, width, height, primary, secondary);
+                break;
+            case "blocks":
+                this.drawBlocks(ctx, width, height, primary, secondary);
+                break;
+            case "stars":
+                this.drawStars(ctx, width, height, primary, secondary);
                 break;
             default:
                 this.drawBars(ctx, width, height, primary, secondary);
@@ -267,6 +282,43 @@ const Visualizer = {
     },
 
     setMode(mode) {
-        this.mode = ["bars", "wave", "dots", "spectrum"].includes(mode) ? mode : "bars";
+        this.mode = ["bars", "wave", "dots", "spectrum", "blocks", "stars"].includes(mode) ? mode : "bars";
     }
+};
+
+Visualizer.drawBlocks = function(ctx, width, height, primary, secondary) {
+    const cols = 18;
+    const rows = 10;
+    const gap = 3;
+    const cellW = width / cols;
+    const cellH = height / rows;
+    for (let x = 0; x < cols; x++) {
+        const idx = Math.floor((x / cols) * this.frequencyData.length * .7);
+        const value = this.frequencyData[idx] / 255;
+        const lit = Math.max(1, Math.round(value * rows));
+        for (let y = 0; y < lit; y++) {
+            ctx.globalAlpha = .35 + (y / rows) * .6;
+            ctx.fillStyle = y > rows * .65 ? secondary : primary;
+            ctx.fillRect(x * cellW + gap/2, height - (y+1)*cellH + gap/2, Math.max(1,cellW-gap), Math.max(1,cellH-gap));
+        }
+    }
+    ctx.globalAlpha = 1;
+};
+
+Visualizer.drawStars = function(ctx, width, height, primary, secondary) {
+    const t = performance.now() / 700;
+    const count = 42;
+    for (let i = 0; i < count; i++) {
+        const idx = Math.floor((i / count) * this.frequencyData.length);
+        const value = this.frequencyData[idx] / 255;
+        const x = ((i * 73.13) % 100) / 100 * width;
+        const baseY = ((i * 41.77) % 100) / 100 * height;
+        const y = (baseY + Math.sin(t + i) * 5 * value + height) % height;
+        const size = 1 + value * 3.5;
+        ctx.globalAlpha = .2 + value * .8;
+        ctx.fillStyle = i % 2 ? primary : secondary;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(size)), Math.max(1, Math.round(size)));
+        if (value > .65) ctx.fillRect(Math.round(x-size), Math.round(y+size/2), Math.round(size*3), 1);
+    }
+    ctx.globalAlpha = 1;
 };

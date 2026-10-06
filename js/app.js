@@ -10,11 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
     Pet.init();
     Settings.initialize();
     Visualizer.initialize();
+    Features.init();
 
-    if (KritrStorage.load("boot", true)) {
+    const bootStyle = KritrStorage.load("bootStyle", "cute");
+    if (KritrStorage.load("boot", true) && bootStyle !== "instant") {
         const boot = document.querySelector("#boot-screen");
         boot?.classList.add("show");
-        window.setTimeout(() => boot?.classList.remove("show"), 1600);
+        window.setTimeout(() => boot?.classList.remove("show"), bootStyle === "terminal" ? 1900 : 1600);
     }
 
     tabs.forEach(tab => {
@@ -50,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         windowElement?.classList.remove("is-playing");
     });
 
-    audio.addEventListener("ended", () => Player.next());
+    audio.addEventListener("ended", () => Player.next(true));
 
     audio.addEventListener("loadedmetadata", () => {
         document.querySelector("#duration").textContent = formatTime(audio.duration);
@@ -118,6 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#pet-trick-btn")?.addEventListener("click", () => {
         Pet.trick(document.querySelector("#pet-trick").value);
     });
+
+    document.querySelector("#pet-display")?.addEventListener("click", () => Pet.interact?.());
+    document.querySelector("#pet-preview")?.addEventListener("click", () => Pet.interact?.());
 
     document.querySelector("#minimize-btn")?.addEventListener("click", () => {
         windowElement?.classList.toggle("compact");

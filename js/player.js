@@ -7,22 +7,18 @@ const Player = {
     analyser: null,
     source: null,
     initialized: false,
+    shuffle: KritrStorage.load("shuffle", false),
+    repeat: KritrStorage.load("repeat", "off"),
 
     initializeAudio() {
         if (this.initialized) return;
-
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) {
-            console.warn("Web Audio API is not supported in this browser.");
-            return;
-        }
-
+        if (!AudioCtx) return;
         this.audioContext = new AudioCtx();
         this.source = this.audioContext.createMediaElementSource(audio);
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
         this.analyser.smoothingTimeConstant = 0.82;
-
         this.source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
         this.initialized = true;
@@ -31,30 +27,21 @@ const Player = {
     async play() {
         if (!audio.src) return;
         this.initializeAudio();
-
         try {
-            if (this.audioContext?.state === "suspended") {
-                await this.audioContext.resume();
-            }
+            if (this.audioContext?.state === "suspended") await this.audioContext.resume();
             await audio.play();
         } catch (error) {
             console.error("Unable to play audio:", error);
-            document.querySelector("#status").textContent = "PLAY ERROR";
+            const status = document.querySelector("#status");
+            if (status) status.textContent = "PLAY ERROR";
         }
     },
 
-    pause() {
-        audio.pause();
-    },
-
-    toggle() {
-        if (!audio.src) return;
-        audio.paused ? this.play() : this.pause();
-    },
+    pause() { audio.pause(); },
+    toggle() { if (audio.src) audio.paused ? this.play() : this.pause(); },
 
     load(index, autoplay = false) {
         if (index < 0 || index >= this.playlist.length) return;
-
         this.currentIndex = index;
         const track = this.playlist[index];
         audio.src = track.url;
@@ -64,7 +51,6 @@ const Player = {
         const artist = document.querySelector("#track-artist");
         const glyph = document.querySelector("#album-glyph");
         const label = document.querySelector("#album-label");
-
         if (title) title.textContent = track.name;
         if (artist) artist.textContent = track.artist || "Local File";
         if (glyph) glyph.textContent = (track.name.trim()[0] || "K").toUpperCase();
@@ -72,20 +58,60 @@ const Player = {
 
         document.title = `${track.name} — Kritr`;
         Playlist.render();
-
+        Features?.updateFavoriteButton?.();
+        Features?.trackChanged?.(track);
         if (autoplay) this.play();
     },
 
-    next() {
+    next(fromEnded = false) {
         if (!this.playlist.length) return;
-        const next = (this.currentIndex + 1) % this.playlist.length;
+        if (fromEnded && this.repeat === "one") {
+            audio.currentTime = 0;
+            this.play();
+            return;
+        }
+
+        let next;
+        if (this.shuffle && this.playlist.length > 1) {
+            do next = Math.floor(Math.random() * this.playlist.length);
+            while (next === this.currentIndex);
+        } else {
+            next = this.currentIndex + 1;
+            if (next >= this.playlist.length) {
+                if (fromEnded && this.repeat === "off") {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    return;
+                }
+                next = 0;
+            }
+        }
         this.load(next, true);
     },
 
     previous() {
         if (!this.playlist.length) return;
+        if (audio.currentTime > 3) {
+            audio.currentTime = 0;
+            return;
+        }
         const previous = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length;
         this.load(previous, true);
+    },
+
+    toggleShuffle() {
+        this.shuffle = !this.shuffle;
+        KritrStorage.save("shuffle", this.shuffle);
+        Features?.syncPlaybackButtons?.();
+        Pet?.say?.(this.shuffle ? "SHUFFLE ON!" : "SHUFFLE OFF");
+    },
+
+    cycleRepeat() {
+        const modes = ["off", "all", "one"];
+        this.repeat = modes[(modes.indexOf(this.repeat) + 1) % modes.length];
+        KritrStorage.save("repeat", this.repeat);
+        Features?.syncPlaybackButtons?.();
+        Pet?.say?.(`REPEAT ${this.repeat.toUpperCase()}`);
     },
 
     setVolume(value) {
