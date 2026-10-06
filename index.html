@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kritr — a tiny, expressive local music player.">
-    <meta name="theme-color" content="#0b0d12">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Kritr — tiny local music player."
+    >
+
+    <meta name="theme-color" content="#17141f">
+
     <title>Kritr Player</title>
 
     <link rel="stylesheet" href="css/main.css">
@@ -12,233 +22,750 @@
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
+
 <body>
-    <div class="ambient-orb orb-a" aria-hidden="true"></div>
-    <div class="ambient-orb orb-b" aria-hidden="true"></div>
+
+    <!-- CRT -->
     <div id="crt-overlay" aria-hidden="true"></div>
 
+
+    <!-- BOOT -->
     <div id="boot-screen" class="boot-screen" aria-hidden="true">
+
         <div class="boot-card">
-            <div class="boot-mark">◆</div>
-            <div class="boot-word">KRITR</div>
-            <div class="boot-line"><span></span></div>
-            <div class="boot-copy">LOCAL AUDIO // READY</div>
+
+            <div class="boot-mascot">
+                ( =ω= )
+            </div>
+
+            <div class="boot-logo">
+                KRITR
+            </div>
+
+            <div class="boot-subtitle">
+                pocket audio system
+            </div>
+
+            <div class="boot-progress">
+                <span></span>
+            </div>
+
+            <div class="boot-copy">
+                NOW LOADING...
+            </div>
+
         </div>
+
     </div>
 
-    <main class="kritr-window" id="kritr-window">
+
+    <!-- MAIN WINDOW -->
+    <main
+        class="kritr-window reactive-on"
+        id="kritr-window"
+    >
+
+        <!-- TITLEBAR -->
         <header class="titlebar">
+
             <div class="brand">
-                <span class="brand-icon">◆</span>
-                <span>KRITR</span>
-                <span class="version-pill">V0.2</span>
+
+                <div class="brand-mascot">
+                    ◆
+                </div>
+
+                <div class="brand-text">
+                    <strong>KRITR</strong>
+                    <small>PLAYER.EXE</small>
+                </div>
+
             </div>
 
-            <div class="window-buttons" aria-label="Window controls">
-                <button id="minimize-btn" type="button" title="Compact mode" aria-label="Compact mode">—</button>
-                <button id="maximize-btn" type="button" title="Maximize" aria-label="Maximize">□</button>
-                <button id="close-btn" type="button" title="Hide player" aria-label="Hide player">×</button>
+
+            <div class="window-buttons">
+
+                <button
+                    id="minimize-btn"
+                    type="button"
+                    title="Compact mode"
+                >
+                    _
+                </button>
+
+                <button
+                    id="maximize-btn"
+                    type="button"
+                    title="Maximize"
+                >
+                    □
+                </button>
+
+                <button
+                    id="close-btn"
+                    type="button"
+                    title="Hide"
+                >
+                    ×
+                </button>
+
             </div>
+
         </header>
 
-        <nav class="tabs" aria-label="Kritr sections">
-            <button class="tab active" data-tab="player" type="button">PLAYER</button>
-            <button class="tab" data-tab="playlist" type="button">PLAYLIST</button>
-            <button class="tab" data-tab="pet" type="button">PET</button>
-            <button class="tab" data-tab="setup" type="button">SETUP</button>
+
+        <!-- TABS -->
+        <nav class="tabs">
+
+            <button
+                class="tab active"
+                data-tab="player"
+                type="button"
+            >
+                ♪ PLAY
+            </button>
+
+            <button
+                class="tab"
+                data-tab="playlist"
+                type="button"
+            >
+                ≡ LIST
+            </button>
+
+            <button
+                class="tab"
+                data-tab="pet"
+                type="button"
+            >
+                ♥ PET
+            </button>
+
+            <button
+                class="tab"
+                data-tab="setup"
+                type="button"
+            >
+                ⚙ SET
+            </button>
+
         </nav>
 
-        <section id="player-tab" class="tab-page active">
+
+        <!-- PLAYER -->
+        <section
+            id="player-tab"
+            class="tab-page active"
+        >
+
+            <!-- HERO -->
             <div class="hero-grid">
+
+                <!-- ALBUM -->
                 <div class="cover-shell">
-                    <div id="album-art" class="album-art" aria-label="Generated album art">
-                        <div class="album-grid" aria-hidden="true"></div>
-                        <div id="album-glyph" class="album-glyph">K</div>
-                        <div class="album-caption">
-                            <span id="album-label">KRITR LOCAL</span>
-                            <span class="album-dot">●</span>
+
+                    <div
+                        id="album-art"
+                        class="album-art"
+                    >
+
+                        <div class="album-pattern"></div>
+
+                        <div
+                            id="album-glyph"
+                            class="album-glyph"
+                        >
+                            K
                         </div>
+
+                        <div class="album-caption">
+
+                            <span id="album-label">
+                                KRITR MIX
+                            </span>
+
+                            <span class="album-heart">
+                                ♥
+                            </span>
+
+                        </div>
+
                     </div>
+
                 </div>
 
+
+                <!-- VISUALIZER -->
                 <div class="visualizer-container">
+
                     <div class="viz-header">
-                        <span>AUDIO // LIVE</span>
-                        <span id="energy-readout">IDLE</span>
+
+                        <span>
+                            ♪ AUDIO
+                        </span>
+
+                        <span id="energy-readout">
+                            IDLE
+                        </span>
+
                     </div>
+
                     <canvas id="visualizer"></canvas>
-                    <div id="pet-display" class="pet-display">
-                        <div class="pet-shadow" aria-hidden="true"></div>
-                        <div class="pet-sprite">◕ᴗ◕</div>
+
+
+                    <div
+                        id="pet-display"
+                        class="pet-display"
+                        data-species="cat"
+                    >
+
+                        <div class="pet-name">
+                            KRITR-CHAN
+                        </div>
+
+                        <div class="pet-bubble">
+                            ♪
+                        </div>
+
+                        <div class="pet-sprite">
+                            (=^･ω･^=)
+                        </div>
+
+                        <div
+                            class="pet-shadow"
+                            aria-hidden="true"
+                        ></div>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <div class="track-info">
-                <div id="track-title" class="track-title">NO TRACK LOADED</div>
-                <div id="track-artist" class="track-artist">Drop a song into Kritr</div>
+
+            <!-- TRACK INFO -->
+            <div class="track-card">
+
+                <div class="track-icon">
+                    ♫
+                </div>
+
+                <div class="track-info">
+
+                    <div
+                        id="track-title"
+                        class="track-title"
+                    >
+                        NO TRACK
+                    </div>
+
+                    <div
+                        id="track-artist"
+                        class="track-artist"
+                    >
+                        add some music!
+                    </div>
+
+                </div>
+
+                <div class="track-status">
+                    ♥
+                </div>
+
             </div>
 
+
+            <!-- PROGRESS -->
             <div class="progress-container">
-                <span id="current-time">0:00</span>
-                <input id="progress" type="range" min="0" max="1000" value="0" aria-label="Track progress">
-                <span id="duration">0:00</span>
+
+                <span id="current-time">
+                    0:00
+                </span>
+
+                <input
+                    id="progress"
+                    type="range"
+                    min="0"
+                    max="1000"
+                    value="0"
+                    aria-label="Track progress"
+                >
+
+                <span id="duration">
+                    0:00
+                </span>
+
             </div>
 
+
+            <!-- MAIN CONTROLS -->
             <div class="player-controls">
-                <button id="previous-btn" class="control-button" type="button" aria-label="Previous track">◀◀</button>
-                <button id="play-btn" class="control-button play-button" type="button" aria-label="Play">▶</button>
-                <button id="next-btn" class="control-button" type="button" aria-label="Next track">▶▶</button>
+
+                <button
+                    id="previous-btn"
+                    class="control-button"
+                    type="button"
+                >
+                    ◀◀
+                </button>
+
+
+                <button
+                    id="play-btn"
+                    class="control-button play-button"
+                    type="button"
+                >
+                    ▶
+                </button>
+
+
+                <button
+                    id="next-btn"
+                    class="control-button"
+                    type="button"
+                >
+                    ▶▶
+                </button>
+
             </div>
 
+
+            <!-- SECONDARY -->
             <div class="secondary-controls">
+
                 <label class="volume-control">
-                    <span>VOL</span>
-                    <input id="volume" type="range" min="0" max="100" value="80" aria-label="Volume">
+
+                    <span>
+                        VOL
+                    </span>
+
+                    <input
+                        id="volume"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="80"
+                    >
+
                 </label>
+
 
                 <label class="speed-control">
-                    <span>SPEED</span>
-                    <select id="speed" aria-label="Playback speed">
-                        <option value="0.5">0.5x</option>
-                        <option value="0.75">0.75x</option>
-                        <option value="1" selected>1x</option>
-                        <option value="1.25">1.25x</option>
-                        <option value="1.5">1.5x</option>
-                        <option value="2">2x</option>
+
+                    <span>
+                        SPD
+                    </span>
+
+                    <select id="speed">
+
+                        <option value="0.5">
+                            .5x
+                        </option>
+
+                        <option value="0.75">
+                            .75x
+                        </option>
+
+                        <option
+                            value="1"
+                            selected
+                        >
+                            1x
+                        </option>
+
+                        <option value="1.25">
+                            1.25x
+                        </option>
+
+                        <option value="1.5">
+                            1.5x
+                        </option>
+
+                        <option value="2">
+                            2x
+                        </option>
+
                     </select>
+
                 </label>
+
             </div>
 
+
+            <!-- ADD MUSIC -->
             <div class="music-actions">
-                <label for="file-input" class="action-button">＋ ADD MUSIC</label>
-                <input id="file-input" type="file" accept="audio/*" multiple hidden>
-                <span id="drop-hint">or drag music here</span>
+
+                <label
+                    for="file-input"
+                    class="action-button"
+                >
+                    ＋ ADD SONG
+                </label>
+
+                <input
+                    id="file-input"
+                    type="file"
+                    accept="audio/*"
+                    multiple
+                    hidden
+                >
+
+                <span id="drop-hint">
+                    DROP MP3 HERE ☆
+                </span>
+
             </div>
+
         </section>
 
-        <section id="playlist-tab" class="tab-page">
+
+        <!-- PLAYLIST -->
+        <section
+            id="playlist-tab"
+            class="tab-page"
+        >
+
             <div class="page-header">
+
                 <div>
-                    <div class="eyebrow">QUEUE</div>
-                    <h2>PLAYLIST</h2>
+
+                    <div class="eyebrow">
+                        ♪ MUSIC BOX
+                    </div>
+
+                    <h2>
+                        PLAYLIST
+                    </h2>
+
                 </div>
-                <button id="clear-playlist" class="small-button" type="button">CLEAR</button>
+
+
+                <button
+                    id="clear-playlist"
+                    class="small-button"
+                    type="button"
+                >
+                    CLEAR
+                </button>
+
             </div>
-            <div id="playlist" class="playlist">
-                <div class="empty-playlist">No music loaded.</div>
+
+
+            <div
+                id="playlist"
+                class="playlist"
+            >
+
+                <div class="empty-playlist">
+
+                    <div class="empty-face">
+                        (￣▽￣)
+                    </div>
+
+                    <strong>
+                        NO SONGS YET
+                    </strong>
+
+                    <span>
+                        add some music!
+                    </span>
+
+                </div>
+
             </div>
+
         </section>
 
-        <section id="pet-tab" class="tab-page">
+
+        <!-- PET -->
+        <section
+            id="pet-tab"
+            class="tab-page"
+        >
+
             <div class="page-header">
+
                 <div>
-                    <div class="eyebrow">COMPANION</div>
-                    <h2>PET SYSTEM</h2>
+
+                    <div class="eyebrow">
+                        ♥ COMPANION
+                    </div>
+
+                    <h2>
+                        KRITR PET
+                    </h2>
+
                 </div>
+
             </div>
+
 
             <div class="pet-settings">
+
                 <div class="pet-preview-card">
-                    <div class="pet-preview-label">LIVE PREVIEW</div>
-                    <div id="pet-preview" class="pet-preview">◕ᴗ◕</div>
+
+                    <div class="pet-preview-title">
+                        YOUR BUDDY
+                    </div>
+
+                    <div
+                        id="pet-preview"
+                        class="pet-preview"
+                    >
+                        (=^･ω･^=)
+                    </div>
+
+                    <div class="pet-preview-message">
+                        ready to jam!
+                    </div>
+
                 </div>
 
-                <label>
-                    SPECIES
+
+                <label class="setting-box">
+
+                    <span>
+                        SPECIES
+                    </span>
+
                     <select id="pet-species">
-                        <option value="cat">CAT</option>
-                        <option value="slime">SLIME</option>
-                        <option value="bunny">BUNNY</option>
+
+                        <option value="cat">
+                            NEKO
+                        </option>
+
+                        <option value="slime">
+                            SLIME
+                        </option>
+
+                        <option value="bunny">
+                            BUNNY
+                        </option>
+
                     </select>
+
                 </label>
 
-                <label>
-                    TRICK
+
+                <label class="setting-box">
+
+                    <span>
+                        TRICK
+                    </span>
+
                     <select id="pet-trick">
-                        <option value="bounce">BOUNCE</option>
-                        <option value="spin">SPIN</option>
-                        <option value="heart">HEART</option>
+
+                        <option value="bounce">
+                            BOUNCE
+                        </option>
+
+                        <option value="spin">
+                            SPIN
+                        </option>
+
+                        <option value="heart">
+                            LOVE
+                        </option>
+
                     </select>
+
                 </label>
 
-                <button id="pet-trick-btn" class="action-button" type="button">DO TRICK</button>
+
+                <button
+                    id="pet-trick-btn"
+                    class="action-button"
+                    type="button"
+                >
+                    ★ DO TRICK!
+                </button>
+
             </div>
+
         </section>
 
-        <section id="setup-tab" class="tab-page">
+
+        <!-- SETUP -->
+        <section
+            id="setup-tab"
+            class="tab-page"
+        >
+
             <div class="page-header">
+
                 <div>
-                    <div class="eyebrow">PERSONALIZE</div>
-                    <h2>SETUP</h2>
+
+                    <div class="eyebrow">
+                        ⚙ OPTIONS <span class="settings-face">(｡•̀ᴗ-)✧</span>
+                    </div>
+
+                    <h2>
+                        SETUP
+                    </h2>
+
                 </div>
+
             </div>
+
 
             <div class="settings">
-                <label>
-                    THEME
-                    <select id="theme-select">
-                        <option value="sakura">SAKURA</option>
-                        <option value="cyber">CYBER</option>
-                        <option value="gameboy">GAMEBOY</option>
-                        <option value="synthwave">SYNTHWAVE</option>
-                        <option value="omarchy">OMARCHY</option>
-                        <option value="oxide">OXIDE</option>
-                        <option value="ice">ICE TERMINAL</option>
-                        <option value="amber">AMBER CRT</option>
-                    </select>
-                </label>
 
-                <label>
-                    VISUALIZER
-                    <select id="visualizer-select">
-                        <option value="bars">BARS</option>
-                        <option value="wave">WAVE</option>
-                        <option value="dots">DOTS</option>
-                        <option value="spectrum">SPECTRUM</option>
-                    </select>
-                </label>
+                <section class="settings-category">
+                    <h3>APPEARANCE</h3>
+                    <label class="setting-box">
+                        <span>THEME</span>
+                        <select id="theme-select">
+                            <option value="sakura">SAKURA</option>
+                            <option value="cyber">CYBER ANGEL</option>
+                            <option value="gameboy">GAMEBOY</option>
+                            <option value="synthwave">NIGHT DRIVE</option>
+                            <option value="omarchy">MONO</option>
+                            <option value="oxide">SUNSET</option>
+                            <option value="ice">ICE POP</option>
+                            <option value="amber">RETRO CRT</option>
+                        </select>
+                    </label>
+                    <label class="setting-box">
+                        <span>UI SIZE <output data-for="ui-scale">100%</output></span>
+                        <input id="ui-scale" type="range" min="90" max="120" value="100">
+                    </label>
+                    <label class="setting-box">
+                        <span>TEXT SIZE</span>
+                        <select id="text-size">
+                            <option value="small">SMALL</option>
+                            <option value="normal">NORMAL</option>
+                            <option value="large">LARGE</option>
+                        </select>
+                    </label>
+                    <label class="setting-box">
+                        <span>DENSITY</span>
+                        <select id="ui-density">
+                            <option value="compact">COMPACT</option>
+                            <option value="cozy">COZY</option>
+                        </select>
+                    </label>
+                </section>
 
-                <label>
-                    UI SCALE
-                    <input id="ui-scale" type="range" min="85" max="115" value="100">
-                </label>
+                <section class="settings-category">
+                    <h3>AUDIO / FX</h3>
+                    <label class="setting-box">
+                        <span>VISUALIZER</span>
+                        <select id="visualizer-select">
+                            <option value="bars">PIXEL BARS</option>
+                            <option value="wave">WAVE</option>
+                            <option value="dots">SPARKLES</option>
+                            <option value="spectrum">MIRROR</option>
+                        </select>
+                    </label>
+                    <label class="setting-box">
+                        <span>VIZ INTENSITY <output data-for="visualizer-intensity">100%</output></span>
+                        <input id="visualizer-intensity" type="range" min="50" max="150" value="100">
+                    </label>
+                    <label class="setting-box">
+                        <span>CRT STRENGTH <output data-for="crt-strength">18%</output></span>
+                        <input id="crt-strength" type="range" min="0" max="100" value="18">
+                    </label>
+                    <label class="toggle-setting">
+                        <input id="reactive-toggle" type="checkbox" checked>
+                        <span>MUSIC REACTIONS</span>
+                    </label>
+                    <label class="toggle-setting">
+                        <input id="crt-toggle" type="checkbox" checked>
+                        <span>CRT FILTER</span>
+                    </label>
+                </section>
 
-                <label class="checkbox-setting">
-                    <input id="crt-toggle" type="checkbox" checked>
-                    CRT EFFECT
-                </label>
+                <section class="settings-category">
+                    <h3>KRITR PET</h3>
+                    <label class="setting-box">
+                        <span>PET ACTIVITY</span>
+                        <select id="pet-activity">
+                            <option value="low">CHILL / LOW</option>
+                            <option value="normal">NORMAL</option>
+                            <option value="high">HYPER / HIGH</option>
+                        </select>
+                    </label>
+                    <label class="toggle-setting">
+                        <input id="pet-reactions" type="checkbox" checked>
+                        <span>PET REACTIONS</span>
+                    </label>
+                </section>
 
-                <label class="checkbox-setting">
-                    <input id="reactive-toggle" type="checkbox" checked>
-                    MUSIC REACTIVE UI
-                </label>
+                <section class="settings-category">
+                    <h3>SYSTEM</h3>
+                    <label class="toggle-setting">
+                        <input id="boot-toggle" type="checkbox" checked>
+                        <span>BOOT ANIMATION</span>
+                    </label>
+                </section>
 
-                <label class="checkbox-setting">
-                    <input id="boot-toggle" type="checkbox" checked>
-                    BOOT ANIMATION
-                </label>
             </div>
+
         </section>
 
-        <audio id="audio-engine" preload="metadata"></audio>
 
+        <!-- AUDIO -->
+        <audio
+            id="audio-engine"
+            preload="metadata"
+        ></audio>
+
+
+        <!-- STATUS -->
         <footer class="statusbar">
-            <span>KRITR PLAYER</span>
-            <span class="status-center" id="status-detail">LOCAL // PRIVATE</span>
-            <span id="status">READY</span>
+
+            <span>
+                KRITR
+            </span>
+
+            <span
+                id="status-detail"
+                class="status-center"
+            >
+                LOCAL AUDIO
+            </span>
+
+            <span id="status">
+                READY
+            </span>
+
         </footer>
 
-        <div id="drop-overlay" class="drop-overlay" aria-hidden="true">
+
+        <!-- DROP -->
+        <div
+            id="drop-overlay"
+            class="drop-overlay"
+        >
+
             <div class="drop-box">
-                <span>＋</span>
-                <strong>DROP MUSIC</strong>
-                <small>MP3 · WAV · OGG · M4A</small>
+
+                <div class="drop-face">
+                    ヽ(>∀<☆)ノ
+                </div>
+
+                <strong>
+                    DROP MUSIC!
+                </strong>
+
+                <small>
+                    MP3 • WAV • OGG • M4A
+                </small>
+
             </div>
+
         </div>
 
-        <button id="restore-btn" class="restore-button" type="button">KRITR ◆ RESTORE</button>
+
+        <button
+            id="restore-btn"
+            class="restore-button"
+            type="button"
+        >
+            ♪ KRITR
+        </button>
+
     </main>
+
 
     <script src="js/storage.js"></script>
     <script src="js/themes.js"></script>
@@ -248,5 +775,6 @@
     <script src="js/pets.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/app.js"></script>
+
 </body>
 </html>

@@ -1,41 +1,211 @@
-/* Kritr themes. Keep variables centralized so every reactive element recolors consistently. */
+/* =========================================================
+   KRITR PIXEL THEMES
+   ========================================================= */
+
+
+/* SAKURA */
+
 body[data-theme="sakura"] {
-    --bg-color:#120f17; --window-bg:#1d1925; --window-header:#292234; --panel-bg:#100d15; --panel-raised:#292333;
-    --accent-main:#ff79b9; --accent-secondary:#80dbff; --accent-rgb:255,121,185; --accent2-rgb:128,219,255;
-    --text-color:#fff7fb; --muted-color:#a99bae; --border-color:#4b3f55;
+    --bg-color: #18131d;
+
+    --window-bg: #2b2231;
+    --window-header: #3b2c41;
+
+    --panel-bg: #18121c;
+    --panel-raised: #47334d;
+
+    --accent-main: #ff8fc7;
+    --accent-secondary: #91dbff;
+
+    --accent-rgb: 255,143,199;
+    --accent2-rgb: 145,219,255;
+
+    --text-color: #fff8fc;
+    --muted-color: #baa6b8;
+
+    --border-color: #725b73;
+
+    --dark-outline: #0e0911;
 }
+
+
+/* CYBER ANGEL */
+
 body[data-theme="cyber"] {
-    --bg-color:#050814; --window-bg:#0c1220; --window-header:#111b2e; --panel-bg:#060a13; --panel-raised:#121c2f;
-    --accent-main:#ff37db; --accent-secondary:#20f2ff; --accent-rgb:255,55,219; --accent2-rgb:32,242,255;
-    --text-color:#effcff; --muted-color:#728ca5; --border-color:#24415c;
+    --bg-color: #08091a;
+
+    --window-bg: #12162a;
+    --window-header: #19203b;
+
+    --panel-bg: #080a16;
+    --panel-raised: #202b4c;
+
+    --accent-main: #ff5fda;
+    --accent-secondary: #5cecff;
+
+    --accent-rgb: 255,95,218;
+    --accent2-rgb: 92,236,255;
+
+    --text-color: #f7fbff;
+    --muted-color: #8491bb;
+
+    --border-color: #344a78;
+
+    --dark-outline: #03040a;
 }
+
+
+/* GAMEBOY */
+
 body[data-theme="gameboy"] {
-    --bg-color:#0f380f; --window-bg:#306230; --window-header:#244b24; --panel-bg:#0f380f; --panel-raised:#3c733c;
-    --accent-main:#9bbc0f; --accent-secondary:#8bac0f; --accent-rgb:155,188,15; --accent2-rgb:139,172,15;
-    --text-color:#d7e899; --muted-color:#9bbc0f; --border-color:#8bac0f;
+    --bg-color: #0f380f;
+
+    --window-bg: #306230;
+    --window-header: #285328;
+
+    --panel-bg: #173f17;
+    --panel-raised: #4a7740;
+
+    --accent-main: #9bbc0f;
+    --accent-secondary: #8bac0f;
+
+    --accent-rgb: 155,188,15;
+    --accent2-rgb: 139,172,15;
+
+    --text-color: #d9e89c;
+    --muted-color: #a8c448;
+
+    --border-color: #8bac0f;
+
+    --dark-outline: #071f07;
 }
+
+
+/* NIGHT DRIVE */
+
 body[data-theme="synthwave"] {
-    --bg-color:#10001d; --window-bg:#201036; --window-header:#32164f; --panel-bg:#10071b; --panel-raised:#32184b;
-    --accent-main:#ff3dc8; --accent-secondary:#23ddff; --accent-rgb:255,61,200; --accent2-rgb:35,221,255;
-    --text-color:#fff8ff; --muted-color:#b19bc7; --border-color:#704190;
+    --bg-color: #160927;
+
+    --window-bg: #28123c;
+    --window-header: #3c1957;
+
+    --panel-bg: #12071d;
+    --panel-raised: #4a225e;
+
+    --accent-main: #ff4ac8;
+    --accent-secondary: #3be6ff;
+
+    --accent-rgb: 255,74,200;
+    --accent2-rgb: 59,230,255;
+
+    --text-color: #fff7ff;
+    --muted-color: #bea1cf;
+
+    --border-color: #774494;
+
+    --dark-outline: #09020e;
 }
+
+
+/* MONO */
+
 body[data-theme="omarchy"] {
-    --bg-color:#0b0c0d; --window-bg:#131516; --window-header:#1b1d1f; --panel-bg:#0d0f10; --panel-raised:#1d2022;
-    --accent-main:#f0eee8; --accent-secondary:#8d9498; --accent-rgb:240,238,232; --accent2-rgb:141,148,152;
-    --text-color:#f4f2ed; --muted-color:#7d8386; --border-color:#34383a;
+    --bg-color: #101112;
+
+    --window-bg: #1b1d1e;
+    --window-header: #27292b;
+
+    --panel-bg: #101112;
+    --panel-raised: #303335;
+
+    --accent-main: #f3f0e9;
+    --accent-secondary: #9ea6a8;
+
+    --accent-rgb: 243,240,233;
+    --accent2-rgb: 158,166,168;
+
+    --text-color: #f3f0e9;
+    --muted-color: #888f91;
+
+    --border-color: #575c5e;
+
+    --dark-outline: #050505;
 }
+
+
+/* SUNSET */
+
 body[data-theme="oxide"] {
-    --bg-color:#110d0a; --window-bg:#1c1612; --window-header:#2a2018; --panel-bg:#100c09; --panel-raised:#302219;
-    --accent-main:#ff7a33; --accent-secondary:#ffd166; --accent-rgb:255,122,51; --accent2-rgb:255,209,102;
-    --text-color:#fff3e9; --muted-color:#a69082; --border-color:#50382a;
+    --bg-color: #1a0e0a;
+
+    --window-bg: #2d1911;
+    --window-header: #442418;
+
+    --panel-bg: #180b08;
+    --panel-raised: #58301c;
+
+    --accent-main: #ff843d;
+    --accent-secondary: #ffd166;
+
+    --accent-rgb: 255,132,61;
+    --accent2-rgb: 255,209,102;
+
+    --text-color: #fff3df;
+    --muted-color: #ba9077;
+
+    --border-color: #764c35;
+
+    --dark-outline: #0b0503;
 }
+
+
+/* ICE POP */
+
 body[data-theme="ice"] {
-    --bg-color:#071017; --window-bg:#0d1922; --window-header:#122530; --panel-bg:#071018; --panel-raised:#142934;
-    --accent-main:#72e5ff; --accent-secondary:#a9ffef; --accent-rgb:114,229,255; --accent2-rgb:169,255,239;
-    --text-color:#effcff; --muted-color:#799aa6; --border-color:#28505e;
+    --bg-color: #07141c;
+
+    --window-bg: #102733;
+    --window-header: #173746;
+
+    --panel-bg: #07131a;
+    --panel-raised: #245063;
+
+    --accent-main: #75e9ff;
+    --accent-secondary: #a4ffd8;
+
+    --accent-rgb: 117,233,255;
+    --accent2-rgb: 164,255,216;
+
+    --text-color: #f3fdff;
+    --muted-color: #86aeb8;
+
+    --border-color: #397487;
+
+    --dark-outline: #02090d;
 }
+
+
+/* RETRO CRT */
+
 body[data-theme="amber"] {
-    --bg-color:#100b04; --window-bg:#1c1409; --window-header:#2a1e0d; --panel-bg:#100b04; --panel-raised:#2e210f;
-    --accent-main:#ffb52e; --accent-secondary:#ffd979; --accent-rgb:255,181,46; --accent2-rgb:255,217,121;
-    --text-color:#fff4d6; --muted-color:#aa8950; --border-color:#57401e;
+    --bg-color: #120b03;
+
+    --window-bg: #261707;
+    --window-header: #3b240a;
+
+    --panel-bg: #100903;
+    --panel-raised: #54320d;
+
+    --accent-main: #ffb52e;
+    --accent-secondary: #ffe08c;
+
+    --accent-rgb: 255,181,46;
+    --accent2-rgb: 255,224,140;
+
+    --text-color: #fff0c8;
+    --muted-color: #be914a;
+
+    --border-color: #76511c;
+
+    --dark-outline: #080401;
 }

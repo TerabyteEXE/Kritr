@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const progress = document.querySelector("#progress");
 
     KritrThemes.load();
+    Pet.init();
     Settings.initialize();
-    Pet.load();
     Visualizer.initialize();
 
     if (KritrStorage.load("boot", true)) {
@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("kritr:basshit", () => {
+        Pet.reactToBass();
         if (!KritrStorage.load("reactive", true)) return;
         windowElement?.classList.remove("bass-hit");
         void windowElement?.offsetWidth;
