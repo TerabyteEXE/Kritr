@@ -1,93 +1,73 @@
-/* SAKURA */
-
 body[data-theme="sakura"] {
+    --bg-color: #09080b;
+    --window-bg: #121014;
+    --window-header: #19151b;
 
-    --bg-color: #f2c4ce;
-    --window-bg: #2b2640;
-    --window-header: #4c436d;
+    --accent-main: #ff8fcf;
+    --accent-secondary: #ffb7df;
 
-    --accent-main: #ff79c6;
-    --accent-secondary: #8be9fd;
+    --text-color: #fff5fb;
+    --muted-color: #9f8d99;
 
-    --text-color: #f8f8f2;
-    --muted-color: #c7bfd0;
-
-    --border-color: #665a7d;
-
+    --border-color: #3a2935;
 }
 
-
-/* CYBER */
 
 body[data-theme="cyber"] {
+    --bg-color: #05090a;
+    --window-bg: #0b1213;
+    --window-header: #101b1c;
 
-    --bg-color: #070b18;
-    --window-bg: #10182a;
-    --window-header: #182440;
+    --accent-main: #00f0ff;
+    --accent-secondary: #008cff;
 
-    --accent-main: #ff2bd6;
-    --accent-secondary: #00f6ff;
+    --text-color: #efffff;
+    --muted-color: #71979b;
 
-    --text-color: #e8faff;
-    --muted-color: #728ca8;
-
-    --border-color: #274a68;
-
+    --border-color: #173d40;
 }
 
-
-/* GAMEBOY */
 
 body[data-theme="gameboy"] {
-
-    --bg-color: #8bac0f;
-    --window-bg: #306230;
-    --window-header: #0f380f;
+    --bg-color: #0b0f08;
+    --window-bg: #162010;
+    --window-header: #1e2c15;
 
     --accent-main: #9bbc0f;
-    --accent-secondary: #8bac0f;
+    --accent-secondary: #306230;
 
-    --text-color: #0f380f;
-    --muted-color: #9bbc0f;
+    --text-color: #d8e8b0;
+    --muted-color: #718050;
 
-    --border-color: #0f380f;
-
+    --border-color: #354626;
 }
 
-
-/* SYNTHWAVE */
 
 body[data-theme="synthwave"] {
+    --bg-color: #090513;
+    --window-bg: #150c20;
+    --window-header: #21102e;
 
-    --bg-color: #16002b;
-    --window-bg: #241044;
-    --window-header: #35145d;
+    --accent-main: #ff49d7;
+    --accent-secondary: #774cff;
 
-    --accent-main: #ff2ec4;
-    --accent-secondary: #20e3ff;
+    --text-color: #fff1ff;
+    --muted-color: #9d82ad;
 
-    --text-color: #ffffff;
-    --muted-color: #bba6d9;
-
-    --border-color: #6c3a96;
-
+    --border-color: #4b2857;
 }
 
 
-/* OMARCHY */
-
 body[data-theme="omarchy"] {
+    --bg-color: #0b0b0b;
+    --window-bg: #111111;
+    --window-header: #181818;
 
-    --bg-color: #111111;
-    --window-bg: #191919;
-    --window-header: #222222;
+    --accent-main: #ff8a3d;
+    --accent-secondary: #ffb067;
 
-    --accent-main: #f5f5f5;
-    --accent-secondary: #999999;
-
-    --text-color: #eeeeee;
+    --text-color: #f5f5f5;
     --muted-color: #888888;
 
-    --border-color: #444444;
-
+    --border-color: #303030;
 }

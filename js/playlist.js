@@ -2,45 +2,53 @@ const Playlist = {
 
     addFiles(files) {
 
-        [...files].forEach(file => {
+        const fileList =
+            Array.from(files);
 
-            if (
-                !file.type.startsWith("audio/")
-            ) {
-                return;
+        for (const file of fileList) {
+
+            if (!file.type.startsWith("audio/")) {
+                continue;
             }
 
-            const track = {
+            const url =
+                URL.createObjectURL(file);
+
+            Player.playlist.push({
 
                 name:
-                    file.name
-                        .replace(
-                            /\.[^/.]+$/,
-                            ""
-                        ),
+                    file.name.replace(
+                        /\.[^/.]+$/,
+                        ""
+                    ),
 
                 artist:
-                    "Local File",
+                    "LOCAL FILE",
 
-                file,
+                url,
 
-                url:
-                    URL.createObjectURL(file)
+                file
 
-            };
+            });
 
-            Player.playlist.push(track);
-
-        });
+        }
 
         this.render();
 
+        document.getElementById(
+            "track-counter"
+        ).textContent =
+            `${Player.playlist.length} TRACKS`;
+
         if (
             Player.currentIndex === -1 &&
-            Player.playlist.length
+            Player.playlist.length > 0
         ) {
 
-            Player.load(0);
+            Player.load(
+                0,
+                false
+            );
 
         }
 
@@ -50,25 +58,28 @@ const Playlist = {
     render() {
 
         const container =
-            document.querySelector(
-                "#playlist"
+            document.getElementById(
+                "playlist"
             );
 
-        if (
-            Player.playlist.length === 0
-        ) {
+        const empty =
+            document.getElementById(
+                "playlist-empty"
+            );
 
-            container.innerHTML =
-                `<div class="empty-playlist">
-                    No music loaded.
-                </div>`;
+        container.innerHTML = "";
+
+        if (!Player.playlist.length) {
+
+            empty.style.display =
+                "flex";
 
             return;
 
         }
 
-
-        container.innerHTML = "";
+        empty.style.display =
+            "none";
 
 
         Player.playlist.forEach(
@@ -81,7 +92,6 @@ const Playlist = {
 
                 item.className =
                     "playlist-item";
-
 
                 if (
                     index ===
@@ -96,17 +106,17 @@ const Playlist = {
 
 
                 item.innerHTML = `
-
                     <span class="playlist-number">
-                        ${index + 1}
+                        ${String(index + 1).padStart(2, "0")}
                     </span>
 
                     <span class="playlist-name">
-                        ${this.escape(
-                            track.name
-                        )}
+                        ${this.escape(track.name)}
                     </span>
 
+                    <span class="playlist-meta">
+                        ${this.escape(track.artist || "LOCAL")}
+                    </span>
                 `;
 
 
@@ -123,7 +133,9 @@ const Playlist = {
                 );
 
 
-                container.appendChild(item);
+                container.appendChild(
+                    item
+                );
 
             }
         );
@@ -133,14 +145,17 @@ const Playlist = {
 
     clear() {
 
-        Player.playlist
-            .forEach(track => {
+        for (const track of Player.playlist) {
+
+            try {
 
                 URL.revokeObjectURL(
                     track.url
                 );
 
-            });
+            } catch {}
+
+        }
 
         Player.playlist = [];
 
@@ -152,31 +167,38 @@ const Playlist = {
             "src"
         );
 
+        audio.load();
+
+        document.getElementById(
+            "track-title"
+        ).textContent =
+            "Kritr is waiting";
+
+        document.getElementById(
+            "track-artist"
+        ).textContent =
+            "DROP SOME MUSIC IN";
+
+        KritrAlbumArt.clear();
+
         this.render();
 
-        document.querySelector(
-            "#track-title"
+        document.getElementById(
+            "track-counter"
         ).textContent =
-            "NO TRACK LOADED";
-
-        document.querySelector(
-            "#track-artist"
-        ).textContent =
-            "Drop a song into Kritr";
+            "0 TRACKS";
 
     },
 
 
-    escape(text) {
+    escape(value) {
 
-        const div =
-            document.createElement(
-                "div"
-            );
-
-        div.textContent = text;
-
-        return div.innerHTML;
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
 
     }
 

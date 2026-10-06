@@ -1,6 +1,23 @@
 const KritrThemes = {
 
+    current: "sakura",
+
+
     set(theme) {
+
+        const allowed = [
+            "sakura",
+            "cyber",
+            "gameboy",
+            "synthwave",
+            "omarchy"
+        ];
+
+        if (!allowed.includes(theme)) {
+            theme = "sakura";
+        }
+
+        this.current = theme;
 
         document.body.dataset.theme = theme;
 
@@ -14,23 +31,13 @@ const KritrThemes = {
 
     load() {
 
-        const theme =
+        const saved =
             KritrStorage.load(
                 "theme",
                 "sakura"
             );
 
-        document.body.dataset.theme =
-            theme;
-
-        const selector =
-            document.querySelector(
-                "#theme-select"
-            );
-
-        if (selector) {
-            selector.value = theme;
-        }
+        this.set(saved);
 
     }
 

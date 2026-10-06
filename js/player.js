@@ -1,5 +1,5 @@
 const audio =
-    document.querySelector("#audio-engine");
+    document.getElementById("audio-engine");
 
 
 const Player = {
@@ -14,58 +14,89 @@ const Player = {
 
     source: null,
 
-    initialized: false,
+    volume: 0.8,
+
+    speed: 1,
 
 
     initializeAudio() {
 
-        if (this.initialized) {
+        if (this.audioContext) {
             return;
         }
 
-        this.audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+        try {
 
-        this.source =
-            this.audioContext
-                .createMediaElementSource(audio);
+            this.audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
 
-        this.analyser =
-            this.audioContext
-                .createAnalyser();
+            this.source =
+                this.audioContext.createMediaElementSource(
+                    audio
+                );
 
-        this.analyser.fftSize = 128;
+            this.analyser =
+                this.audioContext.createAnalyser();
 
-        this.source.connect(
-            this.analyser
-        );
+            this.analyser.fftSize = 256;
 
-        this.analyser.connect(
-            this.audioContext.destination
-        );
+            this.analyser.smoothingTimeConstant =
+                0.82;
 
-        this.initialized = true;
+            this.source.connect(
+                this.analyser
+            );
+
+            this.analyser.connect(
+                this.audioContext.destination
+            );
+
+            KritrReactivity.initialize(
+                this.analyser
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Audio engine failed:",
+                error
+            );
+
+        }
 
     },
 
 
     async play() {
 
+        if (!audio.src) {
+            return;
+        }
+
         this.initializeAudio();
 
         if (
-            this.audioContext.state ===
-            "suspended"
+            this.audioContext &&
+            this.audioContext.state === "suspended"
         ) {
-
             await this.audioContext.resume();
-
         }
 
-        await audio.play();
+        try {
+
+            await audio.play();
+
+        } catch (error) {
+
+            console.warn(
+                "Playback failed:",
+                error
+            );
+
+        }
 
     },
 
@@ -92,7 +123,7 @@ const Player = {
     },
 
 
-    load(index, autoplay = false) {
+    load(index, autoplay = true) {
 
         if (
             index < 0 ||
@@ -106,20 +137,25 @@ const Player = {
         const track =
             this.playlist[index];
 
-        audio.src =
-            track.url;
+        audio.src = track.url;
 
-        audio.load();
+        audio.volume = this.volume;
 
-        document.querySelector(
-            "#track-title"
+        audio.playbackRate = this.speed;
+
+        document.getElementById(
+            "track-title"
         ).textContent =
             track.name;
 
-        document.querySelector(
-            "#track-artist"
+        document.getElementById(
+            "track-artist"
         ).textContent =
-            track.artist || "Unknown Artist";
+            track.artist || "LOCAL FILE";
+
+        KritrAlbumArt.setTrack(
+            track
+        );
 
         Playlist.render();
 
@@ -136,18 +172,13 @@ const Player = {
             return;
         }
 
-        let next =
-            this.currentIndex + 1;
-
-        if (
-            next >=
-            this.playlist.length
-        ) {
-            next = 0;
-        }
+        const nextIndex =
+            (
+                this.currentIndex + 1
+            ) % this.playlist.length;
 
         this.load(
-            next,
+            nextIndex,
             true
         );
 
@@ -160,16 +191,14 @@ const Player = {
             return;
         }
 
-        let previous =
-            this.currentIndex - 1;
-
-        if (previous < 0) {
-            previous =
-                this.playlist.length - 1;
-        }
+        const previousIndex =
+            (
+                this.currentIndex - 1 +
+                this.playlist.length
+            ) % this.playlist.length;
 
         this.load(
-            previous,
+            previousIndex,
             true
         );
 
@@ -178,12 +207,22 @@ const Player = {
 
     setVolume(value) {
 
-        audio.volume =
-            value / 100;
+        const volume =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    Number(value)
+                )
+            );
+
+        this.volume = volume;
+
+        audio.volume = volume;
 
         KritrStorage.save(
             "volume",
-            value
+            volume
         );
 
     },
@@ -191,12 +230,27 @@ const Player = {
 
     setSpeed(value) {
 
-        audio.playbackRate =
-            Number(value);
+        const speed =
+            Math.max(
+                0.5,
+                Math.min(
+                    2,
+                    Number(value)
+                )
+            );
+
+        this.speed = speed;
+
+        audio.playbackRate = speed;
+
+        document.getElementById(
+            "speed-label"
+        ).textContent =
+            speed.toFixed(1) + "x";
 
         KritrStorage.save(
             "speed",
-            value
+            speed
         );
 
     }

@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Kritr — a customizable pixel music player."
     >
 
     <title>Kritr Player</title>
@@ -24,108 +17,144 @@
 
 <body>
 
-    <!-- CRT EFFECT -->
-    <div id="crt-overlay"></div>
+<div id="boot-screen" class="boot-screen">
+    <div class="boot-inner">
+        <div class="boot-logo">KRITR</div>
 
-    <!-- MAIN WINDOW -->
-    <main class="kritr-window">
+        <div class="boot-terminal">
+            <div>&gt; initializing kritr core...</div>
+            <div>&gt; loading audio engine...</div>
+            <div>&gt; calibrating visualizer...</div>
+            <div>&gt; waking pixel pet...</div>
+            <div>&gt; preparing nonsense...</div>
+        </div>
 
-        <!-- TITLE BAR -->
-        <header class="titlebar">
+        <div class="boot-progress">
+            <div id="boot-progress-bar"></div>
+        </div>
 
-            <div class="brand">
-                <span class="brand-icon">◆</span>
-                <span>KRITR</span>
+        <div id="boot-status">INITIALIZING...</div>
+
+        <button id="skip-boot" class="pixel-button">
+            SKIP
+        </button>
+    </div>
+</div>
+
+
+<div id="crt-overlay"></div>
+
+<div id="ambient-background">
+    <canvas id="ambient-canvas"></canvas>
+</div>
+
+
+<main id="kritr-window" class="kritr-window">
+
+    <header class="titlebar">
+
+        <div class="brand">
+            <span class="brand-dot"></span>
+            <span>KRITR</span>
+            <small>PLAYER</small>
+        </div>
+
+        <div class="window-controls">
+            <button id="minimize-window" aria-label="Minimize">−</button>
+            <button id="maximize-window" aria-label="Maximize">□</button>
+            <button id="close-window" aria-label="Close">×</button>
+        </div>
+
+    </header>
+
+
+    <nav class="tabs">
+
+        <button class="tab active" data-tab="player">
+            PLAYER
+        </button>
+
+        <button class="tab" data-tab="playlist">
+            PLAYLIST
+        </button>
+
+        <button class="tab" data-tab="pet">
+            PET
+        </button>
+
+        <button class="tab" data-tab="setup">
+            SETUP
+        </button>
+
+    </nav>
+
+
+    <section id="player-tab" class="tab-panel active">
+
+        <div class="player-stage">
+
+            <div class="music-particles">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
 
-            <div class="window-buttons">
-                <button id="minimize-btn">—</button>
-                <button id="maximize-btn">□</button>
-                <button id="close-btn">×</button>
-            </div>
 
-        </header>
+            <div id="album-art-container" class="album-art-container">
 
+                <div class="album-art-glow"></div>
 
-        <!-- NAVIGATION -->
-        <nav class="tabs">
+                <div id="album-art" class="album-art">
+                    <div class="album-art-grid"></div>
 
-            <button
-                class="tab active"
-                data-tab="player"
-            >
-                PLAYER
-            </button>
+                    <div class="album-art-logo">
+                        K
+                    </div>
 
-            <button
-                class="tab"
-                data-tab="playlist"
-            >
-                PLAYLIST
-            </button>
-
-            <button
-                class="tab"
-                data-tab="pet"
-            >
-                PET
-            </button>
-
-            <button
-                class="tab"
-                data-tab="setup"
-            >
-                SETUP
-            </button>
-
-        </nav>
-
-
-        <!-- ================= PLAYER ================= -->
-
-        <section
-            id="player-tab"
-            class="tab-page active"
-        >
-
-            <div class="visualizer-container">
-
-                <canvas id="visualizer"></canvas>
-
-                <div
-                    id="pet-display"
-                    class="pet-display"
-                >
-                    <div class="pet-sprite">◕ᴗ◕</div>
+                    <div class="album-art-label">
+                        NO TRACK
+                    </div>
                 </div>
 
             </div>
 
-
-            <!-- TRACK INFO -->
 
             <div class="track-info">
 
-                <div
-                    id="track-title"
-                    class="track-title"
-                >
-                    NO TRACK LOADED
+                <div class="track-status">
+                    <span id="playing-indicator"></span>
+                    <span id="track-status-text">
+                        READY
+                    </span>
                 </div>
 
-                <div
-                    id="track-artist"
-                    class="track-artist"
-                >
-                    Drop a song into Kritr
-                </div>
+                <h1 id="track-title">
+                    Kritr is waiting
+                </h1>
+
+                <p id="track-artist">
+                    DROP SOME MUSIC IN
+                </p>
 
             </div>
 
 
-            <!-- PROGRESS -->
+            <div class="visualizer-shell">
 
-            <div class="progress-container">
+                <div class="visualizer-label">
+                    <span>VISUALIZER</span>
+                    <span id="energy-label">IDLE</span>
+                </div>
+
+                <canvas id="visualizer"></canvas>
+
+            </div>
+
+
+            <div class="progress-area">
 
                 <span id="current-time">
                     0:00
@@ -137,6 +166,8 @@
                     min="0"
                     max="100"
                     value="0"
+                    step="0.1"
+                    aria-label="Track progress"
                 >
 
                 <span id="duration">
@@ -146,27 +177,28 @@
             </div>
 
 
-            <!-- CONTROLS -->
-
-            <div class="player-controls">
+            <div class="main-controls">
 
                 <button
-                    id="previous-btn"
+                    id="previous-track"
                     class="control-button"
+                    aria-label="Previous track"
                 >
                     ◀◀
                 </button>
 
                 <button
-                    id="play-btn"
-                    class="control-button play-button"
+                    id="play-button"
+                    class="play-button"
+                    aria-label="Play"
                 >
                     ▶
                 </button>
 
                 <button
-                    id="next-btn"
+                    id="next-track"
                     class="control-button"
+                    aria-label="Next track"
                 >
                     ▶▶
                 </button>
@@ -174,141 +206,150 @@
             </div>
 
 
-            <!-- SECONDARY CONTROLS -->
-
             <div class="secondary-controls">
 
-                <label class="volume-control">
+                <div class="control-group">
 
-                    <span>VOL</span>
+                    <span class="control-label">
+                        VOL
+                    </span>
 
                     <input
                         id="volume"
                         type="range"
                         min="0"
-                        max="100"
-                        value="80"
+                        max="1"
+                        value="0.8"
+                        step="0.01"
+                        aria-label="Volume"
                     >
 
-                </label>
+                </div>
 
 
-                <label class="speed-control">
+                <div class="speed-control">
 
-                    <span>SPEED</span>
+                    <button id="speed-down">−</button>
 
-                    <select id="speed">
+                    <span id="speed-label">
+                        1.0x
+                    </span>
 
-                        <option value="0.5">
-                            0.5x
-                        </option>
+                    <button id="speed-up">+</button>
 
-                        <option value="0.75">
-                            0.75x
-                        </option>
-
-                        <option
-                            value="1"
-                            selected
-                        >
-                            1x
-                        </option>
-
-                        <option value="1.25">
-                            1.25x
-                        </option>
-
-                        <option value="1.5">
-                            1.5x
-                        </option>
-
-                        <option value="2">
-                            2x
-                        </option>
-
-                    </select>
-
-                </label>
-
-            </div>
-
-
-            <!-- ADD MUSIC -->
-
-            <div class="music-actions">
-
-                <label
-                    for="file-input"
-                    class="action-button"
-                >
-                    ＋ ADD MUSIC
-                </label>
-
-                <input
-                    id="file-input"
-                    type="file"
-                    accept="audio/*"
-                    multiple
-                    hidden
-                >
-
-                <span id="drop-hint">
-                    or drag music here
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= PLAYLIST ================= -->
-
-        <section
-            id="playlist-tab"
-            class="tab-page"
-        >
-
-            <div class="page-header">
-
-                <h2>PLAYLIST</h2>
-
-                <button
-                    id="clear-playlist"
-                    class="small-button"
-                >
-                    CLEAR
-                </button>
-
-            </div>
-
-            <div
-                id="playlist"
-                class="playlist"
-            >
-
-                <div class="empty-playlist">
-                    No music loaded.
                 </div>
 
             </div>
 
-        </section>
 
+            <div class="action-row">
 
-        <!-- ================= PET ================= -->
+                <label class="pixel-button upload-button">
 
-        <section
-            id="pet-tab"
-            class="tab-page"
-        >
+                    ADD MUSIC
 
-            <div class="page-header">
+                    <input
+                        id="file-input"
+                        type="file"
+                        accept="audio/*"
+                        multiple
+                        hidden
+                    >
 
-                <h2>PET SYSTEM</h2>
+                </label>
+
+                <button
+                    id="visualizer-mode-button"
+                    class="pixel-button"
+                >
+                    MODE: BARS
+                </button>
 
             </div>
 
-            <div class="pet-settings">
+        </div>
+
+    </section>
+
+
+    <section id="playlist-tab" class="tab-panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <span class="eyebrow">
+                    YOUR MUSIC
+                </span>
+
+                <h2>PLAYLIST</h2>
+            </div>
+
+            <button
+                id="clear-playlist"
+                class="pixel-button danger"
+            >
+                CLEAR
+            </button>
+
+        </div>
+
+        <div
+            id="playlist"
+            class="playlist"
+        ></div>
+
+        <div
+            id="playlist-empty"
+            class="empty-state"
+        >
+            <div class="empty-icon">♫</div>
+            <strong>NOTHING HERE</strong>
+            <span>Drop music into Kritr to begin.</span>
+        </div>
+
+    </section>
+
+
+    <section id="pet-tab" class="tab-panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <span class="eyebrow">
+                    KRITR COMPANION
+                </span>
+
+                <h2>PET SYSTEM</h2>
+            </div>
+
+        </div>
+
+
+        <div class="pet-lab">
+
+            <div class="pet-stage">
+
+                <div id="pet-display" class="pet-display">
+
+                    <div class="pet-shadow"></div>
+
+                    <div
+                        id="pet-sprite"
+                        class="pet-sprite"
+                    >
+                        ฅ^•ﻌ•^ฅ
+                    </div>
+
+                </div>
+
+                <div id="pet-mood">
+                    WAITING...
+                </div>
+
+            </div>
+
+
+            <div class="pet-controls">
 
                 <label>
                     SPECIES
@@ -332,175 +373,230 @@
                 </label>
 
 
-                <label>
-                    TRICK
+                <div class="trick-buttons">
 
-                    <select id="pet-trick">
+                    <button
+                        class="pixel-button"
+                        data-trick="bounce"
+                    >
+                        BOUNCE
+                    </button>
 
-                        <option value="bounce">
-                            BOUNCE
-                        </option>
+                    <button
+                        class="pixel-button"
+                        data-trick="spin"
+                    >
+                        SPIN
+                    </button>
 
-                        <option value="spin">
-                            SPIN
-                        </option>
+                    <button
+                        class="pixel-button"
+                        data-trick="heart"
+                    >
+                        HEART
+                    </button>
 
-                        <option value="heart">
-                            HEART
-                        </option>
-
-                    </select>
-
-                </label>
-
-
-                <button
-                    id="pet-trick-btn"
-                    class="action-button"
-                >
-                    DO TRICK
-                </button>
+                </div>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <!-- ================= SETUP ================= -->
+    <section id="setup-tab" class="tab-panel">
 
-        <section
-            id="setup-tab"
-            class="tab-page"
-        >
+        <div class="panel-heading">
 
-            <div class="page-header">
+            <div>
+                <span class="eyebrow">
+                    KRITR CONFIG
+                </span>
 
                 <h2>SETUP</h2>
-
             </div>
 
+        </div>
 
-            <div class="settings">
 
-                <label>
+        <div class="settings-grid">
+
+            <label class="setting">
+
+                <span>
                     THEME
+                </span>
 
-                    <select id="theme-select">
+                <select id="theme-select">
 
-                        <option value="sakura">
-                            SAKURA
-                        </option>
+                    <option value="sakura">
+                        SAKURA
+                    </option>
 
-                        <option value="cyber">
-                            CYBER
-                        </option>
+                    <option value="cyber">
+                        CYBER
+                    </option>
 
-                        <option value="gameboy">
-                            GAMEBOY
-                        </option>
+                    <option value="gameboy">
+                        GAMEBOY
+                    </option>
 
-                        <option value="synthwave">
-                            SYNTHWAVE
-                        </option>
+                    <option value="synthwave">
+                        SYNTHWAVE
+                    </option>
 
-                        <option value="omarchy">
-                            OMARCHY
-                        </option>
+                    <option value="omarchy">
+                        OMARCHY
+                    </option>
 
-                    </select>
+                </select>
 
-                </label>
+            </label>
 
 
-                <label>
+            <label class="setting">
+
+                <span>
                     VISUALIZER
+                </span>
 
-                    <select id="visualizer-select">
+                <select id="visualizer-select">
 
-                        <option value="bars">
-                            BARS
-                        </option>
+                    <option value="bars">
+                        BARS
+                    </option>
 
-                        <option value="wave">
-                            WAVE
-                        </option>
+                    <option value="wave">
+                        WAVE
+                    </option>
 
-                        <option value="dots">
-                            DOTS
-                        </option>
+                    <option value="dots">
+                        DOTS
+                    </option>
 
-                    </select>
+                    <option value="orbit">
+                        ORBIT
+                    </option>
 
-                </label>
+                    <option value="pixel">
+                        PIXEL
+                    </option>
+
+                    <option value="void">
+                        VOID
+                    </option>
+
+                </select>
+
+            </label>
 
 
-                <label>
+            <label class="setting">
+
+                <span>
                     UI SCALE
+                </span>
 
-                    <input
-                        id="ui-scale"
-                        type="range"
-                        min="80"
-                        max="120"
-                        value="100"
-                    >
+                <input
+                    id="ui-scale"
+                    type="range"
+                    min="0.85"
+                    max="1.2"
+                    step="0.01"
+                    value="1"
+                >
 
-                </label>
+            </label>
 
 
-                <label class="checkbox-setting">
+            <label class="setting toggle-setting">
 
-                    <input
-                        id="crt-toggle"
-                        type="checkbox"
-                        checked
-                    >
-
+                <span>
                     CRT EFFECT
+                </span>
 
-                </label>
+                <input
+                    id="crt-toggle"
+                    type="checkbox"
+                    checked
+                >
 
-            </div>
-
-        </section>
-
-
-        <!-- AUDIO ENGINE -->
-
-        <audio
-            id="audio-engine"
-            preload="metadata"
-        ></audio>
+            </label>
 
 
-        <!-- STATUS BAR -->
+            <label class="setting toggle-setting">
 
-        <footer class="statusbar">
+                <span>
+                    MUSIC REACTIVITY
+                </span>
+
+                <input
+                    id="reactivity-toggle"
+                    type="checkbox"
+                    checked
+                >
+
+            </label>
+
+        </div>
+
+
+        <div class="settings-note">
+
+            <span>KRITR V0.2</span>
 
             <span>
-                KRITR PLAYER
+                BUILT FOR VIBES
             </span>
 
-            <span id="status">
+        </div>
+
+    </section>
+
+
+    <footer class="statusbar">
+
+        <div>
+            <span
+                id="status-dot"
+                class="status-dot"
+            ></span>
+
+            <span id="status-text">
                 READY
             </span>
+        </div>
 
-        </footer>
+        <div>
+            <span id="track-counter">
+                0 TRACKS
+            </span>
+        </div>
 
-    </main>
+    </footer>
+
+</main>
 
 
-    <!-- JAVASCRIPT -->
+<audio
+    id="audio-engine"
+    preload="metadata"
+></audio>
 
-    <script src="js/storage.js"></script>
-    <script src="js/themes.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/playlist.js"></script>
-    <script src="js/visualizer.js"></script>
-    <script src="js/pets.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/app.js"></script>
+
+<script src="js/storage.js"></script>
+<script src="js/themes.js"></script>
+<script src="js/player.js"></script>
+<script src="js/playlist.js"></script>
+<script src="js/audio-reactivity.js"></script>
+<script src="js/visualizer.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/album-art.js"></script>
+<script src="js/pets.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/window.js"></script>
+<script src="js/app.js"></script>
 
 </body>
-
 </html>

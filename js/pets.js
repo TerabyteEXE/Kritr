@@ -1,91 +1,200 @@
-const Pet = {
+const KritrPets = {
 
     species: "cat",
 
-    element:
-        document.querySelector(
-            ".pet-sprite"
-        ),
+    moods: {
+        cat: [
+            "READY...",
+            "VIBING...",
+            "MEOW.EXE",
+            "GOOD SONG",
+            "VERY NICE"
+        ],
+
+        slime: [
+            "BLORB...",
+            "BOUNCING...",
+            "SLIME MODE",
+            "GROOVY",
+            "SQUISH"
+        ],
+
+        bunny: [
+            "HOP...",
+            "VIBING...",
+            "HOP HOP",
+            "GOOD BEAT",
+            "BUNNY MODE"
+        ]
+    },
 
 
-    speciesFaces: {
+    faces: {
 
-        cat: "◕ᴗ◕",
+        cat:
+            "ฅ^•ﻌ•^ฅ",
 
-        slime: "●ᴗ●",
+        slime:
+            "●ᴗ●",
 
-        bunny: "ᵔᴥᵔ"
+        bunny:
+            "ᵔᴥᵔ"
+
+    },
+
+
+    initialize() {
+
+        this.load();
 
     },
 
 
     setSpecies(species) {
 
+        if (!this.faces[species]) {
+            return;
+        }
+
         this.species =
             species;
 
-        this.element.textContent =
-            this.speciesFaces[
-                species
-            ];
+        document.getElementById(
+            "pet-sprite"
+        ).textContent =
+            this.faces[species];
 
         KritrStorage.save(
             "pet",
             species
         );
 
-    },
-
-
-    trick(type) {
-
-        this.element.classList.remove(
-            "pet-bounce",
-            "pet-spin",
-            "pet-heart"
+        this.setMood(
+            this.moods[species][0]
         );
-
-
-        void this.element.offsetWidth;
-
-
-        if (type === "bounce") {
-
-            this.element.classList.add(
-                "pet-bounce"
-            );
-
-        }
-
-        if (type === "spin") {
-
-            this.element.classList.add(
-                "pet-spin"
-            );
-
-        }
-
-        if (type === "heart") {
-
-            this.element.classList.add(
-                "pet-heart"
-            );
-
-        }
 
     },
 
 
     load() {
 
-        const species =
+        const saved =
             KritrStorage.load(
                 "pet",
                 "cat"
             );
 
         this.setSpecies(
-            species
+            saved
+        );
+
+    },
+
+
+    setMood(text) {
+
+        document.getElementById(
+            "pet-mood"
+        ).textContent =
+            text;
+
+    },
+
+
+    trick(type) {
+
+        const sprite =
+            document.getElementById(
+                "pet-sprite"
+            );
+
+        sprite.classList.remove(
+            "pet-bounce",
+            "pet-spin",
+            "pet-heart"
+        );
+
+        void sprite.offsetWidth;
+
+
+        if (
+            type === "bounce"
+        ) {
+
+            sprite.classList.add(
+                "pet-bounce"
+            );
+
+            this.setMood(
+                "BOING!"
+            );
+
+        }
+
+
+        if (
+            type === "spin"
+        ) {
+
+            sprite.classList.add(
+                "pet-spin"
+            );
+
+            this.setMood(
+                "WHEEEEE!"
+            );
+
+        }
+
+
+        if (
+            type === "heart"
+        ) {
+
+            sprite.classList.add(
+                "pet-heart"
+            );
+
+            this.setMood(
+                "♥♥♥"
+            );
+
+        }
+
+    },
+
+
+    reactToMusic() {
+
+        if (
+            !audio ||
+            audio.paused
+        ) {
+            return;
+        }
+
+
+        const messages =
+            this.moods[
+                this.species
+            ];
+
+
+        const random =
+            messages[
+                Math.floor(
+                    Math.random() *
+                    messages.length
+                )
+            ];
+
+
+        this.setMood(
+            random
+        );
+
+        this.trick(
+            "bounce"
         );
 
     }

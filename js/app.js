@@ -1,28 +1,42 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+const KritrApp = {
 
-        /* THEMES */
+    booted: false,
 
-        KritrThemes.load();
+    bootTimer: null,
 
 
-        /* SETTINGS */
+    initialize() {
 
-        Settings.initialize();
+        this.setupTabs();
+
+        this.setupControls();
+
+        this.setupAudioEvents();
+
+        this.setupFileHandling();
+
+        this.setupPetControls();
+
+        this.setupKeyboard();
+
+        KritrWindow.initialize();
+
+        KritrVisualizer.initialize();
+
+        KritrEffects.initialize();
+
+        KritrPets.initialize();
+
+        KritrSettings.initialize();
+
+        Playlist.render();
+
+        this.startBoot();
+
+    },
 
 
-        /* PET */
-
-        Pet.load();
-
-
-        /* VISUALIZER */
-
-        Visualizer.initialize();
-
-
-        /* TABS */
+    setupTabs() {
 
         const tabs =
             document.querySelectorAll(
@@ -30,108 +44,218 @@ document.addEventListener(
             );
 
 
-        tabs.forEach(tab => {
+        tabs.forEach(
+            tab => {
 
-            tab.addEventListener(
-                "click",
-                () => {
+                tab.addEventListener(
+                    "click",
+                    () => {
 
-                    const target =
-                        tab.dataset.tab;
+                        const target =
+                            tab.dataset.tab;
 
 
-                    tabs.forEach(
-                        item =>
-                            item.classList.remove(
-                                "active"
+                        tabs.forEach(
+                            t =>
+                                t.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                        document
+                            .querySelectorAll(
+                                ".tab-panel"
                             )
-                    );
+                            .forEach(
+                                panel =>
+                                    panel.classList.remove(
+                                        "active"
+                                    )
+                            );
 
 
-                    document.querySelectorAll(
-                        ".tab-page"
-                    ).forEach(
-                        page =>
-                            page.classList.remove(
+                        tab.classList.add(
+                            "active"
+                        );
+
+
+                        const panel =
+                            document.getElementById(
+                                `${target}-tab`
+                            );
+
+
+                        if (panel) {
+
+                            panel.classList.add(
                                 "active"
-                            )
-                    );
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    },
 
 
-                    tab.classList.add(
-                        "active"
-                    );
+    setupControls() {
+
+        document.getElementById(
+            "play-button"
+        ).addEventListener(
+            "click",
+            () => Player.toggle()
+        );
 
 
-                    document.querySelector(
-                        `#${target}-tab`
-                    ).classList.add(
-                        "active"
-                    );
+        document.getElementById(
+            "previous-track"
+        ).addEventListener(
+            "click",
+            () => Player.previous()
+        );
 
+
+        document.getElementById(
+            "next-track"
+        ).addEventListener(
+            "click",
+            () => Player.next()
+        );
+
+
+        document.getElementById(
+            "volume"
+        ).addEventListener(
+            "input",
+            event => {
+
+                Player.setVolume(
+                    event.target.value
+                );
+
+            }
+        );
+
+
+        document.getElementById(
+            "speed-down"
+        ).addEventListener(
+            "click",
+            () => {
+
+                Player.setSpeed(
+                    Player.speed - 0.1
+                );
+
+            }
+        );
+
+
+        document.getElementById(
+            "speed-up"
+        ).addEventListener(
+            "click",
+            () => {
+
+                Player.setSpeed(
+                    Player.speed + 0.1
+                );
+
+            }
+        );
+
+
+        document.getElementById(
+            "progress"
+        ).addEventListener(
+            "input",
+            event => {
+
+                if (!audio.duration) {
+                    return;
                 }
-            );
 
-        });
+                const percentage =
+                    Number(
+                        event.target.value
+                    ) / 100;
 
-
-        /* PLAY BUTTON */
-
-        document.querySelector(
-            "#play-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.toggle();
+                audio.currentTime =
+                    audio.duration *
+                    percentage;
 
             }
         );
 
 
-        /* PREVIOUS */
-
-        document.querySelector(
-            "#previous-btn"
+        document.getElementById(
+            "visualizer-mode-button"
         ).addEventListener(
             "click",
             () => {
 
-                Player.previous();
+                const modes = [
+                    "bars",
+                    "wave",
+                    "dots",
+                    "orbit",
+                    "pixel",
+                    "void"
+                ];
+
+                const current =
+                    KritrVisualizer.mode;
+
+                const index =
+                    modes.indexOf(
+                        current
+                    );
+
+                const next =
+                    modes[
+                        (
+                            index + 1
+                        ) % modes.length
+                    ];
+
+                KritrVisualizer.setMode(
+                    next
+                );
+
+                document.getElementById(
+                    "visualizer-select"
+                ).value =
+                    next;
 
             }
         );
 
 
-        /* NEXT */
-
-        document.querySelector(
-            "#next-btn"
+        document.getElementById(
+            "clear-playlist"
         ).addEventListener(
             "click",
-            () => {
-
-                Player.next();
-
-            }
+            () => Playlist.clear()
         );
 
+    },
 
-        /* AUDIO EVENTS */
+
+    setupAudioEvents() {
 
         audio.addEventListener(
             "play",
             () => {
 
-                document.querySelector(
-                    "#play-btn"
-                ).textContent =
-                    "Ⅱ";
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "PLAYING";
+                this.setPlayingUI(
+                    true
+                );
 
             }
         );
@@ -141,15 +265,9 @@ document.addEventListener(
             "pause",
             () => {
 
-                document.querySelector(
-                    "#play-btn"
-                ).textContent =
-                    "▶";
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "PAUSED";
+                this.setPlayingUI(
+                    false
+                );
 
             }
         );
@@ -165,44 +283,24 @@ document.addEventListener(
         );
 
 
-        /* PROGRESS */
-
         audio.addEventListener(
             "timeupdate",
             () => {
 
-                if (
-                    !audio.duration
-                ) {
-                    return;
-                }
+                this.updateProgress();
+
+            }
+        );
 
 
-                const percentage =
-                    (
-                        audio.currentTime /
-                        audio.duration
-                    ) * 100;
+        audio.addEventListener(
+            "loadedmetadata",
+            () => {
 
-
-                document.querySelector(
-                    "#progress"
-                ).value =
-                    percentage;
-
-
-                document.querySelector(
-                    "#current-time"
+                document.getElementById(
+                    "duration"
                 ).textContent =
-                    formatTime(
-                        audio.currentTime
-                    );
-
-
-                document.querySelector(
-                    "#duration"
-                ).textContent =
-                    formatTime(
+                    this.formatTime(
                         audio.duration
                     );
 
@@ -210,108 +308,30 @@ document.addEventListener(
         );
 
 
-        document.querySelector(
-            "#progress"
-        ).addEventListener(
-            "input",
-            event => {
+        audio.addEventListener(
+            "error",
+            () => {
 
-                if (
-                    !audio.duration
-                ) {
-                    return;
-                }
-
-
-                audio.currentTime =
-                    (
-                        Number(
-                            event.target.value
-                        ) / 100
-                    ) *
-                    audio.duration;
-
-            }
-        );
-
-
-        /* VOLUME */
-
-        const savedVolume =
-            KritrStorage.load(
-                "volume",
-                80
-            );
-
-
-        const volume =
-            document.querySelector(
-                "#volume"
-            );
-
-
-        volume.value =
-            savedVolume;
-
-
-        Player.setVolume(
-            savedVolume
-        );
-
-
-        volume.addEventListener(
-            "input",
-            event => {
-
-                Player.setVolume(
-                    event.target.value
+                this.setStatus(
+                    "AUDIO ERROR",
+                    false
                 );
 
             }
         );
 
+    },
 
-        /* SPEED */
 
-        const speed =
-            document.querySelector(
-                "#speed"
+    setupFileHandling() {
+
+        const input =
+            document.getElementById(
+                "file-input"
             );
 
 
-        const savedSpeed =
-            KritrStorage.load(
-                "speed",
-                "1"
-            );
-
-
-        speed.value =
-            savedSpeed;
-
-
-        Player.setSpeed(
-            savedSpeed
-        );
-
-
-        speed.addEventListener(
-            "change",
-            event => {
-
-                Player.setSpeed(
-                    event.target.value
-                );
-
-            }
-        );
-
-
-        /* FILE INPUT */
-
-        document.querySelector(
-            "#file-input"
-        ).addEventListener(
+        input.addEventListener(
             "change",
             event => {
 
@@ -319,17 +339,16 @@ document.addEventListener(
                     event.target.files
                 );
 
-                event.target.value = "";
+                event.target.value =
+                    "";
 
             }
         );
 
 
-        /* DRAG AND DROP */
-
         const windowElement =
-            document.querySelector(
-                ".kritr-window"
+            document.getElementById(
+                "kritr-window"
             );
 
 
@@ -338,6 +357,22 @@ document.addEventListener(
             event => {
 
                 event.preventDefault();
+
+                windowElement.classList.add(
+                    "dragging"
+                );
+
+            }
+        );
+
+
+        windowElement.addEventListener(
+            "dragleave",
+            () => {
+
+                windowElement.classList.remove(
+                    "dragging"
+                );
 
             }
         );
@@ -349,6 +384,11 @@ document.addEventListener(
 
                 event.preventDefault();
 
+                windowElement.classList.remove(
+                    "dragging"
+                );
+
+
                 Playlist.addFiles(
                     event.dataTransfer.files
                 );
@@ -356,30 +396,18 @@ document.addEventListener(
             }
         );
 
-
-        /* CLEAR PLAYLIST */
-
-        document.querySelector(
-            "#clear-playlist"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Playlist.clear();
-
-            }
-        );
+    },
 
 
-        /* PET */
+    setupPetControls() {
 
-        document.querySelector(
-            "#pet-species"
+        document.getElementById(
+            "pet-species"
         ).addEventListener(
             "change",
             event => {
 
-                Pet.setSpecies(
+                KritrPets.setSpecies(
                     event.target.value
                 );
 
@@ -387,84 +415,50 @@ document.addEventListener(
         );
 
 
-        document.querySelector(
-            "#pet-trick-btn"
-        ).addEventListener(
-            "click",
-            () => {
+        document
+            .querySelectorAll(
+                "[data-trick]"
+            )
+            .forEach(
+                button => {
 
-                const trick =
-                    document.querySelector(
-                        "#pet-trick"
-                    ).value;
+                    button.addEventListener(
+                        "click",
+                        () => {
 
-                Pet.trick(
-                    trick
-                );
+                            KritrPets.trick(
+                                button.dataset.trick
+                            );
 
-            }
-        );
+                        }
+                    );
 
+                }
+            );
 
-        /* CLOSE / MINIMIZE */
-
-        document.querySelector(
-            "#close-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).style.display =
-                    "none";
-
-            }
-        );
+    },
 
 
-        document.querySelector(
-            "#minimize-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).style.transform =
-                    "scale(0.7)";
-
-            }
-        );
-
-
-        /* MAXIMIZE */
-
-        document.querySelector(
-            "#maximize-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).classList.toggle(
-                    "maximized"
-                );
-
-            }
-        );
-
-
-        /* KEYBOARD */
+    setupKeyboard() {
 
         document.addEventListener(
             "keydown",
             event => {
 
+                const tag =
+                    event.target.tagName;
+
                 if (
-                    event.code ===
-                    "Space"
+                    tag === "INPUT" ||
+                    tag === "SELECT" ||
+                    tag === "TEXTAREA"
+                ) {
+                    return;
+                }
+
+
+                if (
+                    event.code === "Space"
                 ) {
 
                     event.preventDefault();
@@ -475,67 +469,329 @@ document.addEventListener(
 
 
                 if (
-                    event.code ===
-                    "ArrowRight"
+                    event.code === "ArrowRight"
                 ) {
 
-                    audio.currentTime += 5;
+                    audio.currentTime =
+                        Math.min(
+                            audio.duration || 0,
+                            (
+                                audio.currentTime +
+                                5
+                            )
+                        );
 
                 }
 
 
                 if (
-                    event.code ===
-                    "ArrowLeft"
+                    event.code === "ArrowLeft"
                 ) {
 
-                    audio.currentTime -= 5;
+                    audio.currentTime =
+                        Math.max(
+                            0,
+                            (
+                                audio.currentTime -
+                                5
+                            )
+                        );
 
                 }
 
             }
         );
 
+    },
 
-        document.querySelector(
-            "#status"
+
+    setPlayingUI(playing) {
+
+        const button =
+            document.getElementById(
+                "play-button"
+            );
+
+
+        const indicator =
+            document.getElementById(
+                "playing-indicator"
+            );
+
+
+        const status =
+            document.getElementById(
+                "track-status-text"
+            );
+
+
+        if (playing) {
+
+            button.textContent =
+                "❚❚";
+
+            button.setAttribute(
+                "aria-label",
+                "Pause"
+            );
+
+            indicator.classList.add(
+                "playing"
+            );
+
+            status.textContent =
+                "PLAYING";
+
+            this.setStatus(
+                "PLAYING",
+                true
+            );
+
+        } else {
+
+            button.textContent =
+                "▶";
+
+            button.setAttribute(
+                "aria-label",
+                "Play"
+            );
+
+            indicator.classList.remove(
+                "playing"
+            );
+
+            status.textContent =
+                "PAUSED";
+
+            this.setStatus(
+                "PAUSED",
+                true
+            );
+
+        }
+
+    },
+
+
+    updateProgress() {
+
+        if (
+            !audio.duration ||
+            !Number.isFinite(
+                audio.duration
+            )
+        ) {
+            return;
+        }
+
+
+        const percentage =
+            (
+                audio.currentTime /
+                audio.duration
+            ) * 100;
+
+
+        document.getElementById(
+            "progress"
+        ).value =
+            percentage;
+
+
+        document.getElementById(
+            "current-time"
         ).textContent =
-            "READY";
+            this.formatTime(
+                audio.currentTime
+            );
 
-    }
-);
+    },
 
 
-/* TIME FORMAT */
-
-function formatTime(seconds) {
-
-    if (
-        !Number.isFinite(seconds)
+    setStatus(
+        text,
+        online = true
     ) {
 
-        return "0:00";
+        document.getElementById(
+            "status-text"
+        ).textContent =
+            text;
+
+
+        const dot =
+            document.getElementById(
+                "status-dot"
+            );
+
+
+        dot.classList.toggle(
+            "offline",
+            !online
+        );
+
+    },
+
+
+    formatTime(seconds) {
+
+        if (
+            !Number.isFinite(seconds) ||
+            seconds < 0
+        ) {
+            return "0:00";
+        }
+
+
+        const minutes =
+            Math.floor(
+                seconds / 60
+            );
+
+        const remaining =
+            Math.floor(
+                seconds % 60
+            );
+
+
+        return (
+            minutes +
+            ":" +
+            String(
+                remaining
+            ).padStart(
+                2,
+                "0"
+            )
+        );
+
+    },
+
+
+    startBoot() {
+
+        const screen =
+            document.getElementById(
+                "boot-screen"
+            );
+
+        const bar =
+            document.getElementById(
+                "boot-progress-bar"
+            );
+
+        const status =
+            document.getElementById(
+                "boot-status"
+            );
+
+        const skip =
+            document.getElementById(
+                "skip-boot"
+            );
+
+
+        const messages = [
+            "INITIALIZING...",
+            "AUDIO ENGINE READY",
+            "VISUALIZER CALIBRATED",
+            "PET AWAKE",
+            "KRITR READY"
+        ];
+
+
+        let progress = 0;
+
+
+        const finish = () => {
+
+            if (this.booted) {
+                return;
+            }
+
+            this.booted = true;
+
+            clearInterval(
+                this.bootTimer
+            );
+
+            screen.classList.add(
+                "finished"
+            );
+
+
+            setTimeout(
+                () => {
+
+                    screen.remove();
+
+                },
+                450
+            );
+
+        };
+
+
+        skip.addEventListener(
+            "click",
+            finish
+        );
+
+
+        this.bootTimer =
+            setInterval(
+                () => {
+
+                    progress +=
+                        Math.random() *
+                        18 +
+                        8;
+
+
+                    progress =
+                        Math.min(
+                            100,
+                            progress
+                        );
+
+
+                    bar.style.width =
+                        `${progress}%`;
+
+
+                    const index =
+                        Math.min(
+                            messages.length - 1,
+                            Math.floor(
+                                progress /
+                                20
+                            )
+                        );
+
+
+                    status.textContent =
+                        messages[index];
+
+
+                    if (
+                        progress >= 100
+                    ) {
+
+                        setTimeout(
+                            finish,
+                            350
+                        );
+
+                    }
+
+                },
+                180
+            );
 
     }
 
-
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
+};
 
 
-    const remaining =
-        Math.floor(
-            seconds % 60
-        )
-        .toString()
-        .padStart(
-            2,
-            "0"
-        );
-
-
-    return `${minutes}:${remaining}`;
-
-}
+KritrApp.initialize();

@@ -1,51 +1,51 @@
-const Settings = {
+const KritrSettings = {
 
     initialize() {
 
-        const theme =
-            document.querySelector(
-                "#theme-select"
+        const themeSelect =
+            document.getElementById(
+                "theme-select"
             );
 
-        const visualizer =
-            document.querySelector(
-                "#visualizer-select"
+        const visualizerSelect =
+            document.getElementById(
+                "visualizer-select"
             );
 
         const scale =
-            document.querySelector(
-                "#ui-scale"
+            document.getElementById(
+                "ui-scale"
             );
 
         const crt =
-            document.querySelector(
-                "#crt-toggle"
+            document.getElementById(
+                "crt-toggle"
+            );
+
+        const reactivity =
+            document.getElementById(
+                "reactivity-toggle"
             );
 
 
-        theme.addEventListener(
+        themeSelect.addEventListener(
             "change",
             () => {
 
                 KritrThemes.set(
-                    theme.value
+                    themeSelect.value
                 );
 
             }
         );
 
 
-        visualizer.addEventListener(
+        visualizerSelect.addEventListener(
             "change",
             () => {
 
-                Visualizer.setMode(
-                    visualizer.value
-                );
-
-                KritrStorage.save(
-                    "visualizer",
-                    visualizer.value
+                KritrVisualizer.setMode(
+                    visualizerSelect.value
                 );
 
             }
@@ -57,17 +57,16 @@ const Settings = {
             () => {
 
                 const value =
-                    scale.value / 100;
+                    Number(scale.value);
 
-                document.documentElement.style
-                    .setProperty(
-                        "--ui-scale",
-                        value
-                    );
+                document.documentElement.style.setProperty(
+                    "--ui-scale",
+                    value
+                );
 
                 KritrStorage.save(
-                    "scale",
-                    scale.value
+                    "uiScale",
+                    value
                 );
 
             }
@@ -78,8 +77,8 @@ const Settings = {
             "change",
             () => {
 
-                document.querySelector(
-                    "#crt-overlay"
+                document.getElementById(
+                    "crt-overlay"
                 ).style.display =
                     crt.checked
                         ? "block"
@@ -94,53 +93,144 @@ const Settings = {
         );
 
 
-        /* LOAD SAVED SETTINGS */
+        reactivity.addEventListener(
+            "change",
+            () => {
 
-        const savedScale =
+                KritrReactivity.enabled =
+                    reactivity.checked;
+
+                KritrStorage.save(
+                    "reactivity",
+                    reactivity.checked
+                );
+
+            }
+        );
+
+
+        this.load();
+
+    },
+
+
+    load() {
+
+        const theme =
             KritrStorage.load(
-                "scale",
-                100
+                "theme",
+                "sakura"
             );
 
-        scale.value =
-            savedScale;
-
-        document.documentElement.style
-            .setProperty(
-                "--ui-scale",
-                savedScale / 100
-            );
-
-
-        const savedVisualizer =
+        const visualizer =
             KritrStorage.load(
                 "visualizer",
                 "bars"
             );
 
-        visualizer.value =
-            savedVisualizer;
+        const scale =
+            KritrStorage.load(
+                "uiScale",
+                1
+            );
 
-        Visualizer.setMode(
-            savedVisualizer
-        );
-
-
-        const savedCRT =
+        const crt =
             KritrStorage.load(
                 "crt",
                 true
             );
 
-        crt.checked =
-            savedCRT;
+        const reactivity =
+            KritrStorage.load(
+                "reactivity",
+                true
+            );
 
-        document.querySelector(
-            "#crt-overlay"
+        const volume =
+            KritrStorage.load(
+                "volume",
+                0.8
+            );
+
+        const speed =
+            KritrStorage.load(
+                "speed",
+                1
+            );
+
+
+        KritrThemes.set(
+            theme
+        );
+
+
+        document.getElementById(
+            "theme-select"
+        ).value =
+            theme;
+
+
+        KritrVisualizer.setMode(
+            visualizer
+        );
+
+
+        document.getElementById(
+            "visualizer-select"
+        ).value =
+            visualizer;
+
+
+        document.getElementById(
+            "ui-scale"
+        ).value =
+            scale;
+
+
+        document.documentElement.style.setProperty(
+            "--ui-scale",
+            scale
+        );
+
+
+        document.getElementById(
+            "crt-toggle"
+        ).checked =
+            crt;
+
+
+        document.getElementById(
+            "crt-overlay"
         ).style.display =
-            savedCRT
+            crt
                 ? "block"
                 : "none";
+
+
+        document.getElementById(
+            "reactivity-toggle"
+        ).checked =
+            reactivity;
+
+
+        KritrReactivity.enabled =
+            reactivity;
+
+
+        document.getElementById(
+            "volume"
+        ).value =
+            volume;
+
+
+        Player.setVolume(
+            volume
+        );
+
+
+        Player.setSpeed(
+            speed
+        );
 
     }
 
