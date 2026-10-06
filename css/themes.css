@@ -1,104 +1,41 @@
-/* Sakura */
+/* Kritr themes. Keep variables centralized so every reactive element recolors consistently. */
 body[data-theme="sakura"] {
-    --bg-color: #f2c4ce;
-    --window-bg: #2b2640;
-    --window-header: #4c436d;
-    --accent-main: #ff79c6;
-    --accent-secondary: #8be9fd;
-    --accent-glow: rgba(255, 121, 198, 0.52);
-    --accent-ink: #20172a;
-    --text-color: #f8f8f2;
-    --muted-color: #c7bfd0;
-    --border-color: #76648e;
-    --visualizer-bg: #171322;
+    --bg-color:#120f17; --window-bg:#1d1925; --window-header:#292234; --panel-bg:#100d15; --panel-raised:#292333;
+    --accent-main:#ff79b9; --accent-secondary:#80dbff; --accent-rgb:255,121,185; --accent2-rgb:128,219,255;
+    --text-color:#fff7fb; --muted-color:#a99bae; --border-color:#4b3f55;
 }
-
-/* Cyber */
 body[data-theme="cyber"] {
-    --bg-color: #070b18;
-    --window-bg: #10182a;
-    --window-header: #182440;
-    --accent-main: #ff2bd6;
-    --accent-secondary: #00f6ff;
-    --accent-glow: rgba(0, 246, 255, 0.5);
-    --accent-ink: #080b18;
-    --text-color: #e8faff;
-    --muted-color: #91a9c2;
-    --border-color: #31516d;
-    --visualizer-bg: #080e1c;
+    --bg-color:#050814; --window-bg:#0c1220; --window-header:#111b2e; --panel-bg:#060a13; --panel-raised:#121c2f;
+    --accent-main:#ff37db; --accent-secondary:#20f2ff; --accent-rgb:255,55,219; --accent2-rgb:32,242,255;
+    --text-color:#effcff; --muted-color:#728ca5; --border-color:#24415c;
 }
-
-/* Game Boy */
 body[data-theme="gameboy"] {
-    --bg-color: #8bac0f;
-    --window-bg: #306230;
-    --window-header: #0f380f;
-    --accent-main: #c6ed42;
-    --accent-secondary: #8bac0f;
-    --accent-glow: rgba(198, 237, 66, 0.45);
-    --accent-ink: #0f380f;
-    --text-color: #e0f8a4;
-    --muted-color: #b5d46a;
-    --border-color: #638d28;
-    --visualizer-bg: #132d16;
+    --bg-color:#0f380f; --window-bg:#306230; --window-header:#244b24; --panel-bg:#0f380f; --panel-raised:#3c733c;
+    --accent-main:#9bbc0f; --accent-secondary:#8bac0f; --accent-rgb:155,188,15; --accent2-rgb:139,172,15;
+    --text-color:#d7e899; --muted-color:#9bbc0f; --border-color:#8bac0f;
 }
-
-/* Synthwave */
 body[data-theme="synthwave"] {
-    --bg-color: #16002b;
-    --window-bg: #241044;
-    --window-header: #35145d;
-    --accent-main: #ff2ec4;
-    --accent-secondary: #20e3ff;
-    --accent-glow: rgba(255, 46, 196, 0.52);
-    --accent-ink: #19062c;
-    --text-color: #ffffff;
-    --muted-color: #c6addf;
-    --border-color: #784da1;
-    --visualizer-bg: #10001f;
+    --bg-color:#10001d; --window-bg:#201036; --window-header:#32164f; --panel-bg:#10071b; --panel-raised:#32184b;
+    --accent-main:#ff3dc8; --accent-secondary:#23ddff; --accent-rgb:255,61,200; --accent2-rgb:35,221,255;
+    --text-color:#fff8ff; --muted-color:#b19bc7; --border-color:#704190;
 }
-
-/* Omarchy */
 body[data-theme="omarchy"] {
-    --bg-color: #111111;
-    --window-bg: #191919;
-    --window-header: #252525;
-    --accent-main: #f5f5f5;
-    --accent-secondary: #a5b3aa;
-    --accent-glow: rgba(224, 236, 228, 0.3);
-    --accent-ink: #111111;
-    --text-color: #eeeeee;
-    --muted-color: #a2a2a2;
-    --border-color: #4c534f;
-    --visualizer-bg: #0b0d0c;
+    --bg-color:#0b0c0d; --window-bg:#131516; --window-header:#1b1d1f; --panel-bg:#0d0f10; --panel-raised:#1d2022;
+    --accent-main:#f0eee8; --accent-secondary:#8d9498; --accent-rgb:240,238,232; --accent2-rgb:141,148,152;
+    --text-color:#f4f2ed; --muted-color:#7d8386; --border-color:#34383a;
 }
-
-/* Retro amber terminal */
-body[data-theme="retro"] {
-    --bg-color: #21180f;
-    --window-bg: #2b2115;
-    --window-header: #46321b;
-    --accent-main: #ffbd59;
-    --accent-secondary: #f0784b;
-    --accent-glow: rgba(255, 189, 89, 0.48);
-    --accent-ink: #24180d;
-    --text-color: #ffebc2;
-    --muted-color: #c8a879;
-    --border-color: #77552e;
-    --visualizer-bg: #171109;
+body[data-theme="oxide"] {
+    --bg-color:#110d0a; --window-bg:#1c1612; --window-header:#2a2018; --panel-bg:#100c09; --panel-raised:#302219;
+    --accent-main:#ff7a33; --accent-secondary:#ffd166; --accent-rgb:255,122,51; --accent2-rgb:255,209,102;
+    --text-color:#fff3e9; --muted-color:#a69082; --border-color:#50382a;
 }
-
-/* Monochrome */
-body[data-theme="monochrome"] {
-    --bg-color: #17191c;
-    --window-bg: #22262a;
-    --window-header: #30353a;
-    --accent-main: #f1f3f5;
-    --accent-secondary: #8da3b5;
-    --accent-glow: rgba(194, 216, 230, 0.38);
-    --accent-ink: #17191c;
-    --text-color: #f1f3f5;
-    --muted-color: #a5afb8;
-    --border-color: #515e68;
-    --visualizer-bg: #101316;
+body[data-theme="ice"] {
+    --bg-color:#071017; --window-bg:#0d1922; --window-header:#122530; --panel-bg:#071018; --panel-raised:#142934;
+    --accent-main:#72e5ff; --accent-secondary:#a9ffef; --accent-rgb:114,229,255; --accent2-rgb:169,255,239;
+    --text-color:#effcff; --muted-color:#799aa6; --border-color:#28505e;
+}
+body[data-theme="amber"] {
+    --bg-color:#100b04; --window-bg:#1c1409; --window-header:#2a1e0d; --panel-bg:#100b04; --panel-raised:#2e210f;
+    --accent-main:#ffb52e; --accent-secondary:#ffd979; --accent-rgb:255,181,46; --accent2-rgb:255,217,121;
+    --text-color:#fff4d6; --muted-color:#aa8950; --border-color:#57401e;
 }

@@ -1,37 +1,16 @@
 const KritrThemes = {
+    allowed: ["sakura", "cyber", "gameboy", "synthwave", "omarchy", "oxide", "ice", "amber"],
 
     set(theme) {
+        const next = this.allowed.includes(theme) ? theme : "omarchy";
+        document.body.dataset.theme = next;
+        KritrStorage.save("theme", next);
 
-        document.body.dataset.theme = theme;
-
-        KritrStorage.save(
-            "theme",
-            theme
-        );
-
+        const selector = document.querySelector("#theme-select");
+        if (selector && selector.value !== next) selector.value = next;
     },
 
-
     load() {
-
-        const theme =
-            KritrStorage.load(
-                "theme",
-                "sakura"
-            );
-
-        document.body.dataset.theme =
-            theme;
-
-        const selector =
-            document.querySelector(
-                "#theme-select"
-            );
-
-        if (selector) {
-            selector.value = theme;
-        }
-
+        this.set(KritrStorage.load("theme", "omarchy"));
     }
-
 };

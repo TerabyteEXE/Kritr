@@ -1,93 +1,49 @@
 const Pet = {
-
     species: "cat",
-
-    element:
-        document.querySelector(
-            ".pet-sprite"
-        ),
-
+    element: document.querySelector(".pet-sprite"),
+    preview: document.querySelector("#pet-preview"),
 
     speciesFaces: {
-
         cat: "◕ᴗ◕",
-
         slime: "●ᴗ●",
-
         bunny: "ᵔᴥᵔ"
-
     },
-
 
     setSpecies(species) {
+        if (!this.speciesFaces[species]) species = "cat";
+        this.species = species;
+        const face = this.speciesFaces[species];
 
-        this.species =
-            species;
+        if (this.element) this.element.textContent = face;
+        if (this.preview) this.preview.textContent = face;
 
-        this.element.textContent =
-            this.speciesFaces[
-                species
-            ];
+        const selector = document.querySelector("#pet-species");
+        if (selector) selector.value = species;
 
-        KritrStorage.save(
-            "pet",
-            species
-        );
-
+        KritrStorage.save("pet", species);
     },
-
 
     trick(type) {
+        const targets = [this.element, this.preview].filter(Boolean);
+        const classes = ["pet-bounce", "pet-spin", "pet-heart"];
 
-        this.element.classList.remove(
-            "pet-bounce",
-            "pet-spin",
-            "pet-heart"
-        );
+        targets.forEach(target => {
+            target.classList.remove(...classes);
+            void target.offsetWidth;
+            target.classList.add(`pet-${type}`);
+        });
 
-
-        void this.element.offsetWidth;
-
-
-        if (type === "bounce") {
-
-            this.element.classList.add(
-                "pet-bounce"
-            );
-
-        }
-
-        if (type === "spin") {
-
-            this.element.classList.add(
-                "pet-spin"
-            );
-
-        }
-
-        if (type === "heart") {
-
-            this.element.classList.add(
-                "pet-heart"
-            );
-
-        }
-
+        window.setTimeout(() => {
+            targets.forEach(target => target.classList.remove(...classes));
+        }, 900);
     },
 
+    setPlaying(isPlaying) {
+        if (!this.element) return;
+        this.element.classList.toggle("pet-dance", isPlaying);
+    },
 
     load() {
-
-        const species =
-            KritrStorage.load(
-                "pet",
-                "cat"
-            );
-
-        this.setSpecies(
-            species
-        );
-
+        this.setSpecies(KritrStorage.load("pet", "cat"));
     }
-
 };

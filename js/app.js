@@ -1,667 +1,176 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        /* THEMES */
-
-        KritrThemes.load();
-
-
-        /* SETTINGS */
-
-        Settings.initialize();
-
-
-        /* PET */
-
-        Pet.load();
-
-
-        /* VISUALIZER */
-
-        Visualizer.initialize();
-
-
-        /* TABS */
-
-        const tabs =
-            document.querySelectorAll(
-                ".tab"
-            );
-
-
-        tabs.forEach(tab => {
-
-            tab.addEventListener(
-                "click",
-                () => {
-
-                    const target =
-                        tab.dataset.tab;
-
-
-                    tabs.forEach(
-                        item =>
-                            item.classList.remove(
-                                "active"
-                            )
-                    );
-
-
-                    document.querySelectorAll(
-                        ".tab-page"
-                    ).forEach(
-                        page =>
-                            page.classList.remove(
-                                "active"
-                            )
-                    );
-
-
-                    tab.classList.add(
-                        "active"
-                    );
-
-
-                    document.querySelector(
-                        `#${target}-tab`
-                    ).classList.add(
-                        "active"
-                    );
-
-                }
-            );
-
-        });
-
-
-        /* PLAY BUTTON */
-
-        document.querySelector(
-            "#play-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.toggle();
-
-            }
-        );
-
-
-        /* PREVIOUS */
-
-        document.querySelector(
-            "#previous-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.previous();
-
-            }
-        );
-
-
-        /* NEXT */
-
-        document.querySelector(
-            "#next-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Player.next();
-
-            }
-        );
-
-
-        /* AUDIO EVENTS */
-
-        audio.addEventListener(
-            "play",
-            () => {
-
-                document.body.classList.add(
-                    "is-playing"
-                );
-
-                document.body.classList.remove(
-                    "is-loading"
-                );
-
-                document.querySelector(
-                    "#play-btn"
-                ).textContent =
-                    "Ⅱ";
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "PLAYING";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "pause",
-            () => {
-
-                document.body.classList.remove(
-                    "is-playing",
-                    "is-loading"
-                );
-
-                document.querySelector(
-                    "#play-btn"
-                ).textContent =
-                    "▶";
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "PAUSED";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "loadstart",
-            () => {
-
-                document.body.classList.add(
-                    "is-loading"
-                );
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "LOADING";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "waiting",
-            () => {
-
-                document.body.classList.add(
-                    "is-loading"
-                );
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "BUFFERING";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "canplay",
-            () => {
-
-                document.body.classList.remove(
-                    "is-loading"
-                );
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    audio.paused
-                        ? "READY"
-                        : "PLAYING";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "error",
-            () => {
-
-                document.body.classList.remove(
-                    "is-loading",
-                    "is-playing"
-                );
-
-                document.querySelector(
-                    "#status"
-                ).textContent =
-                    "AUDIO ERROR";
-
-            }
-        );
-
-
-        audio.addEventListener(
-            "ended",
-            () => {
-
-                Player.next();
-
-            }
-        );
-
-
-        /* PROGRESS */
-
-        audio.addEventListener(
-            "timeupdate",
-            () => {
-
-                if (
-                    !audio.duration
-                ) {
-                    return;
-                }
-
-
-                const percentage =
-                    (
-                        audio.currentTime /
-                        audio.duration
-                    ) * 100;
-
-
-                document.querySelector(
-                    "#progress"
-                ).value =
-                    percentage;
-
-                document.querySelector(
-                    "#progress"
-                ).style.setProperty(
-                    "--progress",
-                    `${percentage}%`
-                );
-
-
-                document.querySelector(
-                    "#current-time"
-                ).textContent =
-                    formatTime(
-                        audio.currentTime
-                    );
-
-
-                document.querySelector(
-                    "#duration"
-                ).textContent =
-                    formatTime(
-                        audio.duration
-                    );
-
-            }
-        );
-
-
-        document.querySelector(
-            "#progress"
-        ).addEventListener(
-            "input",
-            event => {
-
-                if (
-                    !audio.duration
-                ) {
-                    return;
-                }
-
-
-                audio.currentTime =
-                    (
-                        Number(
-                            event.target.value
-                        ) / 100
-                    ) *
-                    audio.duration;
-
-                event.target.style.setProperty(
-                    "--progress",
-                    `${event.target.value}%`
-                );
-
-            }
-        );
-
-
-        /* VOLUME */
-
-        const savedVolume =
-            KritrStorage.load(
-                "volume",
-                80
-            );
-
-
-        const volume =
-            document.querySelector(
-                "#volume"
-            );
-
-
-        volume.value =
-            savedVolume;
-
-        volume.style.setProperty(
-            "--progress",
-            `${savedVolume}%`
-        );
-
-
-        Player.setVolume(
-            savedVolume
-        );
-
-
-        volume.addEventListener(
-            "input",
-            event => {
-
-                Player.setVolume(
-                    event.target.value
-                );
-
-                event.target.style.setProperty(
-                    "--progress",
-                    `${event.target.value}%`
-                );
-
-            }
-        );
-
-
-        /* SPEED */
-
-        const speed =
-            document.querySelector(
-                "#speed"
-            );
-
-
-        const savedSpeed =
-            KritrStorage.load(
-                "speed",
-                "1"
-            );
-
-
-        speed.value =
-            savedSpeed;
-
-
-        Player.setSpeed(
-            savedSpeed
-        );
-
-
-        speed.addEventListener(
-            "change",
-            event => {
-
-                Player.setSpeed(
-                    event.target.value
-                );
-
-            }
-        );
-
-
-        /* FILE INPUT */
-
-        document.querySelector(
-            "#file-input"
-        ).addEventListener(
-            "change",
-            event => {
-
-                Playlist.addFiles(
-                    event.target.files
-                );
-
-                event.target.value = "";
-
-            }
-        );
-
-
-        /* DRAG AND DROP */
-
-        const windowElement =
-            document.querySelector(
-                ".kritr-window"
-            );
-
-
-        windowElement.addEventListener(
-            "dragover",
-            event => {
-
-                event.preventDefault();
-                windowElement.classList.add(
-                    "is-drop-target"
-                );
-
-            }
-        );
-
-        windowElement.addEventListener(
-            "dragleave",
-            event => {
-
-                if (!windowElement.contains(event.relatedTarget)) {
-                    windowElement.classList.remove(
-                        "is-drop-target"
-                    );
-                }
-
-            }
-        );
-
-
-        windowElement.addEventListener(
-            "drop",
-            event => {
-
-                event.preventDefault();
-
-                windowElement.classList.remove(
-                    "is-drop-target"
-                );
-
-                Playlist.addFiles(
-                    event.dataTransfer.files
-                );
-
-            }
-        );
-
-
-        /* CLEAR PLAYLIST */
-
-        document.querySelector(
-            "#clear-playlist"
-        ).addEventListener(
-            "click",
-            () => {
-
-                Playlist.clear();
-
-            }
-        );
-
-
-        /* PET */
-
-        document.querySelector(
-            "#pet-species"
-        ).addEventListener(
-            "change",
-            event => {
-
-                Pet.setSpecies(
-                    event.target.value
-                );
-
-            }
-        );
-
-
-        document.querySelector(
-            "#pet-trick-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                const trick =
-                    document.querySelector(
-                        "#pet-trick"
-                    ).value;
-
-                Pet.trick(
-                    trick
-                );
-
-            }
-        );
-
-
-        /* CLOSE / MINIMIZE */
-
-        document.querySelector(
-            "#close-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).style.display =
-                    "none";
-
-            }
-        );
-
-
-        document.querySelector(
-            "#minimize-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).style.transform =
-                    "scale(0.7)";
-
-            }
-        );
-
-
-        /* MAXIMIZE */
-
-        document.querySelector(
-            "#maximize-btn"
-        ).addEventListener(
-            "click",
-            () => {
-
-                document.querySelector(
-                    ".kritr-window"
-                ).classList.toggle(
-                    "maximized"
-                );
-
-            }
-        );
-
-
-        /* KEYBOARD */
-
-        document.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.code ===
-                    "Space"
-                ) {
-
-                    event.preventDefault();
-
-                    Player.toggle();
-
-                }
-
-
-                if (
-                    event.code ===
-                    "ArrowRight"
-                ) {
-
-                    audio.currentTime += 5;
-
-                }
-
-
-                if (
-                    event.code ===
-                    "ArrowLeft"
-                ) {
-
-                    audio.currentTime -= 5;
-
-                }
-
-            }
-        );
-
-
-        document.querySelector(
-            "#status"
-        ).textContent =
-            "READY";
-
+document.addEventListener("DOMContentLoaded", () => {
+    const windowElement = document.querySelector(".kritr-window");
+    const tabs = [...document.querySelectorAll(".tab")];
+    const pages = [...document.querySelectorAll(".tab-page")];
+    const status = document.querySelector("#status");
+    const playButton = document.querySelector("#play-btn");
+    const progress = document.querySelector("#progress");
+
+    KritrThemes.load();
+    Settings.initialize();
+    Pet.load();
+    Visualizer.initialize();
+
+    if (KritrStorage.load("boot", true)) {
+        const boot = document.querySelector("#boot-screen");
+        boot?.classList.add("show");
+        window.setTimeout(() => boot?.classList.remove("show"), 1600);
     }
-);
 
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.tab;
+            tabs.forEach(item => item.classList.toggle("active", item === tab));
+            pages.forEach(page => page.classList.toggle("active", page.id === `${target}-tab`));
+            if (target === "player") window.setTimeout(() => Visualizer.resize(), 30);
+        });
+    });
 
-/* TIME FORMAT */
+    playButton?.addEventListener("click", () => Player.toggle());
+    document.querySelector("#previous-btn")?.addEventListener("click", () => Player.previous());
+    document.querySelector("#next-btn")?.addEventListener("click", () => Player.next());
+
+    audio.addEventListener("play", () => {
+        if (playButton) {
+            playButton.textContent = "Ⅱ";
+            playButton.setAttribute("aria-label", "Pause");
+        }
+        if (status) status.textContent = "PLAYING";
+        Pet.setPlaying(true);
+        windowElement?.classList.add("is-playing");
+    });
+
+    audio.addEventListener("pause", () => {
+        if (playButton) {
+            playButton.textContent = "▶";
+            playButton.setAttribute("aria-label", "Play");
+        }
+        if (status) status.textContent = audio.currentTime ? "PAUSED" : "READY";
+        Pet.setPlaying(false);
+        windowElement?.classList.remove("is-playing");
+    });
+
+    audio.addEventListener("ended", () => Player.next());
+
+    audio.addEventListener("loadedmetadata", () => {
+        document.querySelector("#duration").textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+        if (!Number.isFinite(audio.duration) || !audio.duration) return;
+        if (progress) progress.value = Math.round((audio.currentTime / audio.duration) * 1000);
+        document.querySelector("#current-time").textContent = formatTime(audio.currentTime);
+        document.querySelector("#duration").textContent = formatTime(audio.duration);
+    });
+
+    progress?.addEventListener("input", event => {
+        if (!Number.isFinite(audio.duration) || !audio.duration) return;
+        audio.currentTime = (Number(event.target.value) / 1000) * audio.duration;
+    });
+
+    const savedVolume = KritrStorage.load("volume", 80);
+    const volume = document.querySelector("#volume");
+    if (volume) volume.value = savedVolume;
+    Player.setVolume(savedVolume);
+    volume?.addEventListener("input", event => Player.setVolume(event.target.value));
+
+    const savedSpeed = KritrStorage.load("speed", "1");
+    const speed = document.querySelector("#speed");
+    if (speed) speed.value = savedSpeed;
+    Player.setSpeed(savedSpeed);
+    speed?.addEventListener("change", event => Player.setSpeed(event.target.value));
+
+    const fileInput = document.querySelector("#file-input");
+    fileInput?.addEventListener("change", event => {
+        Playlist.addFiles(event.target.files);
+        event.target.value = "";
+    });
+
+    let dragDepth = 0;
+
+    ["dragenter", "dragover"].forEach(type => {
+        windowElement?.addEventListener(type, event => {
+            event.preventDefault();
+            if (type === "dragenter") dragDepth++;
+            windowElement.classList.add("drag-over");
+        });
+    });
+
+    windowElement?.addEventListener("dragleave", event => {
+        event.preventDefault();
+        dragDepth = Math.max(0, dragDepth - 1);
+        if (dragDepth === 0) windowElement.classList.remove("drag-over");
+    });
+
+    windowElement?.addEventListener("drop", event => {
+        event.preventDefault();
+        dragDepth = 0;
+        windowElement.classList.remove("drag-over");
+        Playlist.addFiles(event.dataTransfer.files);
+    });
+
+    document.querySelector("#clear-playlist")?.addEventListener("click", () => Playlist.clear());
+
+    document.querySelector("#pet-species")?.addEventListener("change", event => {
+        Pet.setSpecies(event.target.value);
+    });
+
+    document.querySelector("#pet-trick-btn")?.addEventListener("click", () => {
+        Pet.trick(document.querySelector("#pet-trick").value);
+    });
+
+    document.querySelector("#minimize-btn")?.addEventListener("click", () => {
+        windowElement?.classList.toggle("compact");
+        windowElement?.classList.remove("maximized");
+    });
+
+    document.querySelector("#maximize-btn")?.addEventListener("click", () => {
+        windowElement?.classList.toggle("maximized");
+        windowElement?.classList.remove("compact");
+        window.setTimeout(() => Visualizer.resize(), 320);
+    });
+
+    document.querySelector("#close-btn")?.addEventListener("click", () => {
+        windowElement?.classList.add("hidden-player");
+    });
+
+    document.querySelector("#restore-btn")?.addEventListener("click", () => {
+        windowElement?.classList.remove("hidden-player");
+    });
+
+    window.addEventListener("kritr:basshit", () => {
+        if (!KritrStorage.load("reactive", true)) return;
+        windowElement?.classList.remove("bass-hit");
+        void windowElement?.offsetWidth;
+        windowElement?.classList.add("bass-hit");
+        window.setTimeout(() => windowElement?.classList.remove("bass-hit"), 220);
+    });
+
+    document.addEventListener("keydown", event => {
+        const tag = document.activeElement?.tagName;
+        const isFormControl = ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(tag);
+
+        if (event.code === "Space" && !isFormControl) {
+            event.preventDefault();
+            Player.toggle();
+        }
+
+        if (!isFormControl && event.code === "ArrowRight" && audio.src) {
+            audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + 5);
+        }
+
+        if (!isFormControl && event.code === "ArrowLeft" && audio.src) {
+            audio.currentTime = Math.max(0, audio.currentTime - 5);
+        }
+    });
+
+    Playlist.render();
+    if (status) status.textContent = "READY";
+});
 
 function formatTime(seconds) {
-
-    if (
-        !Number.isFinite(seconds)
-    ) {
-
-        return "0:00";
-
-    }
-
-
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
-
-
-    const remaining =
-        Math.floor(
-            seconds % 60
-        )
-        .toString()
-        .padStart(
-            2,
-            "0"
-        );
-
-
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const minutes = Math.floor(seconds / 60);
+    const remaining = Math.floor(seconds % 60).toString().padStart(2, "0");
     return `${minutes}:${remaining}`;
-
 }

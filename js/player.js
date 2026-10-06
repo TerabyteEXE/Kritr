@@ -1,205 +1,101 @@
-const audio =
-    document.querySelector("#audio-engine");
-
+const audio = document.querySelector("#audio-engine");
 
 const Player = {
-
     currentIndex: -1,
-
     playlist: [],
-
     audioContext: null,
-
     analyser: null,
-
     source: null,
-
     initialized: false,
 
-
     initializeAudio() {
+        if (this.initialized) return;
 
-        if (this.initialized) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) {
+            console.warn("Web Audio API is not supported in this browser.");
             return;
         }
 
-        this.audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+        this.audioContext = new AudioCtx();
+        this.source = this.audioContext.createMediaElementSource(audio);
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.82;
 
-        this.source =
-            this.audioContext
-                .createMediaElementSource(audio);
-
-        this.analyser =
-            this.audioContext
-                .createAnalyser();
-
-        this.analyser.fftSize = 512;
-        this.analyser.smoothingTimeConstant = 0.68;
-
-        this.source.connect(
-            this.analyser
-        );
-
-        this.analyser.connect(
-            this.audioContext.destination
-        );
-
+        this.source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
         this.initialized = true;
-
     },
-
 
     async play() {
-
+        if (!audio.src) return;
         this.initializeAudio();
 
-        if (
-            this.audioContext.state ===
-            "suspended"
-        ) {
-
-            await this.audioContext.resume();
-
+        try {
+            if (this.audioContext?.state === "suspended") {
+                await this.audioContext.resume();
+            }
+            await audio.play();
+        } catch (error) {
+            console.error("Unable to play audio:", error);
+            document.querySelector("#status").textContent = "PLAY ERROR";
         }
-
-        await audio.play();
-
     },
-
 
     pause() {
-
         audio.pause();
-
     },
-
 
     toggle() {
-
-        if (audio.paused) {
-
-            this.play();
-
-        } else {
-
-            this.pause();
-
-        }
-
+        if (!audio.src) return;
+        audio.paused ? this.play() : this.pause();
     },
-
 
     load(index, autoplay = false) {
-
-        if (
-            index < 0 ||
-            index >= this.playlist.length
-        ) {
-            return;
-        }
+        if (index < 0 || index >= this.playlist.length) return;
 
         this.currentIndex = index;
-
-        const track =
-            this.playlist[index];
-
-        audio.src =
-            track.url;
-
+        const track = this.playlist[index];
+        audio.src = track.url;
         audio.load();
 
-        document.querySelector(
-            "#track-title"
-        ).textContent =
-            track.name;
+        const title = document.querySelector("#track-title");
+        const artist = document.querySelector("#track-artist");
+        const glyph = document.querySelector("#album-glyph");
+        const label = document.querySelector("#album-label");
 
-        document.querySelector(
-            "#track-artist"
-        ).textContent =
-            track.artist || "Unknown Artist";
+        if (title) title.textContent = track.name;
+        if (artist) artist.textContent = track.artist || "Local File";
+        if (glyph) glyph.textContent = (track.name.trim()[0] || "K").toUpperCase();
+        if (label) label.textContent = track.name.slice(0, 18).toUpperCase();
 
+        document.title = `${track.name} — Kritr`;
         Playlist.render();
 
-        if (autoplay) {
-            this.play();
-        }
-
+        if (autoplay) this.play();
     },
-
 
     next() {
-
-        if (!this.playlist.length) {
-            return;
-        }
-
-        let next =
-            this.currentIndex + 1;
-
-        if (
-            next >=
-            this.playlist.length
-        ) {
-            next = 0;
-        }
-
-        this.load(
-            next,
-            true
-        );
-
+        if (!this.playlist.length) return;
+        const next = (this.currentIndex + 1) % this.playlist.length;
+        this.load(next, true);
     },
-
 
     previous() {
-
-        if (!this.playlist.length) {
-            return;
-        }
-
-        let previous =
-            this.currentIndex - 1;
-
-        if (previous < 0) {
-            previous =
-                this.playlist.length - 1;
-        }
-
-        this.load(
-            previous,
-            true
-        );
-
+        if (!this.playlist.length) return;
+        const previous = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length;
+        this.load(previous, true);
     },
-
 
     setVolume(value) {
-
-        audio.volume =
-            value / 100;
-
-        KritrStorage.save(
-            "volume",
-            value
-        );
-
+        const normalized = Math.max(0, Math.min(100, Number(value)));
+        audio.volume = normalized / 100;
+        KritrStorage.save("volume", normalized);
     },
 
-
     setSpeed(value) {
-
-        audio.playbackRate =
-            Number(value);
-
-        KritrStorage.save(
-            "speed",
-            value
-        );
-
+        audio.playbackRate = Number(value) || 1;
+        KritrStorage.save("speed", String(value));
     }
-
 };
