@@ -1,0 +1,93 @@
+/* SAKURA */
+
+body[data-theme="sakura"] {
+
+    --bg-color: #f2c4ce;
+    --window-bg: #2b2640;
+    --window-header: #4c436d;
+
+    --accent-main: #ff79c6;
+    --accent-secondary: #8be9fd;
+
+    --text-color: #f8f8f2;
+    --muted-color: #c7bfd0;
+
+    --border-color: #665a7d;
+
+}
+
+
+/* CYBER */
+
+body[data-theme="cyber"] {
+
+    --bg-color: #070b18;
+    --window-bg: #10182a;
+    --window-header: #182440;
+
+    --accent-main: #ff2bd6;
+    --accent-secondary: #00f6ff;
+
+    --text-color: #e8faff;
+    --muted-color: #728ca8;
+
+    --border-color: #274a68;
+
+}
+
+
+/* GAMEBOY */
+
+body[data-theme="gameboy"] {
+
+    --bg-color: #8bac0f;
+    --window-bg: #306230;
+    --window-header: #0f380f;
+
+    --accent-main: #9bbc0f;
+    --accent-secondary: #8bac0f;
+
+    --text-color: #0f380f;
+    --muted-color: #9bbc0f;
+
+    --border-color: #0f380f;
+
+}
+
+
+/* SYNTHWAVE */
+
+body[data-theme="synthwave"] {
+
+    --bg-color: #16002b;
+    --window-bg: #241044;
+    --window-header: #35145d;
+
+    --accent-main: #ff2ec4;
+    --accent-secondary: #20e3ff;
+
+    --text-color: #ffffff;
+    --muted-color: #bba6d9;
+
+    --border-color: #6c3a96;
+
+}
+
+
+/* OMARCHY */
+
+body[data-theme="omarchy"] {
+
+    --bg-color: #111111;
+    --window-bg: #191919;
+    --window-header: #222222;
+
+    --accent-main: #f5f5f5;
+    --accent-secondary: #999999;
+
+    --text-color: #eeeeee;
+    --muted-color: #888888;
+
+    --border-color: #444444;
+
+}

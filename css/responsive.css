@@ -1,0 +1,53 @@
+@media (max-width: 600px) {
+
+    body {
+
+        align-items: stretch;
+
+    }
+
+
+    .kritr-window {
+
+        width: 100vw;
+        height: 100vh;
+
+        border: none;
+
+        box-shadow: none;
+
+    }
+
+
+    #player-tab {
+
+        padding: 10px;
+
+    }
+
+
+    .visualizer-container {
+
+        min-height: 180px;
+
+    }
+
+
+    .secondary-controls {
+
+        flex-direction: column;
+
+        gap: 10px;
+
+    }
+
+
+    .music-actions {
+
+        flex-direction: column;
+
+        gap: 8px;
+
+    }
+
+}

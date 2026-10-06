@@ -1,0 +1,119 @@
+/* CRT */
+
+#crt-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.025),
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+
+    opacity: 0.35;
+
+}
+
+
+/* PET */
+
+.pet-bounce {
+
+    animation:
+        petBounce 0.5s steps(4);
+
+}
+
+
+.pet-spin {
+
+    animation:
+        petSpin 0.7s steps(8);
+
+}
+
+
+.pet-heart {
+
+    animation:
+        petHeart 0.8s steps(5);
+
+}
+
+
+@keyframes petBounce {
+
+    0% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-25px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+
+}
+
+
+@keyframes petSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+@keyframes petHeart {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
+
+
+/* BUTTON */
+
+button,
+.action-button {
+
+    transition:
+        background 0.1s,
+        border-color 0.1s,
+        transform 0.1s;
+
+}
+
+
+button:active,
+.action-button:active {
+
+    transform:
+        translate(2px, 2px);
+
+}
