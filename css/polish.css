@@ -321,3 +321,101 @@ select {
         font-size: 14px;
     }
 }
+
+/* =========================================================
+   ELECTRON DESKTOP APP
+   ========================================================= */
+
+.desktop-only {
+    display: none !important;
+}
+
+body.desktop-app .desktop-only {
+    display: flex !important;
+}
+
+body.desktop-app .titlebar {
+    -webkit-app-region: drag;
+    user-select: none;
+}
+
+body.desktop-app .window-buttons,
+body.desktop-app .window-buttons *,
+body.desktop-app button,
+body.desktop-app input,
+body.desktop-app select,
+body.desktop-app .tab,
+body.desktop-app .action-button {
+    -webkit-app-region: no-drag;
+}
+
+body.desktop-app {
+    user-select: none;
+}
+
+body.desktop-app input,
+body.desktop-app .track-title,
+body.desktop-app .track-artist,
+body.desktop-app .playlist-copy {
+    user-select: text;
+}
+
+.album-art.has-artwork .album-pattern,
+.album-art.has-artwork .album-glyph {
+    opacity: 0;
+}
+
+.album-art.has-artwork .album-caption {
+    background: rgba(12, 9, 16, .78);
+}
+
+.playlist-item.missing {
+    opacity: .55;
+}
+
+.playlist-item.missing .playlist-name {
+    text-decoration: line-through;
+}
+
+.playlist-remove {
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 2px solid var(--dark-outline);
+    border-radius: 0;
+    background: var(--panel-raised);
+    color: var(--muted-color);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--dark-outline);
+}
+
+.playlist-remove:hover {
+    background: #ff6688;
+    color: var(--dark-outline);
+}
+
+body.desktop-app #drop-hint::after {
+    content: " · SAVED";
+    color: var(--accent-main);
+}
+
+body.desktop-app .settings-category:last-of-type {
+    padding-bottom: 8px;
+}
+
+.playlist-queue {
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 2px solid var(--dark-outline);
+    border-radius: 0;
+    background: var(--panel-raised);
+    color: var(--accent-main);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--dark-outline);
+}
+
+.playlist-queue:hover {
+    background: var(--accent-secondary);
+    color: var(--dark-outline);
+}

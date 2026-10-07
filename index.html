@@ -370,12 +370,21 @@
             <!-- ADD MUSIC -->
             <div class="music-actions">
 
-                <label
-                    for="file-input"
+                <button
+                    id="add-songs-btn"
                     class="action-button"
+                    type="button"
                 >
-                    ＋ ADD SONG
-                </label>
+                    ＋ ADD SONGS
+                </button>
+
+                <button
+                    id="add-folder-btn"
+                    class="action-button desktop-only"
+                    type="button"
+                >
+                    ＋ MUSIC FOLDER
+                </button>
 
                 <input
                     id="file-input"
@@ -427,7 +436,13 @@
 
             <div class="playlist-tools">
                 <input id="playlist-search" class="pixel-input" type="search" placeholder="SEARCH SONGS..." autocomplete="off">
+                <select id="playlist-sort" class="pixel-input" aria-label="Sort library">
+                    <option value="artist">ARTIST</option>
+                    <option value="title">TITLE</option>
+                    <option value="added">NEWEST</option>
+                </select>
                 <button id="favorites-filter" class="small-button" type="button" aria-pressed="false">♡ FAVS</button>
+                <button id="rescan-library" class="small-button desktop-only" type="button">↻ RESCAN</button>
             </div>
 
             <div
@@ -729,6 +744,26 @@
                         <input id="ui-sounds" type="checkbox">
                         <span>PIXEL UI SOUNDS</span>
                     </label>
+                    <label class="toggle-setting desktop-only">
+                        <input id="auto-start" type="checkbox">
+                        <span>START WITH WINDOWS</span>
+                    </label>
+                    <label class="toggle-setting desktop-only">
+                        <input id="start-minimized" type="checkbox">
+                        <span>START MINIMIZED</span>
+                    </label>
+                    <label class="toggle-setting desktop-only">
+                        <input id="close-to-tray" type="checkbox" checked>
+                        <span>CLOSE TO SYSTEM TRAY</span>
+                    </label>
+                    <label class="toggle-setting desktop-only">
+                        <input id="track-notifications" type="checkbox">
+                        <span>TRACK NOTIFICATIONS</span>
+                    </label>
+                    <label class="toggle-setting desktop-only">
+                        <input id="auto-rescan" type="checkbox" checked>
+                        <span>RESCAN LIBRARY ON START</span>
+                    </label>
                     <div class="settings-actions">
                         <button id="shortcuts-btn" class="small-button" type="button">? SHORTCUTS</button>
                         <button id="reset-settings" class="small-button danger-button" type="button">RESET</button>
@@ -806,6 +841,7 @@
 
 
     <script src="js/storage.js"></script>
+    <script src="js/desktop.js"></script>
     <script src="js/themes.js"></script>
     <script src="js/player.js"></script>
     <script src="js/playlist.js"></script>

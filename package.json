@@ -1,0 +1,23 @@
+{
+  "name": "kritr-player",
+  "version": "0.9.0",
+  "description": "Kritr — a tiny 8/16-bit desktop music player with personality.",
+  "author": "TerabyteEXE",
+  "license": "MIT",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "music-metadata": "12.0.0"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  }
+}

@@ -40,10 +40,17 @@ const Player = {
     pause() { audio.pause(); },
     toggle() { if (audio.src) audio.paused ? this.play() : this.pause(); },
 
-    load(index, autoplay = false) {
+    load(index, autoplay = false, options = {}) {
         if (index < 0 || index >= this.playlist.length) return;
-        this.currentIndex = index;
         const track = this.playlist[index];
+        if (track.missing || !track.url) {
+            const status = document.querySelector("#status");
+            if (status) status.textContent = "FILE MISSING";
+            Pet?.say?.("can't find that song", 1400);
+            return;
+        }
+
+        this.currentIndex = index;
         audio.src = track.url;
         audio.load();
 
@@ -51,15 +58,30 @@ const Player = {
         const artist = document.querySelector("#track-artist");
         const glyph = document.querySelector("#album-glyph");
         const label = document.querySelector("#album-label");
+        const art = document.querySelector("#album-art");
         if (title) title.textContent = track.name;
         if (artist) artist.textContent = track.artist || "Local File";
         if (glyph) glyph.textContent = (track.name.trim()[0] || "K").toUpperCase();
-        if (label) label.textContent = track.name.slice(0, 18).toUpperCase();
+        if (label) label.textContent = (track.album || track.name).slice(0, 18).toUpperCase();
+
+        if (art) {
+            if (track.artworkUrl) {
+                art.style.backgroundImage = `linear-gradient(rgba(12,9,16,.12), rgba(12,9,16,.2)), url("${track.artworkUrl.replace(/"/g, "%22")}")`;
+                art.style.backgroundSize = "cover";
+                art.style.backgroundPosition = "center";
+                art.classList.add("has-artwork");
+            } else {
+                art.style.backgroundImage = "";
+                art.classList.remove("has-artwork");
+            }
+        }
 
         document.title = `${track.name} — Kritr`;
         Playlist.render();
         Features?.updateFavoriteButton?.();
         Features?.trackChanged?.(track);
+        if (!options.restoring) Desktop?.trackChanged?.(track);
+        else Desktop?.updateMediaSession?.(track);
         if (autoplay) this.play();
     },
 
@@ -71,20 +93,37 @@ const Player = {
             return;
         }
 
+        const queued = Features?.takeQueuedIndex?.() ?? -1;
+        if (queued >= 0) {
+            this.load(queued, true);
+            return;
+        }
+
+        const playable = this.playlist
+            .map((track, index) => ({ track, index }))
+            .filter(({ track }) => !track.missing && track.url);
+        if (!playable.length) return;
+
         let next;
-        if (this.shuffle && this.playlist.length > 1) {
-            do next = Math.floor(Math.random() * this.playlist.length);
-            while (next === this.currentIndex);
+        if (this.shuffle && playable.length > 1) {
+            const candidates = playable.map(item => item.index).filter(index => index !== this.currentIndex);
+            next = candidates[Math.floor(Math.random() * candidates.length)];
         } else {
-            next = this.currentIndex + 1;
-            if (next >= this.playlist.length) {
-                if (fromEnded && this.repeat === "off") {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    return;
+            next = this.currentIndex;
+            let attempts = 0;
+            do {
+                next++;
+                if (next >= this.playlist.length) {
+                    if (fromEnded && this.repeat === "off") {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        Desktop?.savePlaybackSoon?.();
+                        return;
+                    }
+                    next = 0;
                 }
-                next = 0;
-            }
+                attempts++;
+            } while ((this.playlist[next]?.missing || !this.playlist[next]?.url) && attempts <= this.playlist.length);
         }
         this.load(next, true);
     },
@@ -95,7 +134,12 @@ const Player = {
             audio.currentTime = 0;
             return;
         }
-        const previous = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length;
+        let previous = this.currentIndex;
+        let attempts = 0;
+        do {
+            previous = (previous - 1 + this.playlist.length) % this.playlist.length;
+            attempts++;
+        } while ((this.playlist[previous]?.missing || !this.playlist[previous]?.url) && attempts <= this.playlist.length);
         this.load(previous, true);
     },
 

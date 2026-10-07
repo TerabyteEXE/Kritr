@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const windowElement = document.querySelector(".kritr-window");
     const tabs = [...document.querySelectorAll(".tab")];
     const pages = [...document.querySelectorAll(".tab-page")];
@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Settings.initialize();
     Visualizer.initialize();
     Features.init();
+    await Desktop.init();
 
     const bootStyle = KritrStorage.load("bootStyle", "cute");
     if (KritrStorage.load("boot", true) && bootStyle !== "instant") {
@@ -22,13 +23,18 @@ document.addEventListener("DOMContentLoaded", () => {
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
             if (windowElement?.classList.contains("mini-mode")) return;
-
             const target = tab.dataset.tab;
             tabs.forEach(item => item.classList.toggle("active", item === tab));
             pages.forEach(page => page.classList.toggle("active", page.id === `${target}-tab`));
+            KritrStorage.save("lastTab", target);
             if (target === "player") window.setTimeout(() => Visualizer.resize(), 30);
         });
     });
+
+    const lastTab = KritrStorage.load("lastTab", "player");
+    if (!windowElement?.classList.contains("mini-mode")) {
+        document.querySelector(`.tab[data-tab="${lastTab}"]`)?.click();
+    }
 
     playButton?.addEventListener("click", () => Player.toggle());
     document.querySelector("#previous-btn")?.addEventListener("click", () => Player.previous());
@@ -42,6 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status) status.textContent = "PLAYING";
         Pet.setPlaying(true);
         windowElement?.classList.add("is-playing");
+        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+        Desktop.savePlaybackSoon();
     });
 
     audio.addEventListener("pause", () => {
@@ -52,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status) status.textContent = audio.currentTime ? "PAUSED" : "READY";
         Pet.setPlaying(false);
         windowElement?.classList.remove("is-playing");
+        if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+        Desktop.savePlaybackSoon();
     });
 
     audio.addEventListener("ended", () => Player.next(true));
@@ -61,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (duration) duration.textContent = formatTime(audio.duration);
     });
 
+    let lastPlaybackSave = 0;
     audio.addEventListener("timeupdate", () => {
         if (!Number.isFinite(audio.duration) || !audio.duration) return;
         if (progress) progress.value = Math.round((audio.currentTime / audio.duration) * 1000);
@@ -69,11 +80,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const duration = document.querySelector("#duration");
         if (currentTime) currentTime.textContent = formatTime(audio.currentTime);
         if (duration) duration.textContent = formatTime(audio.duration);
+
+        if ("mediaSession" in navigator && navigator.mediaSession.setPositionState) {
+            try {
+                navigator.mediaSession.setPositionState({
+                    duration: audio.duration,
+                    playbackRate: audio.playbackRate,
+                    position: Math.min(audio.currentTime, audio.duration)
+                });
+            } catch {}
+        }
+
+        if (Date.now() - lastPlaybackSave > 4000) {
+            lastPlaybackSave = Date.now();
+            Desktop.savePlaybackSoon();
+        }
     });
 
     progress?.addEventListener("input", event => {
         if (!Number.isFinite(audio.duration) || !audio.duration) return;
         audio.currentTime = (Number(event.target.value) / 1000) * audio.duration;
+        Desktop.savePlaybackSoon();
     });
 
     const savedVolume = KritrStorage.load("volume", 80);
@@ -86,16 +113,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const speed = document.querySelector("#speed");
     if (speed) speed.value = savedSpeed;
     Player.setSpeed(savedSpeed);
-    speed?.addEventListener("change", event => Player.setSpeed(event.target.value));
+    speed?.addEventListener("change", event => {
+        Player.setSpeed(event.target.value);
+        Desktop.savePlaybackSoon();
+    });
 
     const fileInput = document.querySelector("#file-input");
+    const addSongsButton = document.querySelector("#add-songs-btn");
+
+    addSongsButton?.addEventListener("click", () => {
+        if (Desktop.isDesktop) Desktop.addFiles();
+        else fileInput?.click();
+    });
+
     fileInput?.addEventListener("change", event => {
-        Playlist.addFiles(event.target.files);
+        if (!Desktop.isDesktop) Playlist.addFiles(event.target.files);
         event.target.value = "";
     });
 
     let dragDepth = 0;
-
     ["dragenter", "dragover"].forEach(type => {
         windowElement?.addEventListener(type, event => {
             event.preventDefault();
@@ -114,7 +150,8 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
         dragDepth = 0;
         windowElement.classList.remove("drag-over");
-        Playlist.addFiles(event.dataTransfer.files);
+        if (!Desktop.isDesktop) Playlist.addFiles(event.dataTransfer.files);
+        else if (status) status.textContent = "IMPORTING...";
     });
 
     document.querySelector("#clear-playlist")?.addEventListener("click", () => Playlist.clear());
@@ -126,26 +163,28 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#pet-display")?.addEventListener("click", () => Pet.interact());
     document.querySelector("#pet-preview")?.addEventListener("click", () => Pet.interact());
 
-    // The left window button is now the real mini-player toggle.
-    document.querySelector("#minimize-btn")?.addEventListener("click", () => {
-        Features.toggleMini();
-    });
+    document.querySelector("#minimize-btn")?.addEventListener("click", () => Features.toggleMini());
 
-    document.querySelector("#maximize-btn")?.addEventListener("click", () => {
-        const becomingMaximized = !windowElement?.classList.contains("maximized");
-
-        if (becomingMaximized) {
+    document.querySelector("#maximize-btn")?.addEventListener("click", async () => {
+        if (Desktop.isDesktop) {
             Features.applyWindowMode("normal");
-            windowElement?.classList.add("maximized");
+            const maximized = await Desktop.toggleMaximize();
+            windowElement?.classList.toggle("maximized", maximized);
         } else {
-            windowElement?.classList.remove("maximized");
+            const becomingMaximized = !windowElement?.classList.contains("maximized");
+            if (becomingMaximized) {
+                Features.applyWindowMode("normal");
+                windowElement?.classList.add("maximized");
+            } else {
+                windowElement?.classList.remove("maximized");
+            }
         }
-
         window.setTimeout(() => Visualizer.resize(), 150);
     });
 
     document.querySelector("#close-btn")?.addEventListener("click", () => {
-        windowElement?.classList.add("hidden-player");
+        if (Desktop.isDesktop) Desktop.closeWindow();
+        else windowElement?.classList.add("hidden-player");
     });
 
     document.querySelector("#restore-btn")?.addEventListener("click", () => {
@@ -155,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("kritr:basshit", () => {
         Pet.reactToBass();
         if (!KritrStorage.load("reactive", true)) return;
-
         windowElement?.classList.remove("bass-hit");
         void windowElement?.offsetWidth;
         windowElement?.classList.add("bass-hit");
@@ -180,8 +218,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    window.addEventListener("beforeunload", () => Desktop.savePlaybackNow());
     Playlist.render();
-    if (status) status.textContent = "READY";
+    if (status && !Desktop.isDesktop) status.textContent = "READY";
 });
 
 function formatTime(seconds) {

@@ -1,10 +1,12 @@
 const Features = {
     favorites: new Set(KritrStorage.load("favorites", [])),
+    queue: Array.isArray(KritrStorage.load("queue", [])) ? KritrStorage.load("queue", []) : [],
+    recentlyPlayed: Array.isArray(KritrStorage.load("recentlyPlayed", [])) ? KritrStorage.load("recentlyPlayed", []) : [],
     uiSounds: KritrStorage.load("uiSounds", false),
     soundContext: null,
 
     trackKey(track) {
-        return `${track?.artist || "Local File"}::${track?.name || ""}`.toLowerCase();
+        return String(track?.id || `${track?.artist || "Local File"}::${track?.name || ""}`).toLowerCase();
     },
 
     isFavorite(track) {
@@ -21,11 +23,46 @@ const Features = {
         Pet?.say?.(this.favorites.has(key) ? "favorite ♥" : "favorite removed", 1200);
     },
 
+
+    isQueued(track) {
+        const key = this.trackKey(track);
+        return this.queue.includes(key);
+    },
+
+    addToQueue(track) {
+        if (!track || track.missing) return;
+        const key = this.trackKey(track);
+        this.queue = this.queue.filter(item => item !== key);
+        this.queue.push(key);
+        KritrStorage.save("queue", this.queue);
+        Playlist.render();
+        Pet?.say?.("playing next!", 1000);
+    },
+
+    takeQueuedIndex() {
+        while (this.queue.length) {
+            const key = this.queue.shift();
+            const index = Player.playlist.findIndex(track => this.trackKey(track) === key && !track.missing && track.url);
+            KritrStorage.save("queue", this.queue);
+            if (index >= 0) {
+                Playlist.render();
+                return index;
+            }
+        }
+        return -1;
+    },
+
+    rememberRecentlyPlayed(track) {
+        if (!track) return;
+        const key = this.trackKey(track);
+        this.recentlyPlayed = [key, ...this.recentlyPlayed.filter(item => item !== key)].slice(0, 30);
+        KritrStorage.save("recentlyPlayed", this.recentlyPlayed);
+    },
+
     updateFavoriteButton() {
         const button = document.querySelector("#favorite-btn");
         const track = Player.playlist[Player.currentIndex];
         const active = track && this.isFavorite(track);
-
         if (button) {
             button.textContent = active ? "♥" : "♡";
             button.classList.toggle("active", Boolean(active));
@@ -36,10 +73,8 @@ const Features = {
     syncPlaybackButtons() {
         const shuffle = document.querySelector("#shuffle-btn");
         const repeat = document.querySelector("#repeat-btn");
-
         shuffle?.classList.toggle("active", Player.shuffle);
         shuffle?.setAttribute("aria-pressed", String(Player.shuffle));
-
         if (repeat) {
             repeat.classList.toggle("active", Player.repeat !== "off");
             repeat.textContent = Player.repeat === "one" ? "↻1" : "↻";
@@ -47,17 +82,16 @@ const Features = {
         }
     },
 
-    trackChanged() {
+    trackChanged(track) {
+        this.rememberRecentlyPlayed(track);
         const card = document.querySelector(".track-card");
         card?.classList.remove("track-swap");
         void card?.offsetWidth;
         card?.classList.add("track-swap");
-
-        // Keep pet reactions deliberate. One small response when a song changes.
         Pet?.moment?.("happy", 520, "♪");
     },
 
-    applyWindowMode(mode) {
+    async applyWindowMode(mode, options = {}) {
         const win = document.querySelector(".kritr-window");
         if (!win) return;
 
@@ -67,8 +101,6 @@ const Features = {
 
         if (mini) {
             win.classList.remove("maximized");
-
-            // Mini is a player, not a tiny copy of every page.
             document.querySelectorAll(".tab").forEach(tab => {
                 tab.classList.toggle("active", tab.dataset.tab === "player");
             });
@@ -81,6 +113,9 @@ const Features = {
         if (select) select.value = mini ? "mini" : "normal";
 
         KritrStorage.save("windowMode", mini ? "mini" : "normal");
+        if (Desktop?.isDesktop && !options.fromNative) {
+            await Desktop.setWindowMode(mini ? "mini" : "normal");
+        }
         window.setTimeout(() => Visualizer.resize(), 120);
     },
 
@@ -99,12 +134,10 @@ const Features = {
         const ctx = this.soundContext;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.type = "square";
         osc.frequency.value = kind === "tab" ? 560 : kind === "confirm" ? 760 : 430;
         gain.gain.setValueAtTime(0.025, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
-
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start();
@@ -119,6 +152,11 @@ const Features = {
         document.querySelector("#repeat-btn")?.addEventListener("click", () => Player.cycleRepeat());
         document.querySelector("#favorite-btn")?.addEventListener("click", () => this.toggleFavorite());
         document.querySelector("#playlist-search")?.addEventListener("input", e => Playlist.setQuery(e.target.value));
+        const sort = document.querySelector("#playlist-sort");
+        if (sort) {
+            sort.value = Playlist.sortMode;
+            sort.addEventListener("change", e => Playlist.setSort(e.target.value));
+        }
 
         document.querySelector("#favorites-filter")?.addEventListener("click", e => {
             Playlist.toggleFavorites();
@@ -135,7 +173,6 @@ const Features = {
         document.addEventListener("keydown", e => {
             const tag = document.activeElement?.tagName;
             if (["INPUT", "SELECT", "TEXTAREA"].includes(tag)) return;
-
             if (e.key.toLowerCase() === "s") Player.toggleShuffle();
             if (e.key.toLowerCase() === "r") Player.cycleRepeat();
             if (e.key.toLowerCase() === "m") this.toggleMini();
