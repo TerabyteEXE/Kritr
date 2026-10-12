@@ -59,6 +59,7 @@ const Player = {
         const glyph = document.querySelector("#album-glyph");
         const label = document.querySelector("#album-label");
         const art = document.querySelector("#album-art");
+        const artImage = document.querySelector("#album-image");
         if (title) title.textContent = track.name;
         if (artist) artist.textContent = track.artist || "Local File";
         if (glyph) glyph.textContent = (track.name.trim()[0] || "K").toUpperCase();
@@ -66,13 +67,17 @@ const Player = {
 
         if (art) {
             if (track.artworkUrl) {
-                art.style.backgroundImage = `linear-gradient(rgba(12,9,16,.12), rgba(12,9,16,.2)), url("${track.artworkUrl.replace(/"/g, "%22")}")`;
-                art.style.backgroundSize = "cover";
-                art.style.backgroundPosition = "center";
                 art.classList.add("has-artwork");
+                if (artImage) {
+                    artImage.src = track.artworkUrl;
+                    artImage.hidden = false;
+                }
             } else {
-                art.style.backgroundImage = "";
                 art.classList.remove("has-artwork");
+                if (artImage) {
+                    artImage.removeAttribute("src");
+                    artImage.hidden = true;
+                }
             }
         }
 

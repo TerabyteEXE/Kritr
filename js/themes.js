@@ -1,7 +1,8 @@
 const KritrThemes = {
     allowed: [
         "sakura", "cyber", "gameboy", "synthwave", "omarchy", "oxide", "ice", "amber",
-        "mochi", "bluecrt", "matcha", "candy", "midnight", "famicom", "lavender", "lcd"
+        "mochi", "bluecrt", "matcha", "candy", "midnight", "famicom", "lavender", "lcd",
+        "dreamcast", "nekocafe", "arcade", "aqua", "terminalgreen", "animenight"
     ],
 
     set(theme) {

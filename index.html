@@ -59,7 +59,6 @@
 
     </div>
 
-
     <!-- MAIN WINDOW -->
     <main
         class="kritr-window reactive-on"
@@ -167,7 +166,7 @@
                         id="album-art"
                         class="album-art"
                     >
-
+                        <img id="album-image" class="album-image" alt="Album artwork" draggable="false">
                         <div class="album-pattern"></div>
 
                         <div
@@ -526,19 +525,12 @@
                     </span>
 
                     <select id="pet-species">
-
-                        <option value="cat">
-                            NEKO
-                        </option>
-
-                        <option value="slime">
-                            SLIME
-                        </option>
-
-                        <option value="bunny">
-                            BUNNY
-                        </option>
-
+                        <option value="cat">NEKO CAT</option>
+                        <option value="bunny">BUNNY</option>
+                        <option value="slime">SLIME</option>
+                        <option value="fox">FOX</option>
+                        <option value="frog">FROG</option>
+                        <option value="girl">ANIME GIRL</option>
                     </select>
 
                 </label>
@@ -612,22 +604,38 @@
                     <label class="setting-box">
                         <span>THEME</span>
                         <select id="theme-select">
-                            <option value="sakura">SAKURA</option>
-                            <option value="cyber">CYBER ANGEL</option>
-                            <option value="gameboy">GAMEBOY</option>
-                            <option value="synthwave">NIGHT DRIVE</option>
-                            <option value="omarchy">MONO</option>
-                            <option value="oxide">SUNSET</option>
-                            <option value="ice">ICE POP</option>
-                            <option value="amber">RETRO CRT</option>
-                            <option value="mochi">MOCHI PINK</option>
-                            <option value="bluecrt">BLUE CRT</option>
-                            <option value="matcha">MATCHA</option>
-                            <option value="candy">CANDY POP</option>
-                            <option value="midnight">MIDNIGHT NEKO</option>
-                            <option value="famicom">FAMICOM</option>
-                            <option value="lavender">LAVENDER DREAM</option>
-                            <option value="lcd">MONO LCD</option>
+                            <optgroup label="PINK / PURPLE">
+                                <option value="sakura">SAKURA</option>
+                                <option value="mochi">MOCHI PINK</option>
+                                <option value="candy">CANDY POP</option>
+                                <option value="lavender">LAVENDER DREAM</option>
+                                <option value="animenight">ANIME NIGHT</option>
+                                <option value="midnight">MIDNIGHT NEKO</option>
+                                <option value="cyber">CYBER ANGEL</option>
+                                <option value="synthwave">NIGHT DRIVE</option>
+                            </optgroup>
+                            <optgroup label="BLUE / COOL">
+                                <option value="ice">ICE POP</option>
+                                <option value="aqua">AQUA OS</option>
+                                <option value="bluecrt">BLUE CRT</option>
+                            </optgroup>
+                            <optgroup label="ORANGE / WARM">
+                                <option value="oxide">SUNSET</option>
+                                <option value="amber">RETRO CRT</option>
+                                <option value="dreamcast">DREAMCAST</option>
+                                <option value="nekocafe">NEKO CAFÉ</option>
+                                <option value="famicom">FAMICOM</option>
+                                <option value="arcade">ARCADE</option>
+                            </optgroup>
+                            <optgroup label="GREEN / LCD">
+                                <option value="matcha">MATCHA</option>
+                                <option value="gameboy">GAMEBOY</option>
+                                <option value="lcd">MONO LCD</option>
+                                <option value="terminalgreen">TERMINAL GREEN</option>
+                            </optgroup>
+                            <optgroup label="MONO / NEUTRAL">
+                                <option value="omarchy">MONO</option>
+                            </optgroup>
                         </select>
                     </label>
                     <label class="setting-box">
@@ -664,34 +672,6 @@
                             <option value="blocks">BOUNCE BLOCKS</option>
                             <option value="stars">STARFIELD</option>
                         </select>
-                    </label>
-                    <label class="setting-box">
-                        <span>VIZ INTENSITY <output data-for="visualizer-intensity">100%</output></span>
-                        <input id="visualizer-intensity" type="range" min="50" max="150" value="100">
-                    </label>
-                    <label class="setting-box">
-                        <span>CRT STRENGTH <output data-for="crt-strength">18%</output></span>
-                        <input id="crt-strength" type="range" min="0" max="100" value="18">
-                    </label>
-                    <label class="setting-box">
-                        <span>VIZ COLOR</span>
-                        <select id="visualizer-color">
-                            <option value="theme">THEME</option>
-                            <option value="mono">MONO</option>
-                            <option value="rainbow">RAINBOW</option>
-                        </select>
-                    </label>
-                    <label class="setting-box">
-                        <span>BASS FX</span>
-                        <select id="bass-intensity">
-                            <option value="subtle">SUBTLE</option>
-                            <option value="normal">NORMAL</option>
-                            <option value="wild">RIDICULOUS</option>
-                        </select>
-                    </label>
-                    <label class="toggle-setting">
-                        <input id="screen-shake" type="checkbox" checked>
-                        <span>BASS SCREEN SHAKE</span>
                     </label>
                     <label class="toggle-setting">
                         <input id="reactive-toggle" type="checkbox" checked>
@@ -771,6 +751,57 @@
                     <div id="shortcut-help" class="shortcut-help" hidden>SPACE play/pause · ←/→ seek · S shuffle · R repeat · M mini</div>
                 </section>
 
+                <section class="settings-category advanced-entry">
+                    <h3>ADVANCED</h3>
+                    <p class="settings-note">Deep layout controls. Normal users can ignore this.</p>
+                    <button id="advanced-toggle" class="action-button" type="button" aria-expanded="false">OPEN ADVANCED SETTINGS</button>
+                </section>
+
+                <section id="advanced-settings" class="settings-category advanced-settings" hidden>
+                    <h3>ADVANCED</h3>
+
+                    <div class="advanced-preview" aria-label="Live advanced settings preview">
+                        <div class="advanced-preview-title">LIVE PREVIEW</div>
+                        <div class="advanced-preview-player">
+                            <div class="advanced-preview-art">K</div>
+                            <div class="advanced-preview-viz" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="advanced-preview-pet">/\_/\<br>( o.o )<br>&gt; ^ &lt;</div>
+                        </div>
+                        <div class="advanced-preview-track">KRITR PREVIEW · ♪ NOW PLAYING</div>
+                        <div class="advanced-preview-controls"><i></i><i></i><i></i></div>
+                    </div>
+
+                    <h4>LAYOUT</h4>
+                    <label class="setting-box"><span>ALBUM ART SIZE <output data-for="advanced-album-size">100%</output></span><input id="advanced-album-size" type="range" min="70" max="150" value="100"></label>
+                    <label class="setting-box"><span>VISUALIZER HEIGHT <output data-for="advanced-viz-height">100%</output></span><input id="advanced-viz-height" type="range" min="70" max="160" value="100"></label>
+                    <label class="setting-box"><span>PET SIZE <output data-for="advanced-pet-size">100%</output></span><input id="advanced-pet-size" type="range" min="70" max="160" value="100"></label>
+                    <label class="setting-box"><span>CONTROL SIZE <output data-for="advanced-control-size">100%</output></span><input id="advanced-control-size" type="range" min="80" max="140" value="100"></label>
+                    <label class="setting-box"><span>PANEL SPACING <output data-for="advanced-gap">100%</output></span><input id="advanced-gap" type="range" min="60" max="160" value="100"></label>
+                    <label class="setting-box"><span>BORDER WEIGHT <output data-for="advanced-border">3px</output></span><input id="advanced-border" type="range" min="1" max="5" value="3"></label>
+                    <label class="toggle-setting"><input id="advanced-show-album" type="checkbox" checked><span>SHOW ALBUM ART</span></label>
+                    <label class="toggle-setting"><input id="advanced-show-pet" type="checkbox" checked><span>SHOW PET</span></label>
+                    <label class="toggle-setting"><input id="advanced-statusbar" type="checkbox" checked><span>SHOW STATUS BAR</span></label>
+
+                    <h4>EFFECTS</h4>
+                    <label class="setting-box"><span>VIZ INTENSITY <output data-for="visualizer-intensity">100%</output></span><input id="visualizer-intensity" type="range" min="50" max="150" value="100"></label>
+                    <label class="setting-box"><span>CRT STRENGTH <output data-for="crt-strength">18%</output></span><input id="crt-strength" type="range" min="0" max="100" value="18"></label>
+                    <label class="setting-box"><span>VIZ COLOR</span><select id="visualizer-color"><option value="theme">THEME</option><option value="mono">MONO</option><option value="rainbow">RAINBOW</option></select></label>
+                    <label class="setting-box"><span>BASS FX</span><select id="bass-intensity"><option value="subtle">SUBTLE</option><option value="normal">NORMAL</option><option value="wild">RIDICULOUS</option></select></label>
+                    <label class="toggle-setting"><input id="screen-shake" type="checkbox" checked><span>BASS SCREEN SHAKE</span></label>
+                    <button id="reset-advanced" class="small-button danger-button" type="button">RESET ADVANCED LAYOUT</button>
+                </section>
+
+                <section class="settings-category">
+                    <h3>ABOUT KRITR</h3>
+                    <div class="about-copy">KRITR V1 · TERABYTEEXE</div>
+                    <div class="settings-actions">
+                        <button id="open-kritr-site" class="small-button" type="button">KRITR WEBSITE</button>
+                        <button id="open-kritr-video" class="small-button" type="button">WATCH EXPLANATION</button>
+                    </div>
+                </section>
+
             </div>
 
         </section>
@@ -840,6 +871,7 @@
     </main>
 
 
+    <script src="js/release-config.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/desktop.js"></script>
     <script src="js/themes.js"></script>

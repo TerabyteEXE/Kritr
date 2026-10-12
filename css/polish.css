@@ -419,3 +419,239 @@ body.desktop-app .settings-category:last-of-type {
     background: var(--accent-secondary);
     color: var(--dark-outline);
 }
+
+
+/* =========================================================
+   V1 RELEASE POLISH
+   ========================================================= */
+:root { --adv-album-scale:1; --adv-viz-scale:1; --adv-pet-scale:1; --adv-control-scale:1; --adv-gap-scale:1; --adv-border:3px; }
+
+/* Album covers are photographs/artwork, not pixel sprites. */
+.album-art { position:relative; isolation:isolate; image-rendering:auto !important; }
+.album-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; image-rendering:auto !important; z-index:0; display:none; }
+.album-art.has-artwork .album-image { display:block; }
+.album-art.has-artwork .album-pattern { opacity:.06; z-index:1; }
+.album-art.has-artwork .album-glyph { display:none; }
+.album-art .album-caption { z-index:3; }
+.album-art::after { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.35)); opacity:0; }
+.album-art.has-artwork::after { opacity:1; }
+
+/* Advanced layout variables */
+.hero-grid { gap:calc(8px * var(--adv-gap-scale)); }
+.cover-shell { transform:scale(var(--adv-album-scale)); transform-origin:center; }
+.visualizer-container { min-height:calc(220px * var(--adv-viz-scale)); }
+.pet-display { transform:scale(var(--adv-pet-scale)); transform-origin:right bottom; }
+.control-button { transform-origin:center; width:calc(52px * var(--adv-control-scale)); height:calc(43px * var(--adv-control-scale)); }
+.play-button { width:calc(68px * var(--adv-control-scale)); height:calc(52px * var(--adv-control-scale)); }
+.kritr-window,.track-card,.visualizer-container,.cover-shell,.setting-box,.toggle-setting,.playlist-item { border-width:var(--adv-border) !important; }
+body[data-statusbar="off"] .statusbar { display:none !important; }
+
+.advanced-entry { border-style:dashed; }
+.settings-note,.about-copy { color:var(--muted-color); font-size:10px; line-height:1.5; margin:4px 0 10px; }
+.advanced-settings[hidden] { display:none !important; }
+.advanced-settings { outline:2px dashed var(--accent-main); outline-offset:-5px; }
+
+/* Pet types stay readable at different lengths. */
+.pet-display[data-species="girl"] .pet-sprite,.pet-display[data-species="frog"] .pet-sprite,.pet-display[data-species="fox"] .pet-sprite { font-size:calc(16px * var(--font-scale)); }
+.pet-preview { white-space:nowrap; }
+
+
+.settings-category h4 { margin:14px 0 7px; color:var(--accent-secondary); font-size:9px; letter-spacing:1px; }
+
+
+/* =========================================================
+   V1 FINAL CUSTOMIZATION POLISH
+   ========================================================= */
+
+/* Optional sections from Advanced settings. */
+body[data-album-art="off"] .cover-shell,
+body[data-album-art="off"] .advanced-preview-art {
+    display: none !important;
+}
+
+body[data-album-art="off"] .hero-grid {
+    grid-template-columns: 1fr;
+}
+
+body[data-pet="off"] #pet-display,
+body[data-pet="off"] .advanced-preview-pet {
+    display: none !important;
+}
+
+/* Pets are tiny text sprites now, so preserve their actual silhouette. */
+.pet-sprite,
+.pet-preview {
+    white-space: pre !important;
+    font-family: "Courier New", "Lucida Console", monospace;
+    line-height: 1.02;
+    text-align: center;
+}
+
+.pet-display[data-species="girl"] .pet-sprite {
+    font-size: calc(11px * var(--font-scale)) !important;
+    line-height: .96;
+}
+
+.pet-display[data-species="slime"] .pet-sprite,
+.pet-display[data-species="fox"] .pet-sprite,
+.pet-display[data-species="frog"] .pet-sprite,
+.pet-display[data-species="bunny"] .pet-sprite,
+.pet-display[data-species="cat"] .pet-sprite {
+    font-size: calc(12px * var(--font-scale)) !important;
+}
+
+.pet-preview {
+    font-size: calc(15px * var(--font-scale));
+    min-height: 74px;
+    display: grid;
+    place-items: center;
+}
+
+/* A tiny, always-live mock player for Advanced settings. */
+.advanced-preview {
+    --preview-border: var(--adv-border);
+    margin: 8px 0 16px;
+    padding: 9px;
+    overflow: hidden;
+    background: var(--panel-bg);
+    border: var(--preview-border) solid var(--dark-outline);
+    box-shadow: 4px 4px 0 var(--dark-outline);
+}
+
+.advanced-preview-title {
+    margin-bottom: 7px;
+    color: var(--accent-main);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.advanced-preview-player {
+    min-height: calc(74px * var(--adv-viz-scale));
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: calc(7px * var(--adv-gap-scale));
+    padding: 7px;
+    background: var(--window-header);
+    border: var(--preview-border) solid var(--dark-outline);
+}
+
+.advanced-preview-art {
+    width: calc(52px * var(--adv-album-scale));
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg,var(--accent-main),var(--accent-secondary));
+    border: var(--preview-border) solid var(--dark-outline);
+    color: var(--dark-outline);
+    font-size: 20px;
+    font-weight: 900;
+    transform-origin: center;
+}
+
+.advanced-preview-viz {
+    height: calc(44px * var(--adv-viz-scale));
+    min-width: 70px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px;
+    background: #08080c;
+    border: var(--preview-border) solid var(--dark-outline);
+}
+
+.advanced-preview-viz span {
+    width: 8px;
+    height: 48%;
+    background: var(--accent-main);
+    animation: previewBar 1.25s steps(4,end) infinite;
+}
+.advanced-preview-viz span:nth-child(2){height:78%;animation-delay:-.22s;}
+.advanced-preview-viz span:nth-child(3){height:92%;animation-delay:-.46s;}
+.advanced-preview-viz span:nth-child(4){height:62%;animation-delay:-.68s;}
+.advanced-preview-viz span:nth-child(5){height:35%;animation-delay:-.84s;}
+
+.advanced-preview-pet {
+    white-space: pre;
+    font: 700 calc(9px * var(--adv-pet-scale))/1 "Courier New",monospace;
+    text-align: center;
+    color: var(--text-color);
+    transform-origin: center;
+}
+
+.advanced-preview-track {
+    margin-top: 6px;
+    padding: 5px 7px;
+    overflow: hidden;
+    border: var(--preview-border) solid var(--dark-outline);
+    background: var(--panel-raised);
+    color: var(--text-color);
+    font-size: 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.advanced-preview-controls {
+    display: flex;
+    justify-content: center;
+    gap: calc(5px * var(--adv-gap-scale));
+    margin-top: 7px;
+}
+
+.advanced-preview-controls i {
+    width: calc(22px * var(--adv-control-scale));
+    height: calc(15px * var(--adv-control-scale));
+    display: block;
+    background: var(--panel-raised);
+    border: var(--preview-border) solid var(--dark-outline);
+    box-shadow: 1px 1px 0 var(--dark-outline);
+}
+.advanced-preview-controls i:nth-child(2){background:var(--accent-main);}
+
+/* Subtle polish only: no big floaty motion. */
+.album-art.has-artwork .album-image {
+    animation: artworkIn .28s ease-out both;
+}
+
+.tab-page.active .settings-category,
+.tab-page.active .track-card {
+    animation: softPanelIn .18s ease-out both;
+}
+
+.action-button:hover,
+.small-button:hover,
+.control-button:hover {
+    filter: brightness(1.06);
+}
+
+@keyframes artworkIn {
+    from { opacity: 0; transform: scale(1.015); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes softPanelIn {
+    from { opacity: .88; transform: translateY(2px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes previewBar {
+    0%,100% { transform: scaleY(.72); }
+    50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .advanced-preview-viz span,
+    .album-art.has-artwork .album-image,
+    .tab-page.active .settings-category,
+    .tab-page.active .track-card {
+        animation: none !important;
+    }
+}
+
+/* Turning pets off removes the pet feature from the visible UI, not just the player overlay. */
+body[data-pet="off"] .tab[data-tab="pet"],
+body[data-pet="off"] #pet-tab {
+    display: none !important;
+}

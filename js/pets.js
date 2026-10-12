@@ -13,27 +13,53 @@ const Pet = {
     display: null,
     bubble: null,
 
+    /*
+     * Each pet keeps one recognizable silhouette. Reactions only make small
+     * changes inside that silhouette, which makes them feel like characters
+     * instead of a random kaomoji generator.
+     */
     faces: {
         cat: {
-            base: "(=^･ω･^=)",
-            blink: "(=^－ω－^=)",
-            happy: "(=^▽^=)",
-            surprised: "(=OωO=)",
-            sleepy: "(=－ω－=)"
-        },
-        slime: {
-            base: "(●´ω｀●)",
-            blink: "(●－ω－●)",
-            happy: "(●^▽^●)",
-            surprised: "(●OωO●)",
-            sleepy: "(●－ω－●)"
+            base: " /\\_/\\\n( o.o )\n > ^ <",
+            blink: " /\\_/\\\n( -.- )\n > ^ <",
+            happy: " /\\_/\\\n( ^.^ )\n > ^ <",
+            surprised: " /\\_/\\\n( O.O )\n > ^ <",
+            lines: ["nya~", "good song!", "purrr ♪", "i'm listening!"]
         },
         bunny: {
-            base: "／(=･ x ･=)＼",
-            blink: "／(=- x -=)＼",
-            happy: "／(=^ x ^=)＼",
-            surprised: "／(=O x O=)＼",
-            sleepy: "／(=- x -=)＼"
+            base: `  /)/)\n ( . .)\n c(")(")`,
+            blink: `  /)/)\n ( - -)\n c(")(")`,
+            happy: `  /)/)\n ( ^ ^)\n c(")(")`,
+            surprised: `  /)/)\n ( O O)\n c(")(")`,
+            lines: ["hop hop!", "soft beat~", "one more!", "♪"]
+        },
+        slime: {
+            base: "  .---.\n / o o \\\n|   ᴗ   |\n '-----'",
+            blink: "  .---.\n / - - \\\n|   ᴗ   |\n '-----'",
+            happy: "  .---.\n / ^ ^ \\\n|   ▽   |\n '-----'",
+            surprised: "  .---.\n / O O \\\n|   o   |\n '-----'",
+            lines: ["bloop!", "wobble ♪", "squish", "nice beat!"]
+        },
+        fox: {
+            base: " /\\   /\\\n(  •ᴥ•  )\n /  >  \\",
+            blink: " /\\   /\\\n(  -ᴥ-  )\n /  >  \\",
+            happy: " /\\   /\\\n(  ^ᴥ^  )\n /  >  \\",
+            surprised: " /\\   /\\\n(  OᴥO  )\n /  >  \\",
+            lines: ["yip!", "tail wag!", "this one!", "☆"]
+        },
+        frog: {
+            base: "  @..@\n (----)\n( >__< )",
+            blink: "  @--@\n (----)\n( >__< )",
+            happy: "  @^^@\n (----)\n( >__< )",
+            surprised: "  @OO@\n (----)\n( >__< )",
+            lines: ["ribbit ♪", "cozy!", "good groove", "hop!"]
+        },
+        girl: {
+            base: "  ╭────╮\n (  •‿•  )\n /|  ♡  |\\\n  |     |\n  /     \\",
+            blink: "  ╭────╮\n (  -‿-  )\n /|  ♡  |\\\n  |     |\n  /     \\",
+            happy: "  ╭────╮\n (  ^▽^  )\n /|  ♡  |\\\n  |     |\n  /     \\",
+            surprised: "  ╭────╮\n (  O口O  )\n /|  ♡  |\\\n  |     |\n  /     \\",
+            lines: ["this is cute!", "♪♪", "play it again!", "nice choice!"]
         }
     },
 
@@ -42,106 +68,55 @@ const Pet = {
         this.preview = document.querySelector("#pet-preview");
         this.display = document.querySelector("#pet-display");
         this.bubble = document.querySelector(".pet-bubble");
-
         this.load();
         this.bindNameInput();
         this.startLifeLoop();
         this.showBase();
     },
 
-    currentFaces() {
-        return this.faces[this.species] || this.faces.cat;
-    },
+    currentFaces() { return this.faces[this.species] || this.faces.cat; },
+    showFace(face) { if (this.element) this.element.textContent = face; if (this.preview) this.preview.textContent = face; },
+    showBase() { this.showFace(this.currentFaces().base); this.setBubble(this.playing ? "♪" : "♡"); },
+    setBubble(symbol) { if (this.bubble) this.bubble.textContent = symbol; },
 
-    showFace(face) {
-        if (this.element) this.element.textContent = face;
-        if (this.preview) this.preview.textContent = face;
-    },
-
-    showBase() {
-        this.showFace(this.currentFaces().base);
-        this.setBubble(this.playing ? "♪" : "♡");
-    },
-
-    setBubble(symbol) {
-        if (this.bubble) this.bubble.textContent = symbol;
-    },
-
-    moment(faceName, duration = 360, bubble = null) {
+    moment(faceName, duration = 320, bubble = null) {
         if (!this.reactionsEnabled) return;
-
-        window.clearTimeout(this.reactionTimer);
-        const face = this.currentFaces()[faceName] || this.currentFaces().base;
-        this.showFace(face);
+        clearTimeout(this.reactionTimer);
+        this.showFace(this.currentFaces()[faceName] || this.currentFaces().base);
         if (bubble !== null) this.setBubble(bubble);
-
-        this.reactionTimer = window.setTimeout(() => {
-            this.showBase();
-        }, duration);
+        this.reactionTimer = setTimeout(() => this.showBase(), duration);
     },
 
     setSpecies(species) {
         if (!this.faces[species]) species = "cat";
         this.species = species;
-
         const selector = document.querySelector("#pet-species");
         if (selector) selector.value = species;
         if (this.display) this.display.dataset.species = species;
-
         KritrStorage.save("petSpecies", species);
-        KritrStorage.save("pet", species);
         this.showBase();
+        this.say(`${species.toUpperCase()} READY`, 1000);
     },
 
     setPlaying(isPlaying) {
         this.playing = Boolean(isPlaying);
-        if (this.display) {
-            this.display.classList.toggle("pet-is-playing", this.playing);
-        }
-
-        if (this.playing) {
-            this.moment("happy", 500, "♪");
-            this.say("let's listen!", 1200);
-        } else {
-            this.showBase();
-        }
+        this.display?.classList.toggle("pet-is-playing", this.playing);
+        if (this.playing) this.moment("happy", 420, "♪");
+        else this.showBase();
     },
 
     reactToBass() {
         if (!this.reactionsEnabled || !this.playing) return;
-        this.moment("surprised", 260, "★");
+        if (Math.random() < 0.28) this.moment("surprised", 180, "★");
     },
 
-    blink() {
-        if (!this.reactionsEnabled) return;
-        this.moment("blink", 180, this.playing ? "♪" : "♡");
-    },
-
-    updateLife() {
-        if (!this.reactionsEnabled) {
-            this.showBase();
-            return;
-        }
-
-        // The pet should feel like one character, not a slot machine.
-        // Most life-loop ticks do nothing. Occasionally it only blinks.
-        const chance = this.playing ? 0.22 : 0.32;
-        if (Math.random() < chance) this.blink();
-    },
+    blink() { if (this.reactionsEnabled) this.moment("blink", 150, this.playing ? "♪" : "♡"); },
+    updateLife() { if (this.reactionsEnabled && Math.random() < (this.playing ? 0.14 : 0.24)) this.blink(); },
 
     startLifeLoop() {
-        if (this.loopTimer) window.clearInterval(this.loopTimer);
-
-        const speeds = {
-            low: 9000,
-            normal: 6500,
-            high: 4200
-        };
-
-        this.loopTimer = window.setInterval(
-            () => this.updateLife(),
-            speeds[this.activity] || speeds.normal
-        );
+        clearInterval(this.loopTimer);
+        const speeds = { low: 10000, normal: 7200, high: 4800 };
+        this.loopTimer = setInterval(() => this.updateLife(), speeds[this.activity] || speeds.normal);
     },
 
     setActivity(level) {
@@ -154,85 +129,49 @@ const Pet = {
     setReactions(enabled) {
         this.reactionsEnabled = Boolean(enabled);
         KritrStorage.save("petReactions", this.reactionsEnabled);
-        if (this.display) {
-            this.display.classList.toggle("pet-reactions-on", this.reactionsEnabled);
-        }
+        this.display?.classList.toggle("pet-reactions-on", this.reactionsEnabled);
         this.showBase();
-    },
-
-    wakeUp() {
-        if (this.reactionsEnabled) this.moment("happy", 420, "☆");
     },
 
     trick(type) {
         if (!["bounce", "spin", "heart"].includes(type)) return;
-
         const targets = [this.element, this.preview].filter(Boolean);
         const classes = ["pet-bounce", "pet-spin", "pet-heart"];
-
-        targets.forEach(target => {
-            target.classList.remove(...classes);
-            void target.offsetWidth;
-            target.classList.add(`pet-${type}`);
-        });
-
-        this.moment("happy", 850, type === "heart" ? "♥" : "☆");
-        this.say(type === "heart" ? "love!" : "ta-da!", 1100);
-
-        window.setTimeout(() => {
-            targets.forEach(target => target.classList.remove(...classes));
-        }, 900);
+        targets.forEach(target => { target.classList.remove(...classes); void target.offsetWidth; target.classList.add(`pet-${type}`); });
+        this.moment("happy", 760, type === "heart" ? "♥" : "☆");
+        this.say(type === "heart" ? "love!" : "ta-da!", 1000);
+        setTimeout(() => targets.forEach(target => target.classList.remove(...classes)), 900);
     },
 
     interact() {
-        const lines = this.playing
-            ? ["good song!", "♪", "nice beat!", "i'm listening!"]
-            : ["hi!", "play something?", "*poke*", "i'm here!"];
-
-        this.say(lines[Math.floor(Math.random() * lines.length)], 1500);
-        this.moment("happy", 650, "♡");
+        const lines = this.currentFaces().lines || ["hi!"];
+        this.say(lines[Math.floor(Math.random() * lines.length)], 1400);
+        this.moment("happy", 520, "♡");
     },
 
     setName(name) {
         const clean = String(name || "KRITR-CHAN").trim().slice(0, 16) || "KRITR-CHAN";
         this.name = clean;
-
-        document.querySelectorAll(".pet-name").forEach(el => {
-            el.textContent = clean.toUpperCase();
-        });
-
+        document.querySelectorAll(".pet-name").forEach(el => el.textContent = clean.toUpperCase());
         const input = document.querySelector("#pet-name-input");
         if (input && input.value !== clean) input.value = clean;
         KritrStorage.save("petName", clean);
     },
 
-    say(message, duration = 1800) {
+    say(message, duration = 1700) {
         const box = document.querySelector("#pet-message");
         if (!box) return;
-
-        window.clearTimeout(this.messageTimer);
-        box.textContent = String(message).slice(0, 28);
-        box.classList.remove("message-pop");
-        void box.offsetWidth;
-        box.classList.add("message-pop");
-
-        this.messageTimer = window.setTimeout(() => {
-            box.textContent = this.playing ? "listening with you" : "ready when you are";
-        }, duration);
+        clearTimeout(this.messageTimer);
+        box.textContent = String(message).slice(0, 30);
+        box.classList.remove("message-pop"); void box.offsetWidth; box.classList.add("message-pop");
+        this.messageTimer = setTimeout(() => { box.textContent = this.playing ? "listening with you" : "ready when you are"; }, duration);
     },
 
     bindNameInput() {
         const input = document.querySelector("#pet-name-input");
         if (!input) return;
-
         input.addEventListener("change", () => this.setName(input.value));
-        input.addEventListener("keydown", event => {
-            if (event.key === "Enter") {
-                this.setName(input.value);
-                input.blur();
-                this.say(`i'm ${this.name}!`, 1400);
-            }
-        });
+        input.addEventListener("keydown", event => { if (event.key === "Enter") { this.setName(input.value); input.blur(); this.say(`i'm ${this.name}!`, 1300); } });
     },
 
     load() {
@@ -240,8 +179,7 @@ const Pet = {
         this.activity = ["low", "normal", "high"].includes(activity) ? activity : "normal";
         this.reactionsEnabled = Boolean(KritrStorage.load("petReactions", true));
         this.name = KritrStorage.load("petName", "KRITR-CHAN");
-
-        this.setSpecies(KritrStorage.load("petSpecies", KritrStorage.load("pet", "cat")));
+        this.setSpecies(KritrStorage.load("petSpecies", "cat"));
         this.setName(this.name);
     }
 };

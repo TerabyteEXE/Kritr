@@ -64,12 +64,12 @@ async function parseTrack(filePath, existing = null) {
 
     if (common.picture?.length) {
         try {
-            const picture = common.picture[0];
+            // Prefer the largest embedded image. Some files contain a tiny thumbnail first.
+            const picture = [...common.picture].sort((a, b) => (b.data?.length || 0) - (a.data?.length || 0))[0];
             const ext = mimeExtension(picture.format);
             artworkPath = path.join(artworkDirectory(), `${id}${ext}`);
-            if (!fs.existsSync(artworkPath)) {
-                fs.writeFileSync(artworkPath, picture.data);
-            }
+            // Always refresh the cache when metadata is reparsed so upgraded artwork is picked up.
+            fs.writeFileSync(artworkPath, picture.data);
         } catch (error) {
             console.warn("Artwork cache failed:", error.message);
         }

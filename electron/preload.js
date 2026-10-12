@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld("kritrDesktop", {
     },
 
     notify: payload => ipcRenderer.invoke("notification:show", payload),
+    openExternal: url => ipcRenderer.invoke("external:open", url),
 
     onPlayerCommand: callback => {
         const handler = (_event, command) => callback(command);

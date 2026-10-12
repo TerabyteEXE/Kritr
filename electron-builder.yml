@@ -32,3 +32,9 @@ nsis:
   deleteAppDataOnUninstall: false
 portable:
   artifactName: Kritr-Portable-${version}.${ext}
+
+extraResources:
+  - from: website
+    to: website
+    filter:
+      - "**/*"

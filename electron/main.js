@@ -10,7 +10,8 @@ const {
     nativeImage,
     globalShortcut,
     Notification,
-    screen
+    screen,
+    shell
 } = require("electron");
 
 const Store = require("./store");
@@ -25,6 +26,7 @@ let mainWindow = null;
 let tray = null;
 let isQuitting = false;
 let pendingOpenPaths = [];
+let suppressBoundsSave = false;
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -57,6 +59,7 @@ function clampBounds(bounds) {
 function initialBounds() {
     const state = Store.get();
     if (state.window.mode === "mini") {
+        if (state.window.miniBounds) return clampBounds({ ...state.window.miniBounds, ...MINI_SIZE });
         const display = screen.getPrimaryDisplay().workArea;
         return {
             width: MINI_SIZE.width,
@@ -73,13 +76,15 @@ function initialBounds() {
     return NORMAL_SIZE;
 }
 
-function saveNormalBounds() {
-    if (!mainWindow || mainWindow.isDestroyed()) return;
+function saveWindowBounds() {
+    if (!mainWindow || mainWindow.isDestroyed() || suppressBoundsSave) return;
+    if (mainWindow.isMaximized() || mainWindow.isMinimized()) return;
     const state = Store.get();
-    if (state.window.mode !== "mini" && !mainWindow.isMaximized() && !mainWindow.isMinimized()) {
-        Store.patchSection("window", {
-            normalBounds: mainWindow.getBounds()
-        });
+    const bounds = clampBounds(mainWindow.getBounds());
+    if (state.window.mode === "mini") {
+        Store.patchSection("window", { miniBounds: bounds });
+    } else {
+        Store.patchSection("window", { normalBounds: bounds });
     }
 }
 
@@ -172,30 +177,40 @@ function showWindow() {
 
 async function setWindowMode(mode) {
     if (!mainWindow || mainWindow.isDestroyed()) return mode;
+    const next = mode === "mini" ? "mini" : "normal";
     const state = Store.get();
+    suppressBoundsSave = true;
 
-    if (mode === "mini") {
-        if (state.window.mode !== "mini" && !mainWindow.isMaximized()) {
-            Store.patchSection("window", { normalBounds: mainWindow.getBounds() });
-        }
+    try {
         if (mainWindow.isMaximized()) mainWindow.unmaximize();
-        const current = mainWindow.getBounds();
-        const display = screen.getDisplayMatching(current).workArea;
-        mainWindow.setBounds(clampBounds({
-            x: Math.min(current.x, display.x + display.width - MINI_SIZE.width),
-            y: Math.min(current.y, display.y + display.height - MINI_SIZE.height),
-            ...MINI_SIZE
-        }), true);
-    } else {
-        const target = state.window.normalBounds
-            ? clampBounds(state.window.normalBounds)
-            : { ...mainWindow.getBounds(), ...NORMAL_SIZE };
-        mainWindow.setBounds(target, true);
+        const current = clampBounds(mainWindow.getBounds());
+
+        if (next === "mini") {
+            if (state.window.mode !== "mini") {
+                Store.patchSection("window", { normalBounds: current, mode: "mini" });
+            }
+            const savedMini = Store.get().window.miniBounds;
+            const target = savedMini
+                ? clampBounds({ ...savedMini, ...MINI_SIZE })
+                : clampBounds({ x: current.x, y: current.y, ...MINI_SIZE });
+            mainWindow.setBounds(target, false);
+        } else {
+            if (state.window.mode === "mini") {
+                Store.patchSection("window", { miniBounds: current, mode: "normal" });
+            }
+            const savedNormal = Store.get().window.normalBounds;
+            const target = savedNormal
+                ? clampBounds(savedNormal)
+                : clampBounds({ x: current.x, y: current.y, ...NORMAL_SIZE });
+            mainWindow.setBounds(target, false);
+        }
+        Store.patchSection("window", { mode: next });
+    } finally {
+        setTimeout(() => { suppressBoundsSave = false; saveWindowBounds(); }, 80);
     }
 
-    Store.patchSection("window", { mode: mode === "mini" ? "mini" : "normal" });
     refreshTray();
-    return Store.get().window.mode;
+    return next;
 }
 
 function applyAutoStart(enabled) {
@@ -274,7 +289,7 @@ function createWindow() {
     let moveTimer = null;
     const remember = () => {
         clearTimeout(moveTimer);
-        moveTimer = setTimeout(saveNormalBounds, 250);
+        moveTimer = setTimeout(saveWindowBounds, 300);
     };
     mainWindow.on("move", remember);
     mainWindow.on("resize", remember);
@@ -286,7 +301,7 @@ function createWindow() {
             mainWindow.hide();
             return;
         }
-        saveNormalBounds();
+        saveWindowBounds();
     });
 
     mainWindow.on("closed", () => {
@@ -349,6 +364,14 @@ function wireIpc() {
     });
     ipcMain.handle("window:show", () => showWindow());
 
+
+    ipcMain.handle("external:open", async (_event, url) => {
+        const value = String(url || "");
+        if (!/^https:\/\//i.test(value)) return false;
+        await shell.openExternal(value);
+        return true;
+    });
+
     ipcMain.handle("notification:show", (_event, payload = {}) => {
         if (!Store.get().nativePrefs.notifications || !Notification.isSupported()) return false;
         const notification = new Notification({
@@ -391,7 +414,7 @@ app.whenReady().then(() => {
 
 app.on("before-quit", () => {
     isQuitting = true;
-    saveNormalBounds();
+    saveWindowBounds();
     Store.saveNow();
 });
 

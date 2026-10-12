@@ -3,7 +3,7 @@ const path = require("path");
 const { app } = require("electron");
 
 const DEFAULT_STATE = {
-    version: 1,
+    version: 2,
     library: {
         folders: [],
         tracks: []
@@ -22,6 +22,7 @@ const DEFAULT_STATE = {
     },
     window: {
         normalBounds: null,
+        miniBounds: null,
         mode: "normal"
     }
 };
@@ -81,7 +82,12 @@ function saveNow() {
     const temp = `${file}.tmp`;
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(temp, JSON.stringify(state, null, 2), "utf8");
-    fs.renameSync(temp, file);
+    try {
+        fs.renameSync(temp, file);
+    } catch {
+        try { fs.rmSync(file, { force: true }); } catch {}
+        fs.renameSync(temp, file);
+    }
 }
 
 function saveSoon() {

@@ -8,8 +8,13 @@ const Desktop = {
     },
 
     async init() {
-        if (!this.isDesktop || this.initialized) return;
+        if (this.initialized) return;
         this.initialized = true;
+
+        // Release links work in both the browser demo and Electron.
+        this.bindReleaseLinks();
+
+        if (!this.isDesktop) return;
         document.body.classList.add("desktop-app");
 
         this.bindNativeControls();
@@ -54,6 +59,24 @@ const Desktop = {
         closeToTray?.addEventListener("change", event => this.setPrefs({ closeToTray: event.target.checked }));
         notifications?.addEventListener("change", event => this.setPrefs({ notifications: event.target.checked }));
         autoRescan?.addEventListener("change", event => this.setPrefs({ autoRescan: event.target.checked }));
+    },
+
+    bindReleaseLinks() {
+        const open = url => {
+            if (!url || /YOUR-GITHUB|REPLACE_WITH/.test(url)) {
+                Pet?.say?.("set link in release config", 1500);
+                return;
+            }
+
+            if (this.api?.openExternal) {
+                this.api.openExternal(url);
+            } else {
+                window.open(url, "_blank", "noopener,noreferrer");
+            }
+        };
+
+        document.querySelector("#open-kritr-site")?.addEventListener("click", () => open(window.KRITR_RELEASE?.website));
+        document.querySelector("#open-kritr-video")?.addEventListener("click", () => open(window.KRITR_RELEASE?.video));
     },
 
     applyNativePrefs(prefs = {}) {

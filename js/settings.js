@@ -1,239 +1,126 @@
 const Settings = {
     initialized: false,
-
     defaults: {
-        uiScale: 110,
-        textSize: "normal",
-        density: "cozy",
-        crt: true,
-        crtStrength: 18,
-        reactive: true,
-        boot: true,
-        bootStyle: "cute",
-        visualizer: "bars",
-        visualizerIntensity: 100,
-        visualizerColor: "theme",
-        bassIntensity: "normal",
-        screenShake: true,
-        petActivity: "normal",
-        petReactions: true,
-        uiSounds: false,
-        windowMode: "normal"
+        uiScale: 110, textSize: "normal", density: "cozy", crt: true, crtStrength: 18,
+        reactive: true, boot: true, bootStyle: "cute", visualizer: "bars", visualizerIntensity: 100,
+        visualizerColor: "theme", bassIntensity: "normal", screenShake: true, petActivity: "normal",
+        petReactions: true, uiSounds: false, windowMode: "normal",
+        advancedAlbumSize: 100, advancedVizHeight: 100, advancedPetSize: 100,
+        advancedControlSize: 100, advancedGap: 100, advancedBorder: 3, advancedShowAlbum: true, advancedShowPet: true, advancedStatusbar: true
     },
 
     initialize() {
         if (this.initialized) return;
         this.initialized = true;
-
         const $ = id => document.querySelector(`#${id}`);
-        const val = (key, allowed = null) => {
-            const saved = KritrStorage.load(key, this.defaults[key]);
-            return allowed && !allowed.includes(saved) ? this.defaults[key] : saved;
-        };
-        const num = (key, min, max) => Math.min(max, Math.max(min, Number(val(key)) || this.defaults[key]));
-        const readout = (id, value) => {
-            const el = document.querySelector(`[data-for="${id}"]`);
-            if (el) el.value = `${value}%`;
-        };
+        const load = (key, fallback=this.defaults[key]) => KritrStorage.load(key, fallback);
+        const clamp = (value,min,max) => Math.min(max,Math.max(min,Number(value)||min));
+        const set = (id,value) => { const el=$(id); if(!el)return; if(el.type==="checkbox")el.checked=Boolean(value); else el.value=value; };
+        const output = (id,value,suffix="%") => { const el=document.querySelector(`[data-for="${id}"]`); if(el) el.value=`${value}${suffix}`; };
 
-        const saved = {
-            uiScale: num("uiScale", 90, 140),
-            textSize: val("textSize", ["small", "normal", "large", "xlarge"]),
-            density: val("density", ["compact", "cozy"]),
-            crt: Boolean(val("crt")),
-            crtStrength: num("crtStrength", 0, 100),
-            reactive: Boolean(val("reactive")),
-            boot: Boolean(val("boot")),
-            bootStyle: val("bootStyle", ["cute", "terminal", "instant"]),
-            visualizer: val("visualizer", ["bars", "wave", "dots", "spectrum", "blocks", "stars"]),
-            visualizerIntensity: num("visualizerIntensity", 50, 150),
-            visualizerColor: val("visualizerColor", ["theme", "mono", "rainbow"]),
-            bassIntensity: val("bassIntensity", ["subtle", "normal", "wild"]),
-            screenShake: Boolean(val("screenShake")),
-            petActivity: val("petActivity", ["low", "normal", "high"]),
-            petReactions: Boolean(val("petReactions")),
-            uiSounds: Boolean(val("uiSounds")),
-            windowMode: val("windowMode", ["normal", "mini"])
+        const s = {
+            uiScale: clamp(load("uiScale"),90,140), textSize: load("textSize"), density: load("density"),
+            crt: Boolean(load("crt")), crtStrength: clamp(load("crtStrength"),0,100), reactive: Boolean(load("reactive")),
+            boot: Boolean(load("boot")), bootStyle: load("bootStyle"), visualizer: load("visualizer"),
+            visualizerIntensity: clamp(load("visualizerIntensity"),50,150), visualizerColor: load("visualizerColor"),
+            bassIntensity: load("bassIntensity"), screenShake: Boolean(load("screenShake")), petActivity: load("petActivity"),
+            petReactions: Boolean(load("petReactions")), uiSounds: Boolean(load("uiSounds")), windowMode: load("windowMode"),
+            advancedAlbumSize: clamp(load("advancedAlbumSize"),70,150), advancedVizHeight: clamp(load("advancedVizHeight"),70,160),
+            advancedPetSize: clamp(load("advancedPetSize"),70,160), advancedControlSize: clamp(load("advancedControlSize"),80,140),
+            advancedGap: clamp(load("advancedGap"),60,160), advancedBorder: clamp(load("advancedBorder"),1,5),
+            advancedShowAlbum: Boolean(load("advancedShowAlbum")), advancedShowPet: Boolean(load("advancedShowPet")),
+            advancedStatusbar: Boolean(load("advancedStatusbar"))
         };
 
-        const set = (id, value) => {
-            const el = $(id);
-            if (!el) return;
-            if (el.type === "checkbox") el.checked = Boolean(value);
-            else el.value = value;
-        };
+        Object.entries({
+            "ui-scale":s.uiScale,"text-size":s.textSize,"ui-density":s.density,"crt-toggle":s.crt,"crt-strength":s.crtStrength,
+            "reactive-toggle":s.reactive,"boot-toggle":s.boot,"boot-style":s.bootStyle,"visualizer-select":s.visualizer,
+            "visualizer-intensity":s.visualizerIntensity,"visualizer-color":s.visualizerColor,"bass-intensity":s.bassIntensity,
+            "screen-shake":s.screenShake,"pet-activity":s.petActivity,"pet-reactions":s.petReactions,"ui-sounds":s.uiSounds,
+            "window-mode":s.windowMode,"advanced-album-size":s.advancedAlbumSize,"advanced-viz-height":s.advancedVizHeight,
+            "advanced-pet-size":s.advancedPetSize,"advanced-control-size":s.advancedControlSize,"advanced-gap":s.advancedGap,
+            "advanced-border":s.advancedBorder,"advanced-show-album":s.advancedShowAlbum,"advanced-show-pet":s.advancedShowPet,"advanced-statusbar":s.advancedStatusbar
+        }).forEach(([id,v])=>set(id,v));
 
-        set("ui-scale", saved.uiScale);
-        set("text-size", saved.textSize);
-        set("ui-density", saved.density);
-        set("crt-toggle", saved.crt);
-        set("crt-strength", saved.crtStrength);
-        set("reactive-toggle", saved.reactive);
-        set("boot-toggle", saved.boot);
-        set("boot-style", saved.bootStyle);
-        set("visualizer-select", saved.visualizer);
-        set("visualizer-intensity", saved.visualizerIntensity);
-        set("visualizer-color", saved.visualizerColor);
-        set("bass-intensity", saved.bassIntensity);
-        set("screen-shake", saved.screenShake);
-        set("pet-activity", saved.petActivity);
-        set("pet-reactions", saved.petReactions);
-        set("ui-sounds", saved.uiSounds);
-        set("window-mode", saved.windowMode);
+        this.applyScale(s.uiScale); this.applyTextSize(s.textSize); this.applyDensity(s.density); this.applyCRT(s.crt,s.crtStrength);
+        this.applyReactive(s.reactive); this.applyVisualizerIntensity(s.visualizerIntensity); Visualizer.setMode(s.visualizer);
+        this.applyVisualizerColor(s.visualizerColor); this.applyBass(s.bassIntensity,s.screenShake); Pet.setActivity(s.petActivity);
+        Pet.setReactions(s.petReactions); Features.uiSounds=s.uiSounds; Features.applyWindowMode(s.windowMode);
+        document.body.dataset.bootStyle=s.bootStyle; this.applyAdvanced(s);
 
-        this.applyScale(saved.uiScale);
-        this.applyTextSize(saved.textSize);
-        this.applyDensity(saved.density);
-        this.applyCRT(saved.crt, saved.crtStrength);
-        this.applyReactive(saved.reactive);
-        this.applyVisualizerIntensity(saved.visualizerIntensity);
-        Visualizer.setMode(saved.visualizer);
-        this.applyVisualizerColor(saved.visualizerColor);
-        this.applyBass(saved.bassIntensity, saved.screenShake);
-        Pet.setActivity(saved.petActivity);
-        Pet.setReactions(saved.petReactions);
-        Features.uiSounds = saved.uiSounds;
-        Features.applyWindowMode(saved.windowMode);
-        document.body.dataset.bootStyle = saved.bootStyle;
+        [["ui-scale",s.uiScale],["visualizer-intensity",s.visualizerIntensity],["crt-strength",s.crtStrength],
+         ["advanced-album-size",s.advancedAlbumSize],["advanced-viz-height",s.advancedVizHeight],["advanced-pet-size",s.advancedPetSize],
+         ["advanced-control-size",s.advancedControlSize],["advanced-gap",s.advancedGap]].forEach(([id,v])=>output(id,v));
+        output("advanced-border",s.advancedBorder,"px");
 
-        readout("ui-scale", saved.uiScale);
-        readout("visualizer-intensity", saved.visualizerIntensity);
-        readout("crt-strength", saved.crtStrength);
+        $("theme-select")?.addEventListener("change",e=>KritrThemes.set(e.target.value));
+        this.bindRange("ui-scale","uiScale",v=>this.applyScale(v),90,140,output);
+        $("text-size")?.addEventListener("change",e=>{this.applyTextSize(e.target.value);KritrStorage.save("textSize",e.target.value);});
+        $("ui-density")?.addEventListener("change",e=>{this.applyDensity(e.target.value);KritrStorage.save("density",e.target.value);});
+        $("visualizer-select")?.addEventListener("change",e=>{VisualiserSafe(e.target.value);});
+        function VisualiserSafe(v){ Visualizer.setMode(v); KritrStorage.save("visualizer",Visualizer.mode); }
+        this.bindRange("visualizer-intensity","visualizerIntensity",v=>this.applyVisualizerIntensity(v),50,150,output);
+        $("visualizer-color")?.addEventListener("change",e=>{this.applyVisualizerColor(e.target.value);KritrStorage.save("visualizerColor",e.target.value);});
+        $("crt-toggle")?.addEventListener("change",e=>{this.applyCRT(e.target.checked,Number($("crt-strength")?.value||18));KritrStorage.save("crt",e.target.checked);});
+        this.bindRange("crt-strength","crtStrength",v=>this.applyCRT($("crt-toggle")?.checked??true,v),0,100,output);
+        $("reactive-toggle")?.addEventListener("change",e=>{this.applyReactive(e.target.checked);KritrStorage.save("reactive",e.target.checked);});
+        $("bass-intensity")?.addEventListener("change",e=>{this.applyBass(e.target.value,$("screen-shake")?.checked);KritrStorage.save("bassIntensity",e.target.value);});
+        $("screen-shake")?.addEventListener("change",e=>{this.applyBass($("bass-intensity")?.value||"normal",e.target.checked);KritrStorage.save("screenShake",e.target.checked);});
+        $("pet-activity")?.addEventListener("change",e=>Pet.setActivity(e.target.value));
+        $("pet-reactions")?.addEventListener("change",e=>Pet.setReactions(e.target.checked));
+        $("boot-toggle")?.addEventListener("change",e=>KritrStorage.save("boot",e.target.checked));
+        $("boot-style")?.addEventListener("change",e=>{document.body.dataset.bootStyle=e.target.value;KritrStorage.save("bootStyle",e.target.value);});
+        $("window-mode")?.addEventListener("change",e=>Features.applyWindowMode(e.target.value));
+        $("ui-sounds")?.addEventListener("change",e=>{Features.uiSounds=e.target.checked;KritrStorage.save("uiSounds",e.target.checked);Features.playUISound("confirm");});
 
-        $("theme-select")?.addEventListener("change", e => KritrThemes.set(e.target.value));
-        $("ui-scale")?.addEventListener("input", e => {
-            const v = Number(e.target.value);
-            this.applyScale(v);
-            KritrStorage.save("uiScale", v);
-            readout("ui-scale", v);
-        });
-        $("text-size")?.addEventListener("change", e => {
-            this.applyTextSize(e.target.value);
-            KritrStorage.save("textSize", e.target.value);
-        });
-        $("ui-density")?.addEventListener("change", e => {
-            this.applyDensity(e.target.value);
-            KritrStorage.save("density", e.target.value);
-        });
-        $("visualizer-select")?.addEventListener("change", e => {
-            Visualizer.setMode(e.target.value);
-            KritrStorage.save("visualizer", Visualizer.mode);
-        });
-        $("visualizer-intensity")?.addEventListener("input", e => {
-            const v = Number(e.target.value);
-            this.applyVisualizerIntensity(v);
-            KritrStorage.save("visualizerIntensity", v);
-            readout("visualizer-intensity", v);
-        });
-        $("visualizer-color")?.addEventListener("change", e => {
-            this.applyVisualizerColor(e.target.value);
-            KritrStorage.save("visualizerColor", e.target.value);
-        });
-        $("crt-toggle")?.addEventListener("change", e => {
-            this.applyCRT(e.target.checked, Number($("crt-strength")?.value || 18));
-            KritrStorage.save("crt", e.target.checked);
-        });
-        $("crt-strength")?.addEventListener("input", e => {
-            const v = Number(e.target.value);
-            this.applyCRT($("crt-toggle")?.checked ?? true, v);
-            KritrStorage.save("crtStrength", v);
-            readout("crt-strength", v);
-        });
-        $("reactive-toggle")?.addEventListener("change", e => {
-            this.applyReactive(e.target.checked);
-            KritrStorage.save("reactive", e.target.checked);
-        });
-        $("bass-intensity")?.addEventListener("change", e => {
-            this.applyBass(e.target.value, $("screen-shake")?.checked);
-            KritrStorage.save("bassIntensity", e.target.value);
-        });
-        $("screen-shake")?.addEventListener("change", e => {
-            this.applyBass($("bass-intensity")?.value || "normal", e.target.checked);
-            KritrStorage.save("screenShake", e.target.checked);
-        });
-        $("pet-activity")?.addEventListener("change", e => Pet.setActivity(e.target.value));
-        $("pet-reactions")?.addEventListener("change", e => Pet.setReactions(e.target.checked));
-        $("boot-toggle")?.addEventListener("change", e => KritrStorage.save("boot", e.target.checked));
-        $("boot-style")?.addEventListener("change", e => {
-            document.body.dataset.bootStyle = e.target.value;
-            KritrStorage.save("bootStyle", e.target.value);
-        });
-        $("window-mode")?.addEventListener("change", e => Features.applyWindowMode(e.target.value));
-        $("ui-sounds")?.addEventListener("change", e => {
-            Features.uiSounds = e.target.checked;
-            KritrStorage.save("uiSounds", e.target.checked);
-            Features.playUISound("confirm");
-        });
-        $("shortcuts-btn")?.addEventListener("click", () => {
-            const help = $("shortcut-help");
-            if (help) help.hidden = !help.hidden;
-        });
-        $("reset-settings")?.addEventListener("click", () => {
-            if (!confirm("Reset Kritr settings? Your local playlist files are not affected.")) return;
-
-            [
-                "uiScale", "textSize", "density", "crt", "crtStrength", "reactive",
-                "boot", "bootStyle", "visualizer", "visualizerIntensity", "visualizerColor",
-                "bassIntensity", "screenShake", "petActivity", "petReactions", "uiSounds",
-                "windowMode", "theme", "shuffle", "repeat"
-            ].forEach(key => localStorage.removeItem(`kritr_${key}`));
-
-            location.reload();
-        });
+        $("advanced-toggle")?.addEventListener("click",()=>{ const panel=$("advanced-settings"); if(!panel)return; panel.hidden=!panel.hidden; $("advanced-toggle").setAttribute("aria-expanded",String(!panel.hidden)); $("advanced-toggle").textContent=panel.hidden?"OPEN ADVANCED SETTINGS":"CLOSE ADVANCED SETTINGS"; });
+        const advanced=[
+            ["advanced-album-size","advancedAlbumSize",70,150],["advanced-viz-height","advancedVizHeight",70,160],
+            ["advanced-pet-size","advancedPetSize",70,160],["advanced-control-size","advancedControlSize",80,140],
+            ["advanced-gap","advancedGap",60,160],["advanced-border","advancedBorder",1,5]
+        ];
+        advanced.forEach(([id,key,min,max])=>this.bindRange(id,key,()=>this.applyAdvancedFromControls(),min,max,(id,v)=>output(id,v,id==="advanced-border"?"px":"%")));
+        $("advanced-show-album")?.addEventListener("change",e=>{KritrStorage.save("advancedShowAlbum",e.target.checked);this.applyAdvancedFromControls();});
+        $("advanced-show-pet")?.addEventListener("change",e=>{KritrStorage.save("advancedShowPet",e.target.checked);this.applyAdvancedFromControls();});
+        $("advanced-statusbar")?.addEventListener("change",e=>{KritrStorage.save("advancedStatusbar",e.target.checked);this.applyAdvancedFromControls();});
+        $("reset-advanced")?.addEventListener("click",()=>this.resetAdvanced());
+        $("shortcuts-btn")?.addEventListener("click",()=>{const help=$("shortcut-help");if(help)help.hidden=!help.hidden;});
+        $("reset-settings")?.addEventListener("click",()=>{if(!confirm("Reset Kritr settings? Your saved music library will stay intact."))return; Object.keys(this.defaults).forEach(k=>localStorage.removeItem(`kritr_${k}`)); location.reload();});
     },
 
-    applyScale(value) {
-        document.documentElement.style.setProperty(
-            "--ui-scale",
-            Math.max(0.9, Math.min(1.4, value / 100))
-        );
+    bindRange(id,key,apply,min,max,outputFn){ const el=document.querySelector(`#${id}`); el?.addEventListener("input",e=>{const v=Math.min(max,Math.max(min,Number(e.target.value)));apply(v);KritrStorage.save(key,v);outputFn?.(id,v);}); },
+    applyScale(v){document.documentElement.style.setProperty("--ui-scale",Math.max(.9,Math.min(1.4,v/100)));},
+    applyTextSize(v){const m={small:.96,normal:1.06,large:1.18,xlarge:1.32};document.documentElement.style.setProperty("--font-scale",m[v]||m.normal);document.body.dataset.textSize=v;},
+    applyDensity(v){document.body.dataset.density=v;},
+    applyCRT(on,strength){document.documentElement.style.setProperty("--crt-opacity",Math.max(0,Math.min(1,strength/100)));const o=document.querySelector("#crt-overlay");if(o)o.style.display=on?"block":"none";},
+    applyReactive(on){document.querySelector(".kritr-window")?.classList.toggle("reactive-on",on);if(!on){document.documentElement.style.setProperty("--energy","0");document.documentElement.style.setProperty("--bass","0");}},
+    applyVisualizerIntensity(v){document.documentElement.style.setProperty("--viz-intensity",v/100);},
+    applyVisualizerColor(v){Visualizer.colorMode=v;document.body.dataset.vizColor=v;},
+    applyBass(level,shake){document.body.dataset.bassFx=level;document.body.dataset.screenShake=shake?"on":"off";},
+
+    applyAdvanced(s){
+        const r=document.documentElement.style;
+        r.setProperty("--adv-album-scale",s.advancedAlbumSize/100); r.setProperty("--adv-viz-scale",s.advancedVizHeight/100);
+        r.setProperty("--adv-pet-scale",s.advancedPetSize/100); r.setProperty("--adv-control-scale",s.advancedControlSize/100);
+        r.setProperty("--adv-gap-scale",s.advancedGap/100); r.setProperty("--adv-border",`${s.advancedBorder}px`);
+        document.body.dataset.albumArt=s.advancedShowAlbum?"on":"off";
+        document.body.dataset.pet=s.advancedShowPet?"on":"off";
+        document.body.dataset.statusbar=s.advancedStatusbar?"on":"off";
     },
-
-    applyTextSize(value) {
-        const scales = {
-            small: 0.96,
-            normal: 1.06,
-            large: 1.18,
-            xlarge: 1.32
-        };
-
-        document.documentElement.style.setProperty("--font-scale", scales[value] || scales.normal);
-        document.body.dataset.textSize = value;
+    applyAdvancedFromControls(){
+        const $=id=>document.querySelector(`#${id}`); const s={
+            advancedAlbumSize:Number($("advanced-album-size")?.value||100),advancedVizHeight:Number($("advanced-viz-height")?.value||100),
+            advancedPetSize:Number($("advanced-pet-size")?.value||100),advancedControlSize:Number($("advanced-control-size")?.value||100),
+            advancedGap:Number($("advanced-gap")?.value||100),advancedBorder:Number($("advanced-border")?.value||3),
+            advancedShowAlbum:$("advanced-show-album")?.checked??true,advancedShowPet:$("advanced-show-pet")?.checked??true,
+            advancedStatusbar:$("advanced-statusbar")?.checked??true
+        }; this.applyAdvanced(s);
     },
-
-    applyDensity(value) {
-        document.body.dataset.density = value;
-    },
-
-    applyCRT(on, strength) {
-        document.documentElement.style.setProperty(
-            "--crt-opacity",
-            Math.max(0, Math.min(1, strength / 100))
-        );
-
-        const overlay = document.querySelector("#crt-overlay");
-        if (overlay) overlay.style.display = on ? "block" : "none";
-    },
-
-    applyReactive(on) {
-        document.querySelector(".kritr-window")?.classList.toggle("reactive-on", on);
-        if (!on) {
-            document.documentElement.style.setProperty("--energy", "0");
-            document.documentElement.style.setProperty("--bass", "0");
-        }
-    },
-
-    applyVisualizerIntensity(value) {
-        document.documentElement.style.setProperty("--viz-intensity", value / 100);
-    },
-
-    applyVisualizerColor(value) {
-        Visualizer.colorMode = value;
-        document.body.dataset.vizColor = value;
-    },
-
-    applyBass(level, shake) {
-        document.body.dataset.bassFx = level;
-        document.body.dataset.screenShake = shake ? "on" : "off";
+    resetAdvanced(){
+        const values={"advanced-album-size":100,"advanced-viz-height":100,"advanced-pet-size":100,"advanced-control-size":100,"advanced-gap":100,"advanced-border":3};
+        Object.entries(values).forEach(([id,v])=>{const el=document.querySelector(`#${id}`);if(el)el.value=v;KritrStorage.save({"advanced-album-size":"advancedAlbumSize","advanced-viz-height":"advancedVizHeight","advanced-pet-size":"advancedPetSize","advanced-control-size":"advancedControlSize","advanced-gap":"advancedGap","advanced-border":"advancedBorder"}[id],v);const o=document.querySelector(`[data-for="${id}"]`);if(o)o.value=`${v}${id==="advanced-border"?"px":"%"}`;});
+        const album=document.querySelector("#advanced-show-album");if(album)album.checked=true;KritrStorage.save("advancedShowAlbum",true);
+        const pet=document.querySelector("#advanced-show-pet");if(pet)pet.checked=true;KritrStorage.save("advancedShowPet",true);
+        const status=document.querySelector("#advanced-statusbar");if(status)status.checked=true;KritrStorage.save("advancedStatusbar",true);this.applyAdvancedFromControls();Pet?.say?.("layout reset!",1000);
     }
 };

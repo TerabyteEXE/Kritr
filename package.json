@@ -1,7 +1,7 @@
 {
   "name": "kritr-player",
-  "version": "0.9.0",
-  "description": "Kritr — a tiny 8/16-bit desktop music player with personality.",
+  "version": "1.0.0",
+  "description": "Kritr V1 \u2014 an 8/16-bit Windows music player with persistent library, pets, themes, and deep customization.",
   "author": "TerabyteEXE",
   "license": "MIT",
   "main": "electron/main.js",
