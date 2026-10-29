@@ -67,3 +67,11 @@ The HTML/CSS/JS frontend still works in a normal browser as a demo. Browser secu
 - `npm run pack` — create an unpacked desktop build
 - `npm run dist` — create the Windows NSIS installer
 - `npm run dist:portable` — create a portable Windows executable
+
+
+## V1 customization update
+- Larger default/readable text sizing
+- 9 distinct ASCII pets (no anime-girl pet)
+- Extra color-family themes plus a persistent custom-theme builder
+- Advanced Settings now includes a live miniature of the real player layout
+- Website includes `website/wiki.html` with setup, library, themes, shortcuts, advanced customization and troubleshooting docs

@@ -530,7 +530,10 @@
                         <option value="slime">SLIME</option>
                         <option value="fox">FOX</option>
                         <option value="frog">FROG</option>
-                        <option value="girl">ANIME GIRL</option>
+                        <option value="puppy">PUPPY</option>
+                        <option value="owl">OWL</option>
+                        <option value="penguin">PENGUIN</option>
+                        <option value="axolotl">AXOLOTL</option>
                     </select>
 
                 </label>
@@ -605,37 +608,21 @@
                         <span>THEME</span>
                         <select id="theme-select">
                             <optgroup label="PINK / PURPLE">
-                                <option value="sakura">SAKURA</option>
-                                <option value="mochi">MOCHI PINK</option>
-                                <option value="candy">CANDY POP</option>
-                                <option value="lavender">LAVENDER DREAM</option>
-                                <option value="animenight">ANIME NIGHT</option>
-                                <option value="midnight">MIDNIGHT NEKO</option>
-                                <option value="cyber">CYBER ANGEL</option>
-                                <option value="synthwave">NIGHT DRIVE</option>
+                                <option value="sakura">SAKURA</option><option value="mochi">MOCHI PINK</option><option value="candy">CANDY POP</option><option value="lavender">LAVENDER DREAM</option><option value="animenight">ANIME NIGHT</option><option value="midnight">MIDNIGHT NEKO</option><option value="cyber">CYBER ANGEL</option><option value="synthwave">NIGHT DRIVE</option><option value="grape">GRAPE SODA</option>
                             </optgroup>
                             <optgroup label="BLUE / COOL">
-                                <option value="ice">ICE POP</option>
-                                <option value="aqua">AQUA OS</option>
-                                <option value="bluecrt">BLUE CRT</option>
+                                <option value="ice">ICE POP</option><option value="aqua">AQUA OS</option><option value="bluecrt">BLUE CRT</option><option value="cobalt">COBALT</option>
                             </optgroup>
                             <optgroup label="ORANGE / WARM">
-                                <option value="oxide">SUNSET</option>
-                                <option value="amber">RETRO CRT</option>
-                                <option value="dreamcast">DREAMCAST</option>
-                                <option value="nekocafe">NEKO CAFÉ</option>
-                                <option value="famicom">FAMICOM</option>
-                                <option value="arcade">ARCADE</option>
+                                <option value="oxide">SUNSET</option><option value="amber">RETRO CRT</option><option value="dreamcast">DREAMCAST</option><option value="nekocafe">NEKO CAFÉ</option><option value="famicom">FAMICOM</option><option value="arcade">ARCADE</option><option value="peach">PEACH CREAM</option>
                             </optgroup>
                             <optgroup label="GREEN / LCD">
-                                <option value="matcha">MATCHA</option>
-                                <option value="gameboy">GAMEBOY</option>
-                                <option value="lcd">MONO LCD</option>
-                                <option value="terminalgreen">TERMINAL GREEN</option>
+                                <option value="matcha">MATCHA</option><option value="gameboy">GAMEBOY</option><option value="lcd">MONO LCD</option><option value="terminalgreen">TERMINAL GREEN</option><option value="mint">MINT CHIP</option>
                             </optgroup>
                             <optgroup label="MONO / NEUTRAL">
-                                <option value="omarchy">MONO</option>
+                                <option value="omarchy">MONO</option><option value="paper">PAPER WHITE</option>
                             </optgroup>
+                            <optgroup label="YOUR THEME"><option value="custom">CUSTOM</option></optgroup>
                         </select>
                     </label>
                     <label class="setting-box">
@@ -760,18 +747,37 @@
                 <section id="advanced-settings" class="settings-category advanced-settings" hidden>
                     <h3>ADVANCED</h3>
 
-                    <div class="advanced-preview" aria-label="Live advanced settings preview">
-                        <div class="advanced-preview-title">LIVE PREVIEW</div>
-                        <div class="advanced-preview-player">
-                            <div class="advanced-preview-art">K</div>
-                            <div class="advanced-preview-viz" aria-hidden="true">
-                                <span></span><span></span><span></span><span></span><span></span>
+                    <div class="advanced-preview" aria-label="Live preview of the actual main Kritr widget">
+                        <div class="advanced-preview-title"><span>LIVE PLAYER PREVIEW</span><small>updates as you move the controls below</small></div>
+                        <div class="preview-kritr-window">
+                            <div class="preview-titlebar"><span class="preview-logo">◆ KRITR</span><span>_ □ ×</span></div>
+                            <div class="preview-tabs"><b>♪ PLAY</b><span>≡ LIST</span><span>♥ PET</span><span>⚙ SET</span></div>
+                            <div class="preview-body">
+                                <div class="preview-hero">
+                                    <div class="preview-cover"><span>K</span><small>KRITR MIX</small></div>
+                                    <div class="preview-viz-panel"><div class="preview-viz-head">♪ AUDIO <i>LIVE</i></div><div class="preview-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><pre class="preview-pet"> /\_/\
+( o.o )
+ &gt; ^ &lt;</pre></div>
+                                </div>
+                                <div class="preview-track"><b>YOUR SONG</b><small>YOUR ARTIST</small><em>♥</em></div>
+                                <div class="preview-progress"><span>0:42</span><i></i><span>3:21</span></div>
+                                <div class="preview-controls"><button>◀◀</button><button class="preview-play">▶</button><button>▶▶</button></div>
                             </div>
-                            <div class="advanced-preview-pet">/\_/\<br>( o.o )<br>&gt; ^ &lt;</div>
+                            <div class="preview-status">KRITR <span>LOCAL AUDIO</span><b>READY</b></div>
                         </div>
-                        <div class="advanced-preview-track">KRITR PREVIEW · ♪ NOW PLAYING</div>
-                        <div class="advanced-preview-controls"><i></i><i></i><i></i></div>
                     </div>
+
+                    <h4>CUSTOM THEME</h4>
+                    <p class="settings-note">Choose CUSTOM above, then build your own palette here. Changes save automatically.</p>
+                    <div class="custom-theme-grid">
+                        <label><span>BACKGROUND</span><input id="custom-bg" type="color" value="#101112"></label>
+                        <label><span>WINDOW</span><input id="custom-window" type="color" value="#1b1d1e"></label>
+                        <label><span>PRIMARY</span><input id="custom-accent" type="color" value="#f3f0e9"></label>
+                        <label><span>SECONDARY</span><input id="custom-accent2" type="color" value="#9ea6a8"></label>
+                        <label><span>TEXT</span><input id="custom-text" type="color" value="#f3f0e9"></label>
+                        <label><span>OUTLINE</span><input id="custom-outline" type="color" value="#050505"></label>
+                    </div>
+                    <button id="apply-custom-theme" class="small-button" type="button">APPLY CUSTOM THEME</button>
 
                     <h4>LAYOUT</h4>
                     <label class="setting-box"><span>ALBUM ART SIZE <output data-for="advanced-album-size">100%</output></span><input id="advanced-album-size" type="range" min="70" max="150" value="100"></label>

@@ -1,19 +1,12 @@
 const KritrThemes = {
-    allowed: [
-        "sakura", "cyber", "gameboy", "synthwave", "omarchy", "oxide", "ice", "amber",
-        "mochi", "bluecrt", "matcha", "candy", "midnight", "famicom", "lavender", "lcd",
-        "dreamcast", "nekocafe", "arcade", "aqua", "terminalgreen", "animenight"
-    ],
-
-    set(theme) {
-        const next = this.allowed.includes(theme) ? theme : "omarchy";
-        document.body.dataset.theme = next;
-        KritrStorage.save("theme", next);
-        const selector = document.querySelector("#theme-select");
-        if (selector && selector.value !== next) selector.value = next;
-        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", getComputedStyle(document.body).getPropertyValue("--window-bg").trim() || "#17141f");
-        Pet?.say?.(`${next.toUpperCase()} MODE!`, 1200);
-    },
-
-    load() { this.set(KritrStorage.load("theme", "omarchy")); }
+    allowed:["sakura","cyber","gameboy","synthwave","omarchy","oxide","ice","amber","mochi","bluecrt","matcha","candy","midnight","famicom","lavender","lcd","dreamcast","nekocafe","arcade","aqua","terminalgreen","animenight","grape","cobalt","peach","mint","paper","custom"],
+    customDefaults:{bg:"#101112",window:"#1b1d1e",accent:"#f3f0e9",accent2:"#9ea6a8",text:"#f3f0e9",outline:"#050505"},
+    hexRgb(hex){const h=String(hex).replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);return `${(n>>16)&255},${(n>>8)&255},${n&255}`;},
+    applyCustom(values=this.loadCustom()){const v={...this.customDefaults,...values},r=document.documentElement.style;r.setProperty('--bg-color',v.bg);r.setProperty('--window-bg',v.window);r.setProperty('--window-header',v.window);r.setProperty('--panel-bg',v.bg);r.setProperty('--panel-raised',v.window);r.setProperty('--accent-main',v.accent);r.setProperty('--accent-secondary',v.accent2);r.setProperty('--accent-rgb',this.hexRgb(v.accent));r.setProperty('--accent2-rgb',this.hexRgb(v.accent2));r.setProperty('--text-color',v.text);r.setProperty('--muted-color',v.accent2);r.setProperty('--border-color',v.accent2);r.setProperty('--dark-outline',v.outline);},
+    clearCustomVars(){['--bg-color','--window-bg','--window-header','--panel-bg','--panel-raised','--accent-main','--accent-secondary','--accent-rgb','--accent2-rgb','--text-color','--muted-color','--border-color','--dark-outline'].forEach(k=>document.documentElement.style.removeProperty(k));},
+    loadCustom(){return KritrStorage.load('customTheme',this.customDefaults);},
+    saveCustom(v){KritrStorage.save('customTheme',v);this.applyCustom(v);this.syncInputs(v);},
+    syncInputs(v=this.loadCustom()){const ids={bg:'custom-bg',window:'custom-window',accent:'custom-accent',accent2:'custom-accent2',text:'custom-text',outline:'custom-outline'};for(const[k,id]of Object.entries(ids)){const el=document.querySelector(`#${id}`);if(el)el.value=v[k]||this.customDefaults[k];}},
+    set(theme){const next=this.allowed.includes(theme)?theme:'omarchy';if(next==='custom')this.applyCustom();else this.clearCustomVars();document.body.dataset.theme=next;KritrStorage.save('theme',next);const selector=document.querySelector('#theme-select');if(selector&&selector.value!==next)selector.value=next;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',getComputedStyle(document.body).getPropertyValue('--window-bg').trim()||'#17141f');this.syncInputs();Pet?.say?.(`${next.toUpperCase()} MODE!`,900);},
+    load(){this.set(KritrStorage.load('theme','omarchy'));}
 };

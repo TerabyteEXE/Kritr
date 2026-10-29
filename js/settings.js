@@ -54,6 +54,10 @@ const Settings = {
         output("advanced-border",s.advancedBorder,"px");
 
         $("theme-select")?.addEventListener("change",e=>KritrThemes.set(e.target.value));
+        KritrThemes.syncInputs();
+        const customIds=["custom-bg","custom-window","custom-accent","custom-accent2","custom-text","custom-outline"];
+        customIds.forEach(id=>$(id)?.addEventListener("input",()=>this.applyCustomThemeFromControls(true)));
+        $("apply-custom-theme")?.addEventListener("click",()=>this.applyCustomThemeFromControls(true));
         this.bindRange("ui-scale","uiScale",v=>this.applyScale(v),90,140,output);
         $("text-size")?.addEventListener("change",e=>{this.applyTextSize(e.target.value);KritrStorage.save("textSize",e.target.value);});
         $("ui-density")?.addEventListener("change",e=>{this.applyDensity(e.target.value);KritrStorage.save("density",e.target.value);});
@@ -90,7 +94,7 @@ const Settings = {
 
     bindRange(id,key,apply,min,max,outputFn){ const el=document.querySelector(`#${id}`); el?.addEventListener("input",e=>{const v=Math.min(max,Math.max(min,Number(e.target.value)));apply(v);KritrStorage.save(key,v);outputFn?.(id,v);}); },
     applyScale(v){document.documentElement.style.setProperty("--ui-scale",Math.max(.9,Math.min(1.4,v/100)));},
-    applyTextSize(v){const m={small:.96,normal:1.06,large:1.18,xlarge:1.32};document.documentElement.style.setProperty("--font-scale",m[v]||m.normal);document.body.dataset.textSize=v;},
+    applyTextSize(v){const m={small:1.02,normal:1.14,large:1.28,xlarge:1.42};document.documentElement.style.setProperty("--font-scale",m[v]||m.normal);document.body.dataset.textSize=v;},
     applyDensity(v){document.body.dataset.density=v;},
     applyCRT(on,strength){document.documentElement.style.setProperty("--crt-opacity",Math.max(0,Math.min(1,strength/100)));const o=document.querySelector("#crt-overlay");if(o)o.style.display=on?"block":"none";},
     applyReactive(on){document.querySelector(".kritr-window")?.classList.toggle("reactive-on",on);if(!on){document.documentElement.style.setProperty("--energy","0");document.documentElement.style.setProperty("--bass","0");}},
@@ -115,6 +119,13 @@ const Settings = {
             advancedShowAlbum:$("advanced-show-album")?.checked??true,advancedShowPet:$("advanced-show-pet")?.checked??true,
             advancedStatusbar:$("advanced-statusbar")?.checked??true
         }; this.applyAdvanced(s);
+    },
+
+    applyCustomThemeFromControls(selectCustom=true){
+        const $=id=>document.querySelector(`#${id}`);
+        const v={bg:$("custom-bg")?.value||"#101112",window:$("custom-window")?.value||"#1b1d1e",accent:$("custom-accent")?.value||"#f3f0e9",accent2:$("custom-accent2")?.value||"#9ea6a8",text:$("custom-text")?.value||"#f3f0e9",outline:$("custom-outline")?.value||"#050505"};
+        KritrThemes.saveCustom(v);
+        if(selectCustom) KritrThemes.set("custom");
     },
     resetAdvanced(){
         const values={"advanced-album-size":100,"advanced-viz-height":100,"advanced-pet-size":100,"advanced-control-size":100,"advanced-gap":100,"advanced-border":3};
